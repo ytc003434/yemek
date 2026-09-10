@@ -37,6 +37,12 @@
 
   .slots{display:flex;gap:6px;flex:none}
   #acts .slot{min-height:46px;padding:7px 10px} #acts .slot b{font-size:13px}
+  .q{position:absolute;top:6px;right:8px;width:20px;height:20px;border-radius:50%;background:var(--ink);color:var(--card);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:2}
+  #calm p{font-size:15px;line-height:1.5;font-weight:600;color:var(--ink)} #calm p.m{color:var(--mute);font-size:13px}
+  .big{font-size:22px;font-weight:800;letter-spacing:-.03em;line-height:1.25}
+  .fact{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;gap:14px;align-items:baseline}
+  .fact b{font-size:28px;font-weight:800;letter-spacing:-.04em;flex:none;min-width:70px} .fact span{font-size:13px;font-weight:600;color:var(--mute);line-height:1.4}
+  .steps{display:flex;flex-direction:column;gap:8px} .steps div{background:var(--lime);border-radius:14px;padding:12px 14px;font-size:14px;font-weight:700}
   .slot.lift.done{background:#DCE3FF;border-color:#DCE3FF} .slot.lift .fill{background:#B9C6FF}
   .slot.cardio.done{background:#FFE1B8;border-color:#FFE1B8} .slot.cardio .fill{background:#FFC98A}
   .slot{flex:1;border-radius:14px;padding:9px 10px;background:var(--card);font-size:11px;font-weight:700;color:var(--mute);border:1px solid var(--line);position:relative;overflow:hidden;min-height:54px}
@@ -174,6 +180,26 @@
   <button class="pillb ghost" id="close">Kapat</button>
 </div>
 
+
+<div id="calm" class="sheet">
+  <h2>Sakin ol. Rakamlara bak.</h2>
+  <p class="big">Bugün hapı aldın ya da almadın — iki durumda da şu an kafanda dönen şey bir yan etki değil, Reddit'in yan etkisi.</p>
+  <p>Finasterid dünyanın en çok çalışılmış ilaçlarından biri. 1 mg dozunda, onay çalışmalarında cinsel yan etki bildiren erkek oranı yaklaşık %4'tü; şeker hapı (plasebo) alan grupta bu oran %2 civarıydı. Yani ilacın kendine ait ek riski birkaç yüzde puanı — ve bu vakaların büyük çoğunluğu ya kullanırken kendiliğinden geçti ya da bırakınca düzeldi.</p>
+  <div class="fact"><b>%15 → %44</b><span>Aynı ilaç, aynı doz. Yan etkiler anlatılmadan verilen grupta %15, "cinsel yan etki yapabilir" denilen grupta %44 şikâyet. Bu bir nocebo çalışması; korku, yan etkinin ta kendisini üretiyor.</span></div>
+  <div class="fact"><b>~3 puan</b><span>İlacın plaseboya göre gerçek ek yan etki farkı. Reddit'te okuduğun her şey bu küçük dilimin, on binlerce sorunsuz kullanıcının sesi olmadığı bir yerde toplanmış hâli.</span></div>
+  <div class="fact"><b>10 milyon+</b><span>Yıllardır kullanan erkek sayısı bu ölçekte. Sorun yaşamayan hiç kimse gidip "bugün de bir şey olmadı" diye post açmıyor.</span></div>
+  <p class="m">Kalıcı sendrom iddiaları bilim dünyasında hâlâ tartışmalı; bildirilen vaka sayısı kullanan milyonlara oranla son derece küçük ve büyük kısmında kanıt seviyesi zayıf. Bu, "sıfır" demek değil — ama bir Reddit sayfasının sana hissettirdiğinden çok, çok uzak.</p>
+  <h3>Şimdi ne yapacaksın</h3>
+  <div class="steps">
+    <div>1. Google'ı ve Reddit'i kapat. Şu an okuyacağın hiçbir şey seni rahatlatmayacak, algoritma korkuyu ödüllendiriyor.</div>
+    <div>2. Vücudunu tarama. Hissettiğin şey "acaba" ile bakınca büyüyen normal dalgalanma. Bugün bir şey ölçmek zorunda değilsin.</div>
+    <div>3. Kararı tek başına Reddit'le değiştirme. Rahatsızlık iki haftadan uzun sürerse dermatoloğunla konuş; o senin için karar verecek doğru kişi, yabancılar değil.</div>
+    <div>4. Bu ekranı kapat, sağa kaydır, devam et.</div>
+  </div>
+  <p class="m">Bu bir bilgilendirme, tıbbi tavsiye değil. Rakamlar 1 mg finasterid faz III çalışmaları ve nocebo araştırmalarından; ilaç kararların doktorunla.</p>
+  <button class="pillb" id="calmClose">Tamam, geçti</button>
+</div>
+
 <div id="psheet" class="sheet">
   <h2>Profil</h2>
   <div class="fields">
@@ -306,7 +332,7 @@ function render(){
   const ar=$('acts'); ar.innerHTML='';
   ACTS.forEach(a=>{ const el=document.createElement('div'); el.className='slot '+a.cls; if(a.k==='pills') el.id='pill'; const done=actToday(a.k); if(done) el.classList.add('done');
     const sub=done?(a.weekly?`✓ ${actWeek(a.k)}/hafta`:`✓ ${actStreak(a.k)} gün`):(a.weekly?`${actWeek(a.k)}/hafta`:'basılı tut');
-    el.innerHTML=`<div class="fill"></div><span class="e">${a.e} ${a.n}</span><b>${sub}</b>`; ar.appendChild(el); bindAct(el,a); });
+    el.innerHTML=`<div class="fill"></div><span class="e">${a.e} ${a.n}</span><b>${sub}</b>${a.k==='pills'?'<span class="q" id="fmq">?</span>':''}`; ar.appendChild(el); bindAct(el,a); if(a.k==='pills') el.querySelector('#fmq').addEventListener('click',ev=>{ ev.stopPropagation(); openCalm(); }); });
   $('hintL').textContent=st.cheats>0?`← serbest kart ×${st.cheats}`:'← kötü';
   $('snd').textContent='ses: '+(st.sound?'açık':'kapalı'); $('snd').classList.toggle('on',st.sound);
 }
@@ -375,7 +401,7 @@ $('snd').onclick=()=>{ st.sound=!st.sound; save(); render(); if(st.sound){ unloc
 // ---------- basılı tut mekaniği ----------
 function bindAct(el,a){
   const fill=()=>el.querySelector('.fill'); const HOLD=1500; let hold=null,k=0,tapT=0;
-  const down=e=>{ if(actToday(a.k)){ tapT=performance.now(); return; } e.preventDefault&&e.preventDefault(); A(); const t0=performance.now(); let lastS=0;
+  const down=e=>{ if(e.target.classList&&e.target.classList.contains('q')) return; if(actToday(a.k)){ tapT=performance.now(); return; } e.preventDefault&&e.preventDefault(); A(); const t0=performance.now(); let lastS=0;
     hold=requestAnimationFrame(function step(now){ k=Math.min(1,(now-t0)/HOLD); if(fill()) fill().style.height=k*100+'%';
       if(k-lastS>.12){ lastS=k; sCharge(k); vib(6); }
       if(k>=1){ hold=null; doAct(a,el); } else hold=requestAnimationFrame(step); }); };
@@ -471,6 +497,9 @@ function processDays(){
   if(lost){ st.fit=clamp(st.fit-lost,0,100); setTimeout(()=>{ word(`−${lost} yakınlık · ${missedDays} gün eksik kayıt`,'cool'); sBad(); vib(30); setFit(st.fit); },600); }
   save();
 }
+
+function openCalm(){ $('calm').classList.add('open'); vib(10); }
+$('calmClose').onclick=()=>{ $('calm').classList.remove('open'); sGood(); word('DEVAM','big'); };
 
 // ---------- boot ----------
 processDays(); render(); setFit(st.fit,false); checkSlots();
