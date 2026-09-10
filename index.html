@@ -36,6 +36,9 @@
   .bar i{display:block;height:100%;width:0;background:var(--ink);transition:width .6s cubic-bezier(.2,.8,.2,1)}
 
   .slots{display:flex;gap:6px;flex:none}
+  #acts .slot{min-height:46px;padding:7px 10px} #acts .slot b{font-size:13px}
+  .slot.lift.done{background:#DCE3FF;border-color:#DCE3FF} .slot.lift .fill{background:#B9C6FF}
+  .slot.cardio.done{background:#FFE1B8;border-color:#FFE1B8} .slot.cardio .fill{background:#FFC98A}
   .slot{flex:1;border-radius:14px;padding:9px 10px;background:var(--card);font-size:11px;font-weight:700;color:var(--mute);border:1px solid var(--line);position:relative;overflow:hidden;min-height:54px}
   .slot b{display:block;font-size:14px;color:var(--ink);margin-top:1px;position:relative;letter-spacing:-.02em}
   .slot.good{background:var(--lime);border-color:var(--lime);color:var(--limedeep)}
@@ -126,6 +129,7 @@
     <div class="bar"><i id="xpBar"></i></div>
   </div>
   <div class="slots" id="slots"></div>
+  <div class="slots" id="acts"></div>
 
   <main>
     <div id="card">
@@ -192,7 +196,7 @@
 <script>
 // ---------- storage ----------
 const KEY='yemek_log_v2', SKEY='yemek_settings';
-let log=[], st={sound:true,notified:{},fit:18,pills:[],hgt:'',goal:'',weights:[],photos:[],processed:0,cheats:0,weekDone:0};
+let log=[], st={sound:true,notified:{},fit:18,pills:[],hgt:'',goal:'',weights:[],photos:[],processed:0,cheats:0,weekDone:0,lift:[],cardio:[]};
 try{ log=JSON.parse(localStorage.getItem(KEY)||'[]'); st=Object.assign(st,JSON.parse(localStorage.getItem(SKEY)||'{}')); }catch(e){}
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(log)); localStorage.setItem(SKEY,JSON.stringify(st)); return true; }catch(e){ return false; } }
 
@@ -204,16 +208,26 @@ const dayStart=(d=new Date())=>{ const x=new Date(d); x.setHours(0,0,0,0); retur
 const inWeek=ws=>log.filter(e=>e.t>=ws&&e.t<ws+7*864e5);
 const thisWeek=()=>inWeek(weekStart().getTime());
 const today=()=>log.filter(e=>e.t>=dayStart());
-const pillToday=()=>st.pills.some(t=>t>=dayStart());
+
 const hhmm=(h,m)=>`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
+
+// ---------- günlük aksiyonlar: F+M / ağırlık / kardiyo ----------
+const ACTS=[
+ {k:'pills',cls:'pill',e:'💊',n:'F+M',fit:8,xp:15,word:'+15 SAÇ KÖKÜ',wcls:'pinkw',cols:['#FFB4D1','#FF5FA2','#15171A','#C6F53A'],flash:'rgba(255,180,209,.9)',weekly:false},
+ {k:'lift',cls:'lift',e:'🏋️',n:'Ağırlık',fit:7,xp:20,word:'KAS DOLUYOR',wcls:'huge',cols:['#B9C6FF','#4A6CFF','#15171A','#C6F53A'],flash:'rgba(185,198,255,.9)',weekly:true},
+ {k:'cardio',cls:'cardio',e:'🏃',n:'Kardiyo',fit:6,xp:20,word:'KALP ATIYOR',wcls:'huge',cols:['#FFC98A','#FF8A1A','#15171A','#C6F53A'],flash:'rgba(255,201,138,.9)',weekly:true}];
+const actToday=k=>st[k].some(t=>t>=dayStart());
+const actWeek=k=>st[k].filter(t=>t>=weekStart().getTime()).length;
+function actStreak(k){ let s=0, d=dayStart(); if(!actToday(k)) d-=864e5; while(st[k].some(t=>t>=d&&t<d+864e5)){ s++; d-=864e5; } return s; }
+
 // ---------- xp / rank ----------
 const RANKS=[[0,'Çaylak'],[100,'Düzenli'],[300,'Disiplinli'],[700,'Makine'],[1500,'Efsane'],[3000,'Başka Boyut']];
-function xp(){ let x=0,s=0; for(const e of log){ if(e.good){ s++; x+=(10+Math.min(s,10)*2)*(e.jackpot?3:1); } else if(!e.cheat) s=0; } return x+st.pills.length*15; }
+function xp(){ let x=0,s=0; for(const e of log){ if(e.good){ s++; x+=(10+Math.min(s,10)*2)*(e.jackpot?3:1); } else if(!e.cheat) s=0; } return x+st.pills.length*15+(st.lift.length+st.cardio.length)*20; }
 function streakNow(){ let s=0; for(let i=log.length-1;i>=0;i--){ if(log[i].good) s++; else if(!log[i].cheat) break; } return s; }
 function rankOf(x){ let i=0; while(i+1<RANKS.length&&x>=RANKS[i+1][0]) i++; return i; }
-function pillStreak(){ let s=0, d=dayStart(); if(!pillToday()) d-=864e5; while(st.pills.some(t=>t>=d&&t<d+864e5)){ s++; d-=864e5; } return s; }
+const pillToday=()=>actToday('pills'); const pillStreak=()=>actStreak('pills');
 
 // ---------- copy ----------
 const GOOD=["YAKLAŞTIN","GLOW +1","YÜZÜN PARLIYOR","FOTOLARDA NET","CİLT LEVEL UP","TEMİZ ENERJİ","ÇENE HATTI GELİYOR","BUGÜN KAZANDIN","MAKİNE GİBİ","ATEŞ ATEŞ","DİSİPLİN = ÖZGÜRLÜK","KIZLAR FARK ETTİ"];
@@ -275,9 +289,9 @@ function render(){
   $('rate').textContent=w.length?Math.round(good/w.length*100)+'%':'—';
   $('streak').textContent=streakNow();
   const g=$('grid'); g.innerHTML=''; const wsT=weekStart().getTime(); const DAYS=['Pt','Sa','Ça','Pe','Cu','Ct','Pa'];
-  for(let d=0;d<7;d++){ const ds=wsT+d*864e5, de=ds+864e5; const meals=log.filter(e=>e.t>=ds&&e.t<de).slice(0,3); const pill=st.pills.some(t=>t>=ds&&t<de);
+  for(let d=0;d<7;d++){ const ds=wsT+d*864e5, de=ds+864e5; const meals=log.filter(e=>e.t>=ds&&e.t<de).slice(0,3); const pill=st.pills.some(t=>t>=ds&&t<de), lf=st.lift.some(t=>t>=ds&&t<de), cd=st.cardio.some(t=>t>=ds&&t<de);
     const col=document.createElement('div'); col.className='col'+(dayStart()===ds?' today':''); col.innerHTML=`<small>${DAYS[d]}</small>`;
-    for(let m=0;m<3;m++){ const dot=document.createElement('div'); dot.className='d'; if(meals[m]) dot.classList.add(meals[m].good?'good':(meals[m].cheat?'cheat':'bad')); if(meals[m]&&meals[m].jackpot) dot.innerHTML='<span class="pe">⭐</span>'; if(m===2&&pill) dot.innerHTML='<span class="pe">💊</span>'; dot.dataset.k=d+'-'+m; col.appendChild(dot); }
+    for(let m=0;m<3;m++){ const dot=document.createElement('div'); dot.className='d'; if(meals[m]) dot.classList.add(meals[m].good?'good':(meals[m].cheat?'cheat':'bad')); if(meals[m]&&meals[m].jackpot) dot.innerHTML='<span class="pe">⭐</span>'; if(m===2&&pill) dot.innerHTML='<span class="pe">💊</span>'; if(m===1&&(lf||cd)) dot.innerHTML=`<span class="pe">${lf&&cd?'💪':(lf?'🏋️':'🏃')}</span>`; dot.dataset.k=d+'-'+m; col.appendChild(dot); }
     g.appendChild(col); }
   $('undo').disabled=!log.length;
   const ws=weekStart(); const we=new Date(ws); we.setDate(we.getDate()+6);
@@ -289,8 +303,10 @@ function render(){
   SLOTS.forEach((s,i)=>{ const el=document.createElement('div'); el.className='slot'; const e=td[i]; const due=new Date(); due.setHours(s.h,s.m,0,0);
     if(e) el.classList.add(e.good?'good':(e.cheat?'cheat':'bad')); else if(now>due&&now-due>3*36e5) el.classList.add('miss'); else if(Math.abs(now-due)<9e5) el.classList.add('now');
     el.innerHTML=`${s.n}<b>${e?(e.good?'iyi':(e.cheat?'serbest':'kötü')):hhmm(s.h,s.m)}</b>`; sl.appendChild(el); });
-  const pl=document.createElement('div'); pl.className='slot'; pl.id='pill'; const done=pillToday(); if(done) pl.classList.add('done');
-  pl.innerHTML=`<div class="fill" id="pfill"></div><span class="e">💊 F+M</span><b>${done?`✓ ${pillStreak()} gün`:'basılı tut'}</b>`; sl.appendChild(pl); bindPill(pl);
+  const ar=$('acts'); ar.innerHTML='';
+  ACTS.forEach(a=>{ const el=document.createElement('div'); el.className='slot '+a.cls; if(a.k==='pills') el.id='pill'; const done=actToday(a.k); if(done) el.classList.add('done');
+    const sub=done?(a.weekly?`✓ ${actWeek(a.k)}/hafta`:`✓ ${actStreak(a.k)} gün`):(a.weekly?`${actWeek(a.k)}/hafta`:'basılı tut');
+    el.innerHTML=`<div class="fill"></div><span class="e">${a.e} ${a.n}</span><b>${sub}</b>`; ar.appendChild(el); bindAct(el,a); });
   $('hintL').textContent=st.cheats>0?`← serbest kart ×${st.cheats}`:'← kötü';
   $('snd').textContent='ses: '+(st.sound?'açık':'kapalı'); $('snd').classList.toggle('on',st.sound);
 }
@@ -323,7 +339,7 @@ function meet(){ setTimeout(()=>{ word('BULUŞTULAR 🎉','pinkw'); for(let i=0;
 // ---------- swipe ----------
 const card=$('card'), tint=$('tint'); let sx=0,sy=0,dx=0,dragging=false,titleIdx=0,lastTick=false; const TH=90;
 function pos(e){ const t=e.touches?e.touches[0]:e; return [t.clientX,t.clientY]; }
-function start(e){ if(e.target.closest&&e.target.closest('#pill')) return; [sx,sy]=pos(e); dx=0; dragging=true; card.classList.remove('snap'); A(); }
+function start(e){ if(e.target.closest&&e.target.closest('.slot')) return; [sx,sy]=pos(e); dx=0; dragging=true; card.classList.remove('snap'); A(); }
 function move(e){ if(!dragging) return; const [x,y]=pos(e); dx=x-sx; const dy=(y-sy)*.25;
   card.style.transform=`translate(${dx}px,${dy}px) rotate(${dx/18}deg)`; const k=Math.min(Math.abs(dx)/TH,1);
   tint.style.opacity=k*.55; tint.style.background=dx>0?'#C6F53A':'#C9CDD4';
@@ -356,27 +372,27 @@ addEventListener('keydown',e=>{ if(e.key==='ArrowRight'){dx=TH;dragging=true;end
 $('undo').onclick=()=>{ const e=log.pop(); if(e){ if(e.cheat){ st.cheats++; } else st.fit=clamp(st.fit-(e.good?6:-5),0,100); } save(); render(); setFit(st.fit); vib(10); };
 $('snd').onclick=()=>{ st.sound=!st.sound; save(); render(); if(st.sound){ unlock(); sTick(); } };
 
-// ---------- F+M pill: basılı tut ----------
-let hold=null, holdK=0;
-function bindPill(el){
-  const fill=()=>$('pfill'); const HOLD=1500;
-  let tapT=0;
-  const down=e=>{ if(pillToday()){ tapT=performance.now(); return; } e.preventDefault&&e.preventDefault(); A(); const t0=performance.now(); let lastS=0;
-    hold=requestAnimationFrame(function step(now){ holdK=Math.min(1,(now-t0)/HOLD); if(fill()) fill().style.height=holdK*100+'%';
-      if(holdK-lastS>.12){ lastS=holdK; sCharge(holdK); vib(6); }
-      if(holdK>=1){ hold=null; takePill(); } else hold=requestAnimationFrame(step); }); };
-  const up=()=>{ if(tapT&&performance.now()-tapT<400){ tapT=0; st.pills=st.pills.filter(t=>t<dayStart()); st.fit=clamp(st.fit-8,0,100); save(); render(); setFit(st.fit); vib(10); word('F+M geri alındı','cool'); return; } tapT=0; if(hold){ cancelAnimationFrame(hold); hold=null; } if(holdK<1&&fill()){ fill().style.transition='height .25s'; fill().style.height='0%'; setTimeout(()=>{ if(fill()) fill().style.transition=''; },260); } holdK=0; };
+// ---------- basılı tut mekaniği ----------
+function bindAct(el,a){
+  const fill=()=>el.querySelector('.fill'); const HOLD=1500; let hold=null,k=0,tapT=0;
+  const down=e=>{ if(actToday(a.k)){ tapT=performance.now(); return; } e.preventDefault&&e.preventDefault(); A(); const t0=performance.now(); let lastS=0;
+    hold=requestAnimationFrame(function step(now){ k=Math.min(1,(now-t0)/HOLD); if(fill()) fill().style.height=k*100+'%';
+      if(k-lastS>.12){ lastS=k; sCharge(k); vib(6); }
+      if(k>=1){ hold=null; doAct(a,el); } else hold=requestAnimationFrame(step); }); };
+  const up=()=>{ if(tapT&&performance.now()-tapT<400){ tapT=0; st[a.k]=st[a.k].filter(t=>t<dayStart()); st.fit=clamp(st.fit-a.fit,0,100); save(); render(); setFit(st.fit); vib(10); word(`${a.n} geri alındı`,'cool'); return; } tapT=0;
+    if(hold){ cancelAnimationFrame(hold); hold=null; } if(k<1&&fill()){ fill().style.transition='height .25s'; fill().style.height='0%'; setTimeout(()=>{ if(fill()) fill().style.transition=''; },260); } k=0; };
   el.addEventListener('touchstart',down,{passive:false}); el.addEventListener('touchend',up); el.addEventListener('touchcancel',up);
   el.addEventListener('mousedown',down); el.addEventListener('mouseup',up); el.addEventListener('mouseleave',up);
 }
-function takePill(){
-  const before=xp(), rBefore=rankOf(before), fitBefore=st.fit;
-  st.pills.push(Date.now()); st.fit=clamp(st.fit+8,0,100); save(); render();
-  const el=$('pill'); const r=el.getBoundingClientRect(); const cx=r.left+r.width/2, cy=r.top+r.height/2;
-  flash('radial-gradient(circle at 70% 25%, rgba(255,180,209,.9), rgba(255,95,162,.2) 55%, transparent)');
-  burst(120,['#FFB4D1','#FF5FA2','#15171A','#C6F53A'],cx,cy,6.3,7);
-  for(let i=0;i<3;i++) setTimeout(()=>burst(90,['#FFB4D1','#C6F53A','#15171A'],innerWidth*(.25+.25*i),innerHeight*.4,3.2,9),200+i*160);
-  word('+15 SAÇ KÖKÜ','pinkw'); setTimeout(()=>word(`F+M gün ${pillStreak()} · +15 xp`,'xp'),300);
+function doAct(a,el){
+  const rBefore=rankOf(xp()), fitBefore=st.fit;
+  st[a.k].push(Date.now()); st.fit=clamp(st.fit+a.fit,0,100); save();
+  const r=el.getBoundingClientRect(); const cx=r.left+r.width/2, cy=r.top+r.height/2; render();
+  flash(`radial-gradient(circle at ${Math.round(cx/innerWidth*100)}% ${Math.round(cy/innerHeight*100)}%, ${a.flash}, transparent 55%)`);
+  burst(120,a.cols,cx,cy,6.3,7); for(let i=0;i<3;i++) setTimeout(()=>burst(90,a.cols,innerWidth*(.25+.25*i),innerHeight*.4,3.2,9),200+i*160);
+  const both=actToday('lift')&&actToday('cardio')&&a.k!=='pills';
+  word(a.word,a.wcls); setTimeout(()=>word(a.weekly?`${a.n} ${actWeek(a.k)}. antrenman · +${a.xp} xp`:`F+M gün ${actStreak('pills')} · +${a.xp} xp`,'xp'),300);
+  if(both) setTimeout(()=>{ word('ÇİFT ANTRENMAN 💪','huge'); burst(160,['#B9C6FF','#FFC98A','#15171A','#C6F53A'],innerWidth/2,innerHeight*.45,5,10); },1100);
   shake(); vib([50,30,50,30,50,30,250]); sHuge();
   setTimeout(()=>setFit(st.fit),300); if(st.fit>=100&&fitBefore<100) meet();
   if(rankOf(xp())>rBefore) rankUp(RANKS[rankOf(xp())][1]);
@@ -406,11 +422,11 @@ function openSheet(){ const h=$('hist'); h.innerHTML=''; let max=1, rows=[];
   for(let k=5;k>=0;k--){ const ws=new Date(weekStart()); ws.setDate(ws.getDate()-7*k); const g=inWeek(ws.getTime()).filter(e=>e.good).length; max=Math.max(max,g); rows.push([ws,g]); }
   rows.forEach(([ws,g])=>{ const d=document.createElement('div'); d.innerHTML=`<i style="height:${Math.max(4,g/Math.max(max,21)*90)}px"></i>${g}<span>${ws.getDate()}/${ws.getMonth()+1}</span>`; h.appendChild(d); });
   const tg=log.filter(e=>e.good).length; let best=0,cur=0; for(const e of log){ cur=e.good?cur+1:0; best=Math.max(best,cur); }
-  $('kpi').innerHTML=`<div><b>${log.length}</b>yemek</div><div><b>${tg}</b>iyi</div><div><b>${best}</b>en uzun seri</div><div><b>${st.pills.length}</b>F+M toplam</div><div><b>${pillStreak()}</b>F+M seri</div><div><b>${st.cheats||0}</b>serbest kart</div><div><b>${xp()}</b>xp</div>`;
+  $('kpi').innerHTML=`<div><b>${log.length}</b>yemek</div><div><b>${tg}</b>iyi</div><div><b>${best}</b>en uzun seri</div><div><b>${st.pills.length}</b>F+M toplam</div><div><b>${pillStreak()}</b>F+M seri</div><div><b>${st.lift.length}</b>ağırlık</div><div><b>${st.cardio.length}</b>kardiyo</div><div><b>${st.cheats||0}</b>serbest kart</div><div><b>${xp()}</b>xp</div>`;
   notifState(); calLinks(); $('sheet').classList.add('open'); }
 $('stats').onclick=openSheet; $('close').onclick=()=>$('sheet').classList.remove('open');
 $('share').onclick=()=>{ const w=thisWeek(), g=w.filter(e=>e.good).length; const dots=Array.from({length:21},(_,i)=>w[i]?(w[i].good?'🟢':(w[i].cheat?'⚪':'🔘')):'⚫').join('');
-  const txt=`Bu hafta ${g}/${w.length} iyi yemek · F+M ${pillStreak()} gün\n${dots}\nRütbe: ${RANKS[rankOf(xp())][1]} · ${Math.round(st.fit)}% yakın`; if(navigator.share) navigator.share({text:txt}).catch(()=>{}); else { try{ navigator.clipboard.writeText(txt); }catch(e){} } };
+  const txt=`Bu hafta ${g}/${w.length} iyi yemek · 🏋️ ${actWeek('lift')} · 🏃 ${actWeek('cardio')} · F+M ${pillStreak()} gün\n${dots}\nRütbe: ${RANKS[rankOf(xp())][1]} · ${Math.round(st.fit)}% yakın`; if(navigator.share) navigator.share({text:txt}).catch(()=>{}); else { try{ navigator.clipboard.writeText(txt); }catch(e){} } };
 
 // ---------- profile ----------
 const monthKey=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
