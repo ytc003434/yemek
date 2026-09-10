@@ -330,9 +330,12 @@ const DIST=p=>p<.15?'aynı şehirde bile değiller':p<.3?'uzaktan bakıyorlar':p
 
 // ---------- sound ----------
 let ac, unlocked=false;
-function A(){ if(!st.sound) return null; try{ ac=ac||new (window.AudioContext||window.webkitAudioContext)(); if(ac.state==='suspended') ac.resume(); return ac; }catch(e){ return null; } }
-function unlock(){ const a=A(); if(!a||unlocked) return; try{ const b=a.createBuffer(1,1,22050), s=a.createBufferSource(); s.buffer=b; s.connect(a.destination); s.start(0); unlocked=true; }catch(e){} }
-['touchend','mouseup','click','keydown'].forEach(ev=>addEventListener(ev,unlock,{passive:true}));
+function A(){ if(!st.sound) return null; try{ if(!ac) ac=new (window.AudioContext||window.webkitAudioContext)(); if(ac.state!=='running'){ ac.resume().catch(()=>{}); if(ac.state==='closed'){ ac=new (window.AudioContext||window.webkitAudioContext)(); unlocked=false; } } return ac; }catch(e){ return null; } }
+function unlock(){ const a=A(); if(!a) return; try{ if(a.state!=='running') a.resume().catch(()=>{}); const b=a.createBuffer(1,1,22050), s=a.createBufferSource(); s.buffer=b; s.connect(a.destination); s.start(0); unlocked=true; }catch(e){} }
+['touchstart','touchend','mousedown','click','keydown'].forEach(ev=>addEventListener(ev,unlock,{passive:true,capture:true}));
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&ac) ac.resume().catch(()=>{}); });
+addEventListener('pageshow',()=>{ if(ac) ac.resume().catch(()=>{}); });
+addEventListener('focus',()=>{ if(ac) ac.resume().catch(()=>{}); });
 function tone(f,t0,dur,type='sine',g=.18){ const a=A(); if(!a) return; const o=a.createOscillator(), v=a.createGain(); o.type=type; o.frequency.setValueAtTime(f,a.currentTime+t0);
   v.gain.setValueAtTime(0,a.currentTime+t0); v.gain.linearRampToValueAtTime(g,a.currentTime+t0+.01); v.gain.exponentialRampToValueAtTime(.001,a.currentTime+t0+dur);
   o.connect(v).connect(a.destination); o.start(a.currentTime+t0); o.stop(a.currentTime+t0+dur+.05); }
