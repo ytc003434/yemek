@@ -58,7 +58,15 @@
   main{flex:1;min-height:0;display:flex;align-items:stretch;justify-content:center;position:relative}
   #card{width:100%;max-width:360px;border-radius:28px;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;padding:14px 16px;position:relative;will-change:transform;cursor:grab;box-shadow:0 24px 50px -30px rgba(21,23,26,.25);min-height:0}
   #card.snap{transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .35s}
-  #scene{flex:1;min-height:0;width:100%;border-radius:18px;display:block}
+  #sceneWrap{flex:1;min-height:0;position:relative;display:flex}
+  #scene{flex:1;min-height:0;width:100%;border-radius:18px;display:block;transition:filter .25s}
+  #glass{position:absolute;left:14px;top:14px;width:44px;height:58px;touch-action:none;cursor:grab;z-index:3;filter:drop-shadow(0 6px 10px rgba(21,23,26,.25));transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+  #glass svg{width:100%;height:100%;overflow:visible} #glass.drag{transition:none}
+  #drops{position:absolute;left:50%;top:70%;width:0;height:0}
+  .drop{position:absolute;font-size:12px;animation:fall .7s linear forwards}
+  @keyframes fall{0%{transform:translate(0,0);opacity:1}100%{transform:translate(var(--dx),70px);opacity:0}}
+  #wlab{position:absolute;left:14px;bottom:12px;background:rgba(255,255,255,.85);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:800;z-index:3;backdrop-filter:blur(6px)}
+  #wlab.full{background:#5FB9FF;color:#fff}
   .dist{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;flex:none}
   .dist b{font-size:24px;font-weight:800;letter-spacing:-.04em}
   .dist span{font-size:12px;font-weight:700;color:var(--mute);text-align:right}
@@ -154,7 +162,13 @@
   <main>
     <div id="card">
       <div id="tint"></div>
-      <svg id="scene" viewBox="0 0 340 210" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"></svg>
+      <div id="sceneWrap"><svg id="scene" viewBox="0 0 340 210" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"></svg>
+        <div id="glass"><svg viewBox="0 0 60 80"><defs><clipPath id="gc"><path d="M 12 6 L 48 6 L 43 74 L 17 74 Z"/></clipPath></defs>
+          <g clip-path="url(#gc)"><rect id="gw" x="0" y="20" width="60" height="60" fill="#5FB9FF"/><rect id="gw2" x="0" y="20" width="60" height="4" fill="#BFE5FF" opacity=".9"/></g>
+          <path d="M 12 6 L 48 6 L 43 74 L 17 74 Z" fill="none" stroke="#15171A" stroke-width="3" stroke-linejoin="round"/>
+          <circle id="gring" cx="30" cy="40" r="34" fill="none" stroke="#5FB9FF" stroke-width="3" stroke-dasharray="0 1000" transform="rotate(-90 30 40)" opacity="0"/></svg>
+          <div id="drops"></div></div>
+        <div id="wlab">💧 0 L</div></div>
       <div class="dist"><b id="distPct">0%</b><span id="distTxt"></span></div>
       <h1 id="title">Yemek yedin. Nasıldı?</h1>
       <div class="hint"><span class="l" id="hintL">← kötü</span><span class="r">iyi →</span></div>
@@ -237,7 +251,7 @@
 <script>
 // ---------- storage ----------
 const KEY='yemek_log_v2', SKEY='yemek_settings';
-let log=[], st={sound:true,notified:{},fit:18,pills:[],hgt:'',goal:'',weights:[],photos:[],processed:0,cheats:0,weekDone:0,lift:[],cardio:[]};
+let log=[], st={sound:true,notified:{},fit:18,pills:[],hgt:'',goal:'',weights:[],photos:[],processed:0,cheats:0,weekDone:0,lift:[],cardio:[],water:[]};
 try{ log=JSON.parse(localStorage.getItem(KEY)||'[]'); st=Object.assign(st,JSON.parse(localStorage.getItem(SKEY)||'{}')); }catch(e){}
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(log)); localStorage.setItem(SKEY,JSON.stringify(st)); return true; }catch(e){ return false; } }
 
@@ -265,7 +279,7 @@ function actStreak(k){ let s=0, d=dayStart(); if(!actToday(k)) d-=864e5; while(s
 
 // ---------- xp / rank ----------
 const RANKS=[[0,'Çaylak'],[150,'Düzenli'],[400,'Disiplinli'],[800,'Sıkı'],[1400,'Makine'],[2200,'Zırhlı'],[3500,'Efsane'],[5500,'Titan'],[8000,'Başka Boyut'],[12000,'Final Boss']];
-function xp(){ let x=0,s=0; for(const e of log){ if(e.good){ s++; x+=(10+Math.min(s,10)*2)*(e.jackpot?3:1); } else if(!e.cheat) s=0; } return x+st.pills.length*15+(st.lift.length+st.cardio.length)*20; }
+function xp(){ let x=0,s=0; for(const e of log){ if(e.good){ s++; x+=(10+Math.min(s,10)*2)*(e.jackpot?3:1); } else if(!e.cheat) s=0; } return x+st.pills.length*15+(st.lift.length+st.cardio.length)*20+st.water.length*5; }
 function streakNow(){ let s=0; for(let i=log.length-1;i>=0;i--){ if(log[i].good) s++; else if(!log[i].cheat) break; } return s; }
 function rankOf(x){ let i=0; while(i+1<RANKS.length&&x>=RANKS[i+1][0]) i++; return i; }
 const pillToday=()=>actToday('pills'); const pillStreak=()=>actStreak('pills');
@@ -330,9 +344,10 @@ function render(){
   $('rate').textContent=w.length?Math.round(good/w.length*100)+'%':'—';
   $('streak').textContent=streakNow();
   const g=$('grid'); g.innerHTML=''; const wsT=weekStart().getTime(); const DAYS=['Pt','Sa','Ça','Pe','Cu','Ct','Pa'];
-  for(let d=0;d<7;d++){ const ds=wsT+d*864e5, de=ds+864e5; const meals=log.filter(e=>e.t>=ds&&e.t<de).slice(0,3); const pill=st.pills.some(t=>t>=ds&&t<de), lf=st.lift.some(t=>t>=ds&&t<de), cd=st.cardio.some(t=>t>=ds&&t<de);
+  for(let d=0;d<7;d++){ const ds=wsT+d*864e5, de=ds+864e5; const meals=log.filter(e=>e.t>=ds&&e.t<de).slice(0,3); const wl=st.water.filter(t=>t>=ds&&t<de).length; const pill=st.pills.some(t=>t>=ds&&t<de), lf=st.lift.some(t=>t>=ds&&t<de), cd=st.cardio.some(t=>t>=ds&&t<de);
     const col=document.createElement('div'); col.className='col'+(dayStart()===ds?' today':''); col.innerHTML=`<small>${DAYS[d]}</small>`;
     for(let m=0;m<3;m++){ const dot=document.createElement('div'); dot.className='d'; if(meals[m]) dot.classList.add(meals[m].good?'good':(meals[m].cheat?'cheat':'bad')); if(meals[m]&&meals[m].jackpot) dot.innerHTML='<span class="pe">⭐</span>'; if(m===2&&pill) dot.innerHTML='<span class="pe">💊</span>'; if(m===1&&(lf||cd)) dot.innerHTML=`<span class="pe">${lf&&cd?'💪':(lf?'🏋️':'🏃')}</span>`; dot.dataset.k=d+'-'+m; col.appendChild(dot); }
+    const wd=document.createElement('small'); wd.style.color='#5FB9FF'; wd.textContent=wl?`${wl}L`:' '; wd.style.minHeight='12px'; col.appendChild(wd);
     g.appendChild(col); }
   $('undo').disabled=!log.length;
   const ws=weekStart(); const we=new Date(ws); we.setDate(we.getDate()+6);
@@ -349,6 +364,7 @@ function render(){
     const sub=done?(a.weekly?`✓ ${actWeek(a.k)}/hafta`:`✓ ${actStreak(a.k)} gün`):(a.weekly?`${actWeek(a.k)}/hafta`:'basılı tut');
     el.innerHTML=`<div class="fill"></div><span class="e">${a.e} ${a.n}</span><b>${sub}</b>${a.k==='pills'?'<span class="q" id="fmq">?</span>':''}`; ar.appendChild(el); bindAct(el,a); if(a.k==='pills') el.querySelector('#fmq').addEventListener('click',ev=>{ ev.stopPropagation(); openCalm(); }); });
   $('hintL').textContent=st.cheats>0?`← serbest kart ×${st.cheats}`:'← kötü';
+  if(typeof waterLabel==='function') waterLabel();
   $('snd').textContent='ses: '+(st.sound?'açık':'kapalı'); $('snd').classList.toggle('on',st.sound);
 }
 
@@ -380,7 +396,7 @@ function meet(){ setTimeout(()=>{ word('BULUŞTULAR 🎉','pinkw'); for(let i=0;
 // ---------- swipe ----------
 const card=$('card'), tint=$('tint'); let sx=0,sy=0,dx=0,dragging=false,titleIdx=0,lastTick=false; const TH=90;
 function pos(e){ const t=e.touches?e.touches[0]:e; return [t.clientX,t.clientY]; }
-function start(e){ if(e.target.closest&&e.target.closest('.slot')) return; [sx,sy]=pos(e); dx=0; dragging=true; card.classList.remove('snap'); A(); }
+function start(e){ if(e.target.closest&&(e.target.closest('.slot')||e.target.closest('#glass'))) return; [sx,sy]=pos(e); dx=0; dragging=true; card.classList.remove('snap'); A(); }
 function move(e){ if(!dragging) return; const [x,y]=pos(e); dx=x-sx; const dy=(y-sy)*.25;
   card.style.transform=`translate(${dx}px,${dy}px) rotate(${dx/18}deg)`; const k=Math.min(Math.abs(dx)/TH,1);
   tint.style.opacity=k*.55; tint.style.background=dx>0?'#C6F53A':'#C9CDD4';
@@ -468,11 +484,11 @@ function openSheet(){ const h=$('hist'); h.innerHTML=''; let max=1, rows=[];
     const d=document.createElement('div'); d.innerHTML=`<i style="height:${Math.max(4,g/21*70)}px;${cur?'':'opacity:.55'}"></i><b>${g}</b><span class="ac">${acts[0]?'💊'+acts[0]:''}${acts[1]?' 🏋️'+acts[1]:''}${acts[2]?' 🏃'+acts[2]:''}</span><span>${cur?'bu hafta':ws.getDate()+'–'+we.getDate()+' '+MON[we.getMonth()]}</span>`; h.appendChild(d); });
   const tg=log.filter(e=>e.good).length; let best=0,cur=0; for(const e of log){ cur=e.good?cur+1:0; best=Math.max(best,cur); }
   const lw=st.weights[st.weights.length-1], goal=parseFloat(st.goal)||90; const days=log.length?Math.floor((dayStart()-dayStart(new Date(log[0].t)))/864e5)+1:0;
-  $('kpi').innerHTML=`<div><b>${days}</b>gün yolda</div><div><b>${tg}/${log.length}</b>iyi yemek</div><div><b>${best}</b>en uzun seri</div><div><b>${pillStreak()}</b>F+M seri · ${st.pills.length} toplam</div><div><b>${st.lift.length}</b>ağırlık</div><div><b>${st.cardio.length}</b>kardiyo</div><div><b>${lw?lw.kg.toFixed(1):'—'}</b>kg${st.weights.length>1?` · ${((lw.kg-st.weights[0].kg)>0?'+':'')+(lw.kg-st.weights[0].kg).toFixed(1)}`:''}</div><div><b>${lw?Math.max(0,lw.kg-goal).toFixed(1):'—'}</b>kg hedefe</div><div><b>${xp()}</b>xp · ${st.cheats||0} kart</div>`;
+  $('kpi').innerHTML=`<div><b>${days}</b>gün yolda</div><div><b>${tg}/${log.length}</b>iyi yemek</div><div><b>${best}</b>en uzun seri</div><div><b>${pillStreak()}</b>F+M seri · ${st.pills.length} toplam</div><div><b>${st.lift.length}</b>ağırlık</div><div><b>${st.cardio.length}</b>kardiyo</div><div><b>${st.water.length}</b>L su · ${waterToday()} bugün</div><div><b>${lw?lw.kg.toFixed(1):'—'}</b>kg${st.weights.length>1?` · ${((lw.kg-st.weights[0].kg)>0?'+':'')+(lw.kg-st.weights[0].kg).toFixed(1)}`:''}</div><div><b>${lw?Math.max(0,lw.kg-goal).toFixed(1):'—'}</b>kg hedefe</div><div><b>${xp()}</b>xp · ${st.cheats||0} kart</div>`;
   notifState(); calLinks(); $('sheet').classList.add('open'); }
 $('stats').onclick=openSheet; $('close').onclick=()=>$('sheet').classList.remove('open');
 $('share').onclick=()=>{ const w=thisWeek(), g=w.filter(e=>e.good).length; const dots=Array.from({length:21},(_,i)=>w[i]?(w[i].good?'🟢':(w[i].cheat?'⚪':'🔘')):'⚫').join('');
-  const txt=`Bu hafta ${g}/${w.length} iyi yemek · 🏋️ ${actWeek('lift')} · 🏃 ${actWeek('cardio')} · F+M ${pillStreak()} gün\n${dots}\nRütbe: ${RANKS[rankOf(xp())][1]} · ${Math.round(st.fit)}% yakın`; if(navigator.share) navigator.share({text:txt}).catch(()=>{}); else { try{ navigator.clipboard.writeText(txt); }catch(e){} } };
+  const txt=`Bu hafta ${g}/${w.length} iyi yemek · 🏋️ ${actWeek('lift')} · 🏃 ${actWeek('cardio')} · 💧 ${waterToday()} L · F+M ${pillStreak()} gün\n${dots}\nRütbe: ${RANKS[rankOf(xp())][1]} · ${Math.round(st.fit)}% yakın`; if(navigator.share) navigator.share({text:txt}).catch(()=>{}); else { try{ navigator.clipboard.writeText(txt); }catch(e){} } };
 
 // ---------- profile ----------
 const monthKey=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
@@ -545,6 +561,34 @@ $('photoIn').onchange=e=>{ const file=e.target.files[0]; if(!file) return; const
     if(!save()){ st.photos.pop(); alert('Depolama doldu, foto kaydedilemedi.'); return; } renderProfile(); flash('radial-gradient(circle, rgba(198,245,58,.6), transparent 60%)'); sGood(); word('AYLIK FOTO ✓','big'); e.target.value=''; };
   img.src=u; };
 
+
+
+// ---------- su: bardağı sağa götür, 5 sn tut ----------
+const waterToday=()=>st.water.filter(t=>t>=dayStart()).length;
+function waterLabel(){ const n=waterToday(); const l=$('wlab'); l.textContent=`💧 ${n} L`+(n>=3?' ✓':''); l.classList.toggle('full',n>=3); }
+(function(){ const g=$('glass'), wrap=$('sceneWrap'), gw=$('gw'), gw2=$('gw2'), ring=$('gring'); const POUR=.62, HOLD=5000;
+  let drag=false, x0=0, gx=0, level=1, pourT=null, pourStart=0, dropT=null, raf=null;
+  const setLevel=v=>{ level=clamp(v,0,1); const y=74-level*60; gw.setAttribute('y',y); gw2.setAttribute('y',y); };
+  const place=()=>{ const W=wrap.clientWidth-60; const px=gx*W; const pouring=gx>POUR; g.style.transform=`translate(${px}px,0) rotate(${pouring?55+ (gx-POUR)/(1-POUR)*25:gx*20}deg)`; $('scene').style.filter=pouring?`blur(${3+(gx-POUR)/(1-POUR)*5}px) saturate(1.2)`:''; };
+  const stopPour=(reset)=>{ if(pourT){ cancelAnimationFrame(pourT); pourT=null; } if(dropT){ clearInterval(dropT); dropT=null; } ring.style.opacity=0; ring.setAttribute('stroke-dasharray','0 1000'); if(reset) setLevel(1); };
+  const startPour=()=>{ if(pourT) return; pourStart=performance.now(); ring.style.opacity=1; sTick();
+    dropT=setInterval(()=>{ const d=document.createElement('span'); d.className='drop'; d.textContent='💧'; d.style.setProperty('--dx',(Math.random()*30-10)+'px'); $('drops').appendChild(d); setTimeout(()=>d.remove(),750); },110);
+    pourT=requestAnimationFrame(function step(now){ const k=Math.min(1,(now-pourStart)/HOLD); setLevel(1-k); ring.setAttribute('stroke-dasharray',`${k*214} 1000`); if(Math.floor(k*10)!==Math.floor((k-.02)*10)) vib(4);
+      if(k>=1){ stopPour(false); drinkDone(); } else pourT=requestAnimationFrame(step); }); };
+  const down=e=>{ drag=true; g.classList.add('drag'); x0=(e.touches?e.touches[0]:e).clientX-gx*(wrap.clientWidth-60); A(); e.preventDefault&&e.preventDefault(); };
+  const move=e=>{ if(!drag) return; const cx=(e.touches?e.touches[0]:e).clientX; gx=clamp((cx-x0)/(wrap.clientWidth-60),0,1); place();
+    if(gx>POUR) startPour(); else if(pourT||level<1){ stopPour(false); setLevel(Math.min(1,level+.04)); } };
+  const up=()=>{ if(!drag) return; drag=false; g.classList.remove('drag'); stopPour(true); gx=0; place(); };
+  g.addEventListener('touchstart',down,{passive:false}); g.addEventListener('touchmove',move,{passive:true}); g.addEventListener('touchend',up); g.addEventListener('touchcancel',up);
+  g.addEventListener('mousedown',down); addEventListener('mousemove',move); addEventListener('mouseup',up);
+  function drinkDone(){ st.water.push(Date.now()); st.fit=clamp(st.fit+1,0,100); save(); waterLabel(); const n=waterToday();
+    const r=g.getBoundingClientRect(); burst(70,['#5FB9FF','#BFE5FF','#fff','#15171A'],r.left+r.width/2,r.top+r.height/2,3,7);
+    flash('radial-gradient(circle at 70% 40%, rgba(95,185,255,.7), transparent 60%)'); vib([30,20,80]); sGood();
+    if(n===3){ word('SU HEDEFİ ✓ 3 L','huge'); shake(); for(let i=0;i<3;i++) setTimeout(()=>burst(120,['#5FB9FF','#BFE5FF','#C6F53A','#15171A'],innerWidth*(.25+.25*i),innerHeight*.4,3.2,10),i*130); sHuge(); }
+    else word(`+1 L 💧 · bugün ${n} L`,'big');
+    setTimeout(()=>{ setLevel(1); gx=0; place(); },300); setTimeout(()=>setFit(st.fit),400); }
+  setLevel(1); waterLabel(); addEventListener('resize',place);
+})();
 
 // ---------- gün sonu cezası & haftalık serbest kart ----------
 function processDays(){
