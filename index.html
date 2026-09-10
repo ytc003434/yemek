@@ -22,6 +22,10 @@
   #flash.on{animation:flash .55s ease-out}
   @keyframes flash{0%{opacity:.9}100%{opacity:0}}
   #app.shake{animation:shake .45s}
+  #hbar{position:fixed;left:18px;right:18px;top:calc(env(safe-area-inset-top) + 14px);z-index:30;display:none;flex-direction:column;gap:8px;align-items:center}
+  #hbar.on{display:flex} .hb{width:100%;height:18px;border-radius:9px;background:rgba(21,23,26,.12);overflow:hidden;box-shadow:0 8px 24px -10px rgba(0,0,0,.35)}
+  .hb i{display:block;height:100%;width:0;background:var(--hbc,#78DC50);border-radius:9px}
+  #hbTxt{font-size:16px;font-weight:800;letter-spacing:-.03em;background:var(--card);border-radius:999px;padding:4px 12px;border:1px solid var(--line)}
   @keyframes shake{0%,100%{transform:none}20%{transform:translate(-6px,2px)}40%{transform:translate(6px,-3px)}60%{transform:translate(-4px,1px)}80%{transform:translate(4px,-1px)}}
 
   header{display:flex;justify-content:space-between;align-items:flex-start;flex:none}
@@ -160,6 +164,7 @@
 </head>
 <body>
 <div id="flash"></div>
+<div id="hbar"><div class="hb"><i id="hbFill"></i></div><span id="hbTxt"></span></div>
 <canvas id="fx"></canvas>
 <div id="rise"></div>
 
@@ -601,15 +606,16 @@ $('photoIn').onchange=e=>{ const file=e.target.files[0]; if(!file) return; const
 // ---------- su: sağ üste çek = doldur (+1 L), sol alta çek = boşalt (−1 L) ----------
 const waterToday=()=>st.water.filter(t=>t>=dayStart()).length;
 function waterLabel(){ const n=waterToday(); const l=$('wlab'); l.innerHTML=`💧<b>${n}</b>L${n>=3?' ✓':''}`; l.classList.toggle('full',n>=3); }
-(function(){ const g=$('glass'), wrap=$('sceneWrap'), gw=$('gw'), gw2=$('gw2'), ring=$('gring'), zg=$('zoneG'), zr=$('zoneR'); const HOLD=5000, HOLD_R=2500;
+(function(){ const g=$('glass'), wrap=$('sceneWrap'), gw=$('gw'), gw2=$('gw2'), ring=$('gring'), zg=$('zoneG'), zr=$('zoneR'); const HOLD=2200, HOLD_R=1300;
   let drag=false, sx=0, sy=0, dx=0, dy=0, level=1, zone=0, t0=0, raf=null, dropT=null;
   const setLevel=v=>{ level=clamp(v,0,1); const y=74-level*60; gw.setAttribute('y',y); gw2.setAttribute('y',y); };
   const place=()=>{ g.style.transform=`translate(${dx}px,${dy}px) rotate(${zone===1?60:(zone===-1?-60:dx/8)}deg)`; };
-  const stopHold=()=>{ if(raf){ cancelAnimationFrame(raf); raf=null; } if(dropT){ clearInterval(dropT); dropT=null; } ring.style.opacity=0; ring.setAttribute('stroke-dasharray','0 1000'); };
-  const startHold=z=>{ t0=performance.now(); ring.style.opacity=1; ring.setAttribute('stroke',z===1?'#78DC50':'#FF5050'); sTick();
+  const hb=$('hbar'), hbF=$('hbFill'), hbT=$('hbTxt');
+  const stopHold=()=>{ hb.classList.remove('on'); hbF.style.width='0%'; if(raf){ cancelAnimationFrame(raf); raf=null; } if(dropT){ clearInterval(dropT); dropT=null; } ring.style.opacity=0; ring.setAttribute('stroke-dasharray','0 1000'); };
+  const startHold=z=>{ t0=performance.now(); ring.style.opacity=1; hb.classList.add('on'); hb.style.setProperty('--hbc',z===1?'#78DC50':'#FF5050'); ring.setAttribute('stroke',z===1?'#78DC50':'#FF5050'); sTick();
     dropT=setInterval(()=>{ const d=document.createElement('span'); d.className='drop'; d.textContent='💧'; d.style.setProperty('--dx',(Math.random()*30-10)+'px'); $('drops').appendChild(d); setTimeout(()=>d.remove(),750); },z===1?110:70);
     const dur=z===1?HOLD:HOLD_R;
-    raf=requestAnimationFrame(function step(now){ const k=Math.min(1,(now-t0)/dur); setLevel(z===1?1-k:k); ring.setAttribute('stroke-dasharray',`${k*214} 1000`); if(Math.floor(k*10)!==Math.floor((k-.02)*10)) vib(4);
+    raf=requestAnimationFrame(function step(now){ const k=Math.min(1,(now-t0)/dur); setLevel(z===1?1-k:k); ring.setAttribute('stroke-dasharray',`${k*214} 1000`); hbF.style.width=(k*100)+'%'; hbT.textContent=(z===1?'💧 +1 L · ':'🗑 −1 L · ')+((dur-(now-t0))/1000).toFixed(1)+' sn'; if(Math.floor(k*10)!==Math.floor((k-.02)*10)) vib(4);
       if(k>=1){ stopHold(); z===1?drinkDone():drainDone(); } else raf=requestAnimationFrame(step); }); };
   const zoneOf=()=>{ const W=wrap.clientWidth, H=wrap.clientHeight; const nx=dx/W, ny=dy/H; if(nx>.45&&ny<.15) return 1; if(dx<8&&ny>.35) return -1; return 0; };
   const down=e=>{ drag=true; g.classList.add('drag'); const p=e.touches?e.touches[0]:e; sx=p.clientX-dx; sy=p.clientY-dy; A(); e.preventDefault&&e.preventDefault(); };
