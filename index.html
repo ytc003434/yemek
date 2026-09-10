@@ -71,21 +71,23 @@
   #drops{position:absolute;left:50%;top:70%;width:0;height:0} .drop{position:absolute;font-size:12px;animation:fall .7s linear forwards}
   @keyframes fall{0%{transform:translate(0,0);opacity:1}100%{transform:translate(var(--dx),70px);opacity:0}}
   /* fire */
-  .fl{position:absolute;left:50%;bottom:22%;border-radius:50% 50% 45% 45%;filter:blur(var(--b,8px));transform-origin:50% 100%;mix-blend-mode:screen}
-  .fl.a{width:46%;height:60%;background:radial-gradient(ellipse at 50% 90%, #fff 0%, #C6F53A 35%, rgba(198,245,58,0) 75%);animation:fa 1.1s ease-in-out infinite alternate}
-  .fl.b{width:34%;height:70%;background:radial-gradient(ellipse at 50% 90%, #E8FFA0 0%, #A6DB1F 40%, rgba(166,219,31,0) 75%);animation:fb .8s ease-in-out infinite alternate}
-  .fl.c{width:20%;height:44%;background:radial-gradient(ellipse at 50% 90%, #fff 0%, #F3FFC8 50%, rgba(255,255,255,0) 80%);animation:fc .6s ease-in-out infinite alternate;--b:4px}
+  #flame{position:absolute;inset:0;bottom:36%;animation:sway 3.2s ease-in-out infinite alternate;pointer-events:none}
+  @keyframes sway{from{transform:translateX(-7%)}to{transform:translateX(7%)}}
+  .fl{position:absolute;left:50%;bottom:0;border-radius:50% 50% 45% 45%;filter:blur(var(--b,8px));transform-origin:50% 100%;mix-blend-mode:screen}
+  .fl.a{width:44%;height:78%;background:radial-gradient(ellipse at 50% 90%, #fff 0%, #C6F53A 35%, rgba(198,245,58,0) 75%);animation:fa 1.1s ease-in-out infinite alternate}
+  .fl.b{width:32%;height:92%;background:radial-gradient(ellipse at 50% 90%, #E8FFA0 0%, #A6DB1F 40%, rgba(166,219,31,0) 75%);animation:fb .8s ease-in-out infinite alternate}
+  .fl.c{width:18%;height:56%;background:radial-gradient(ellipse at 50% 90%, #fff 0%, #F3FFC8 50%, rgba(255,255,255,0) 80%);animation:fc .6s ease-in-out infinite alternate;--b:4px}
   @keyframes fa{from{transform:translateX(-50%) scale(var(--s,1)) skewX(-3deg)}to{transform:translateX(-50%) scale(calc(var(--s,1)*1.06),calc(var(--s,1)*1.1)) skewX(3deg)}}
   @keyframes fb{from{transform:translateX(-48%) scale(var(--s,1)) skewX(4deg)}to{transform:translateX(-52%) scale(calc(var(--s,1)*1.08),calc(var(--s,1)*1.14)) skewX(-4deg)}}
   @keyframes fc{from{transform:translateX(-50%) scale(var(--s,1))}to{transform:translateX(-50%) scale(calc(var(--s,1)*1.05),calc(var(--s,1)*1.2))}}
-  .ember{position:absolute;bottom:25%;width:4px;height:4px;border-radius:50%;background:var(--lime);opacity:0;animation:em 2.4s linear infinite}
+  .ember{position:absolute;bottom:38%;width:4px;height:4px;border-radius:50%;background:var(--lime);opacity:0;animation:em 2.4s linear infinite}
   @keyframes em{0%{transform:translate(0,0) scale(1);opacity:0}10%{opacity:.9}100%{transform:translate(var(--ex),-160px) scale(.2);opacity:0}}
-  .base{position:absolute;left:0;right:0;bottom:0;height:24%;background:radial-gradient(ellipse at 50% 100%, rgba(198,245,58,.35), transparent 70%)}
+  .base{position:absolute;left:0;right:0;bottom:0;height:40%;background:linear-gradient(180deg,rgba(21,23,26,0),rgba(21,23,26,.85) 45%,#15171A)}
   .meters{position:absolute;left:10px;right:10px;bottom:10px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;z-index:3}
-  .mt{background:rgba(255,255,255,.08);backdrop-filter:blur(8px);border-radius:12px;padding:7px 8px;color:#fff}
+  .mt{background:rgba(255,255,255,.1);border-radius:12px;padding:7px 8px;color:#fff}
   .mt small{display:block;font-size:9px;font-weight:800;color:#C9CDD4;letter-spacing:.04em} .mt b{font-size:15px;font-weight:800;letter-spacing:-.03em;display:block;margin:1px 0 4px}
   .mt i{display:block;height:3px;border-radius:2px;background:rgba(255,255,255,.15);overflow:hidden} .mt i::after{content:'';display:block;height:100%;width:var(--p,0%);background:var(--lime);transition:width .8s}
-  .lvl{position:absolute;top:10px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:baseline;color:#fff;z-index:3}
+  .lvl{position:absolute;top:10px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:baseline;color:#fff;z-index:3;text-shadow:0 2px 12px rgba(21,23,26,.9)}
   .lvl b{font-size:26px;font-weight:800;letter-spacing:-.04em} .lvl span{font-size:11px;font-weight:700;color:#C9CDD4;text-align:right}
   .lvl b em{font-style:normal;color:var(--lime)}
   #card h1{font-size:18px;line-height:1.05;font-weight:800;letter-spacing:-.03em;margin-top:8px;flex:none}
@@ -171,7 +173,7 @@
   .mon{display:flex;flex-direction:column;gap:6px}
   #lightbox{position:fixed;inset:0;z-index:70;background:rgba(15,17,19,.96);display:none;align-items:center;justify-content:center;padding:20px} #lightbox.open{display:flex} #lightbox img{max-width:100%;max-height:100%;border-radius:16px}
   .boost{display:flex;justify-content:space-between;align-items:center;background:var(--ink);color:var(--card);border-radius:18px;padding:14px 16px} .boost b{display:block;font-size:15px;font-weight:800} .boost span{font-size:12px;color:#9AA0A8;font-weight:700}
-  .remrow{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 8px 8px 14px;font-size:13px;font-weight:700} .remrow input{font:inherit;font-weight:800;font-size:15px;border:none;background:var(--bg);border-radius:8px;padding:6px 8px;color:var(--ink)} .remrow .pillb{margin-left:auto}
+  .remrow{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 8px 8px 14px;font-size:13px;font-weight:700} .remrow input{font:inherit;font-weight:800;font-size:15px;border:none;background:var(--bg);border-radius:8px;padding:6px 8px;color:var(--ink)} .remrow .pillb{text-decoration:none;padding:8px 10px;font-size:12px} .remrow input{margin-right:auto}
 
   .sheet{position:fixed;inset:0;z-index:20;background:var(--bg);padding:calc(env(safe-area-inset-top) + 20px) 20px calc(env(safe-area-inset-bottom) + 24px);display:none;flex-direction:column;gap:18px;overflow:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch}
   .sheet.open{display:flex} .sheet>*{flex:none}
@@ -217,7 +219,7 @@
           <div id="strip"><div id="wlab">💧<b>0</b>L</div></div>
           <div id="fire">
             <div class="lvl"><b><em id="lvlPct">0</em>%</b><span id="lvlTxt"></span></div>
-            <div class="base"></div><div class="fl a" id="fla"></div><div class="fl b" id="flb"></div><div class="fl c" id="flc"></div>
+            <div id="flame"><div class="fl a" id="fla"></div><div class="fl b" id="flb"></div><div class="fl c" id="flc"></div></div><div class="base"></div>
             <div id="embers"></div>
             <div class="meters" id="meters"></div>
           </div>
@@ -435,10 +437,12 @@ function dayScore(ds){ const meals=inDay(log,ds); const good=Math.min(3,meals.fi
 
 // ================= SOUND =================
 let ac, unlocked=false;
-function A(){ if(!st.sound) return null; try{ if(!ac) ac=new (window.AudioContext||window.webkitAudioContext)(); if(ac.state!=='running'){ ac.resume().catch(()=>{}); if(ac.state==='closed'){ ac=new (window.AudioContext||window.webkitAudioContext)(); } } return ac; }catch(e){ return null; } }
+let acBad=false;
+function mkAC(){ const a=new (window.AudioContext||window.webkitAudioContext)(); a.onstatechange=()=>{ if(a.state==='interrupted'||a.state==='closed') acBad=true; }; return a; }
+function A(){ if(!st.sound) return null; try{ if(!ac) ac=mkAC(); if(acBad||ac.state==='closed'||ac.state==='interrupted'){ try{ ac.close(); }catch(e){} ac=mkAC(); acBad=false; unlocked=false; } if(ac.state==='suspended') ac.resume().catch(()=>{}); return ac; }catch(e){ return null; } }
 function unlock(){ const a=A(); if(!a) return; try{ const b=a.createBuffer(1,1,22050), s=a.createBufferSource(); s.buffer=b; s.connect(a.destination); s.start(0); unlocked=true; }catch(e){} }
 ['touchstart','touchend','mousedown','click','keydown'].forEach(ev=>addEventListener(ev,unlock,{passive:true,capture:true}));
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&ac) ac.resume().catch(()=>{}); }); addEventListener('pageshow',()=>{ if(ac) ac.resume().catch(()=>{}); });
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&ac){ acBad=true; } }); addEventListener('pageshow',()=>{ if(ac) acBad=true; });
 function tone(f,t0,dur,type='sine',g=.18){ const a=A(); if(!a) return; const o=a.createOscillator(), v=a.createGain(); o.type=type; o.frequency.setValueAtTime(f,a.currentTime+t0); v.gain.setValueAtTime(0,a.currentTime+t0); v.gain.linearRampToValueAtTime(g,a.currentTime+t0+.01); v.gain.exponentialRampToValueAtTime(.001,a.currentTime+t0+dur); o.connect(v).connect(a.destination); o.start(a.currentTime+t0); o.stop(a.currentTime+t0+dur+.05); }
 const sGood=()=>{ [523,659,784,1046].forEach((f,i)=>tone(f,i*.06,.35,'triangle')); tone(1568,.26,.5,'sine',.08); };
 const sHuge=()=>{ [392,523,659,784,1046,1318].forEach((f,i)=>tone(f,i*.08,.6,'triangle',.2)); [784,1046].forEach((f,i)=>tone(f,.6+i*.1,1.2,'sine',.12)); };
@@ -690,11 +694,10 @@ $('photoIn').onchange=e=>{ const f=e.target.files[0]; if(!f) return; readImg(f,7
 $('ava').onclick=()=>$('avaIn').click(); $('avaIn').onchange=e=>{ const f=e.target.files[0]; if(!f) return; readImg(f,300,d=>{ st.avatar=d; save(); renderProfile(); sGood(); e.target.value=''; }); };
 // reminders → .ics
 const REMS=[{k:'k',n:'🔥 Kahvaltı',b:'Yedin mi? Sağa kaydır.'},{k:'o',n:'🔥 Öğle',b:'Seri bekliyor.'},{k:'a',n:'🔥 Akşam',b:'Günün son yemeği.'},{k:'f',n:'💊 F+M',b:'Basılı tut, +15 saç kökü.'}];
-function renderRems(){ const box=$('rems'); box.innerHTML=''; REMS.forEach(r=>{ const row=document.createElement('div'); row.className='remrow'; row.innerHTML=`<span>${r.n}</span><input type="time" value="${st.rems[r.k]}"><button class="pillb sm">Takvime</button>`; row.querySelector('input').onchange=ev=>{ st.rems[r.k]=ev.target.value; save(); }; row.querySelector('button').onclick=()=>ics(r); box.appendChild(row); }); }
-function ics(r){ const [h,m]=st.rems[r.k].split(':').map(Number); const d=new Date(); d.setHours(h,m,0,0); if(d<new Date()) d.setDate(d.getDate()+1); const f=x=>x.toISOString().replace(/[-:]|\.\d{3}/g,''); const e=new Date(d.getTime()+5*6e4); const url=location.href.split('#')[0];
-  const txt=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//YANSIN//TR','BEGIN:VEVENT',`UID:yansin-${r.k}@yansin`,`DTSTAMP:${f(new Date())}`,`DTSTART:${f(d)}`,`DTEND:${f(e)}`,'RRULE:FREQ=DAILY',`SUMMARY:${r.n} — YANSIN`,`DESCRIPTION:${r.b} ${url}`,`URL:${url}`,'BEGIN:VALARM','TRIGGER:PT0M','ACTION:DISPLAY',`DESCRIPTION:${r.n}`,'END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
-  const blob=new Blob([txt],{type:'text/calendar'}); const file=new File([blob],`yansin-${r.k}.ics`,{type:'text/calendar'});
-  if(navigator.canShare&&navigator.canShare({files:[file]})) navigator.share({files:[file],title:r.n}).catch(()=>{}); else { const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`yansin-${r.k}.ics`; document.body.appendChild(a); a.click(); a.remove(); } }
+function renderRems(){ const box=$('rems'); box.innerHTML=''; REMS.forEach(r=>{ const row=document.createElement('div'); row.className='remrow'; const t=st.rems[r.k]; row.innerHTML=`<span>${r.n}</span><input type="time" value="${t}"><a class="pillb sm" target="_blank" rel="noopener" href="${gcal(r)}">Google</a><a class="pillb sm dark" target="_blank" rel="noopener" href="ics/${r.k}.ics">Apple</a>`; row.querySelector('input').onchange=ev=>{ st.rems[r.k]=ev.target.value; save(); renderRems(); }; box.appendChild(row); });
+  const n=document.createElement('p'); n.className='note'; n.textContent='Apple: iPhone Takvim\'e günlük alarm olarak ekler (varsayılan saatlerle; saati Takvim\'den değiştir). Google: seçtiğin saatle Google Takvim\'e ekler.'; box.appendChild(n); }
+function gcal(r){ const [h,m]=st.rems[r.k].split(':').map(Number); const d=new Date(); d.setHours(h,m,0,0); if(d<new Date()) d.setDate(d.getDate()+1); const e=new Date(d.getTime()+5*6e4); const f=x=>x.toISOString().replace(/[-:]|\.\d{3}/g,''); const url=location.href.split('#')[0];
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(r.n+' — YANSIN')+'&dates='+f(d)+'/'+f(e)+'&recur='+encodeURIComponent('RRULE:FREQ=DAILY')+'&details='+encodeURIComponent(r.b+'\n'+url); }
 
 // ================= ÖZET & PDF =================
 function openSheet(){ const h=$('hist'); h.innerHTML=''; const rows=[]; for(let k=5;k>=0;k--){ const ws=new Date(weekStart()); ws.setDate(ws.getDate()-7*k); rows.push([ws,inWeek(ws.getTime()).filter(e=>e.good).length]); }
@@ -704,26 +707,31 @@ function openSheet(){ const h=$('hist'); h.innerHTML=''; const rows=[]; for(let 
   $('pdfNote').textContent=''; $('sheet').classList.add('open'); }
 $('stats').onclick=openSheet; $('close').onclick=()=>$('sheet').classList.remove('open');
 $('share').onclick=()=>{ const w=thisWeek(), g=w.filter(e=>e.good).length; const dots=Array.from({length:21},(_,i)=>w[i]?(w[i].good?'🟢':'⚪'):'⚫').join(''); const txt=`YANSIN · bu hafta ${g}/${w.length} iyi öğün · 🔥 ${Math.round(st.sessions.filter(s=>s.t>=weekStart().getTime()).reduce((a,b)=>a+b.kcal,0))} kcal · 💧 ${waterToday()} L · F+M ${actStreak('pills')} gün\n${dots}\nRütbe: ${RANKS[rankOf(xp())][1]}`; if(navigator.share) navigator.share({text:txt}).catch(()=>{}); else { try{ navigator.clipboard.writeText(txt); }catch(e){} } };
-const tr=s=>String(s).replace(/ş/g,'s').replace(/Ş/g,'S').replace(/ğ/g,'g').replace(/Ğ/g,'G').replace(/ı/g,'i').replace(/İ/g,'I').replace(/ç/g,'c').replace(/Ç/g,'C').replace(/ö/g,'o').replace(/Ö/g,'O').replace(/ü/g,'u').replace(/Ü/g,'U').replace(/[^\x00-\x7F]/g,'');
-$('pdf').onclick=async()=>{ $('pdfNote').textContent='PDF hazırlanıyor…'; try{ if(!window.jspdf){ await new Promise((res,rej)=>{ const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
-  const { jsPDF }=window.jspdf; const doc=new jsPDF({unit:'mm',format:'a4'}); const W=210; let y=18; const lime=[198,245,58], ink=[21,23,26], mute=[122,127,135];
-  const H=(t,sz=11,c=ink,b=true)=>{ if(y>280){ doc.addPage(); y=18; } doc.setFont('helvetica',b?'bold':'normal'); doc.setFontSize(sz); doc.setTextColor(...c); doc.text(tr(t),14,y); y+=sz*.5+2; };
-  doc.setFillColor(...ink); doc.rect(0,0,W,30,'F'); doc.setFillColor(...lime); doc.roundedRect(14,9,12,12,3,3,'F'); doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(20); doc.text('YANSIN',30,18); doc.setFontSize(9); doc.setTextColor(201,205,212); doc.text(tr(`${st.name||''} ${st.lname||''}`.trim()+'  ·  rapor '+new Date().toLocaleDateString('tr-TR')),30,24); y=40;
-  const lw=st.weights[st.weights.length-1], goal=parseFloat(st.goal)||88, start=dayStart(new Date(st.c60+'T00:00:00')), dayN=clamp(Math.floor((dayStart()-start)/864e5)+1,0,60);
-  H('Ozet',15); const tg=log.filter(e=>e.good).length; 
-  [[`#60Challenge gun ${dayN}/60`,`Rutbe ${RANKS[rankOf(xp())][1]} · ${xp()} xp`],[`Iyi ana ogun ${tg}/${log.length} (%${log.length?Math.round(tg/log.length*100):0})`,`En uzun seri ${(()=>{let b=0,c=0;for(const e of log){c=e.good?c+1:(e.cheat?c:0);b=Math.max(b,c);}return b;})()}`],[`F+M ${st.pills.length} gun · seri ${actStreak('pills')}`,`Su toplam ${st.water.length} L`],[`Antrenman ${st.sessions.length} seans · ${Math.round(st.sessions.reduce((a,b)=>a+b.min,0))} dk`,`Yakilan ${Math.round(st.sessions.reduce((a,b)=>a+b.kcal,0))} kcal`],[`Kilo ${lw?lw.kg.toFixed(1):'-'} kg (baslangic ${st.weights[0]?st.weights[0].kg:'-'})`,`Hedef ${goal} kg · kalan ${lw?Math.max(0,lw.kg-goal).toFixed(1):'-'}`]].forEach(([a,b])=>{ doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(...ink); doc.text(tr(a),14,y); doc.text(tr(b),110,y); y+=6; }); y+=4;
-  // 60 grid
-  H('#60 gun haritasi',13); const cell=5.6, gx=14; for(let i=0;i<60;i++){ const ds=start+i*864e5; const cx=gx+(i%10)*(cell+1.2), cy=y+Math.floor(i/10)*(cell+1.2); const fut=ds>dayStart(); const s=fut?0:dayScore(ds); const cols=[[230,232,225],[228,243,181],[211,238,133],[198,245,58],[166,219,31],[21,23,26]]; doc.setFillColor(...cols[s]); if(fut) doc.setFillColor(240,241,236); doc.roundedRect(cx,cy,cell,cell,1,1,'F'); doc.setFontSize(5); doc.setTextColor(...(s===5?lime:mute)); doc.text(String(i+1),cx+cell/2,cy+cell/2+.8,{align:'center'}); } y+=6*(cell+1.2)+6;
-  // meals per day (last 14 days)
-  H('Son 14 gun',13); doc.setFontSize(8); doc.setTextColor(...mute); doc.setFont('helvetica','bold'); ['Tarih','Ogun','Iyi','Ara','F+M','Su L','Antrenman','kcal'].forEach((t,i)=>doc.text(t,14+i*24,y)); y+=5;
-  for(let k=13;k>=0;k--){ const ds=dayStart()-k*864e5; if(ds<start-30*864e5) continue; const m=inDay(log,ds), sn=inDay(st.snacks,ds), pl=inDay(st.pills,ds).length, w=inDay(st.water,ds).length, tr2=inDay(st.sessions,ds); if(!m.length&&!sn.length&&!pl&&!w&&!tr2.length&&ds!==dayStart()) continue; const d=new Date(ds);
-    doc.setFont('helvetica','normal'); doc.setTextColor(...ink); [`${d.getDate()}.${d.getMonth()+1}`,m.length,m.filter(e=>e.good).length,sn.length,pl?'x':'-',w,tr2.map(s=>(MODES.find(x=>x.id===s.type)||{}).n||s.type).join(', ').slice(0,22),Math.round(tr2.reduce((a,b)=>a+b.kcal,0))].forEach((t,i)=>doc.text(tr(String(t)),14+i*24,y)); y+=5; if(y>280){ doc.addPage(); y=18; } } y+=4;
-  if(st.weights.length){ H('Kilo kayitlari',13); doc.setFontSize(9); st.weights.slice(-20).forEach(w=>{ const d=new Date(w.t); doc.setFont('helvetica','normal'); doc.setTextColor(...ink); doc.text(`${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}   ${w.kg.toFixed(1)} kg`,14,y); y+=5; if(y>280){ doc.addPage(); y=18; } }); y+=4; }
-  if(st.sessions.length){ H('Antrenmanlar',13); doc.setFontSize(9); st.sessions.slice(-25).forEach(s=>{ const d=new Date(s.t); const md=MODES.find(m=>m.id===s.type)||{n:s.type}; doc.setFont('helvetica','normal'); doc.setTextColor(...ink); doc.text(tr(`${d.getDate()}.${d.getMonth()+1}   ${md.n}   ${Math.round(s.min)} dk   ${Math.round(s.kcal)} kcal`),14,y); y+=5; if(y>280){ doc.addPage(); y=18; } }); }
-  doc.setFontSize(7); doc.setTextColor(...mute); doc.text('YANSIN · kisisel takip raporu · tibbi belge degildir',14,292);
-  const blob=doc.output('blob'); const file=new File([blob],`yansin-${new Date().toISOString().slice(0,10)}.pdf`,{type:'application/pdf'});
+function loadScript(src){ return new Promise((res,rej)=>{ const sc=document.createElement('script'); sc.src=src; sc.onload=res; sc.onerror=rej; document.head.appendChild(sc); }); }
+function reportHTML(){ const lw=st.weights[st.weights.length-1], goal=parseFloat(st.goal)||88, start=dayStart(new Date(st.c60+'T00:00:00')), dayN=clamp(Math.floor((dayStart()-start)/864e5)+1,0,60); const tg=log.filter(e=>e.good).length; let best=0,cur=0; for(const e of log){ cur=e.good?cur+1:(e.cheat?cur:0); best=Math.max(best,cur); }
+  const cols=['#E6E8E1','#E4F3B5','#D3EE85','#C6F53A','#A6DB1F','#15171A']; let grid=''; for(let i=0;i<60;i++){ const ds=start+i*864e5; const fut=ds>dayStart(); const sc=fut?0:dayScore(ds); grid+=`<div style="aspect-ratio:1;border-radius:6px;background:${fut?'#F3F4EF':cols[sc]};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:${sc===5?'#C6F53A':(fut?'#C9CDD4':'#7A7F87')}">${i+1}</div>`; }
+  let rows=''; for(let k=13;k>=0;k--){ const ds=dayStart()-k*864e5; const m=inDay(log,ds), sn=inDay(st.snacks,ds), pl=inDay(st.pills,ds).length, w=inDay(st.water,ds).length, tr2=inDay(st.sessions,ds); if(!m.length&&!sn.length&&!pl&&!w&&!tr2.length) continue; const d=new Date(ds);
+    rows+=`<tr><td>${fmtD(d)}</td><td>${m.filter(e=>e.good).length}/${m.length}</td><td>${sn.length}</td><td>${pl?'✓':'—'}</td><td>${w} L</td><td>${tr2.map(x=>(MODES.find(y=>y.id===x.type)||{}).n||x.type).join(', ')||'—'}</td><td>${Math.round(tr2.reduce((a,b)=>a+b.kcal,0))}</td><td><b>${dayScore(ds)}/5</b></td></tr>`; }
+  const wrows=st.weights.slice(-12).map(w=>`<tr><td>${new Date(w.t).toLocaleDateString('tr-TR')}</td><td><b>${w.kg.toFixed(1)} kg</b></td></tr>`).join('');
+  const srows=st.sessions.slice(-12).reverse().map(x=>{ const md=MODES.find(m=>m.id===x.type)||{n:x.type,e:''}; return `<tr><td>${fmtD(new Date(x.t))}</td><td>${md.e} ${md.n}</td><td>${Math.round(x.min)} dk</td><td><b>${Math.round(x.kcal)} kcal</b></td></tr>`; }).join('');
+  const kpi=(v,l)=>`<div style="background:#fff;border:1px solid #E6E8E1;border-radius:14px;padding:12px 14px"><div style="font-size:24px;font-weight:800;letter-spacing:-.04em">${v}</div><div style="font-size:11px;font-weight:700;color:#7A7F87">${l}</div></div>`;
+  const mtr=meters().map(m=>`<div style="flex:1"><div style="font-size:10px;font-weight:800;color:#7A7F87;letter-spacing:.04em">${m.n}</div><div style="font-size:22px;font-weight:800">${m.v}%</div><div style="height:5px;border-radius:3px;background:#E6E8E1;overflow:hidden"><div style="height:100%;width:${m.v}%;background:#C6F53A"></div></div></div>`).join('');
+  return `<div id="rep" style="width:794px;background:#F5F6F1;font-family:Manrope,system-ui,sans-serif;color:#15171A;padding:0 0 30px">
+   <div style="background:#15171A;color:#fff;padding:34px 40px;display:flex;align-items:center;gap:16px"><img src="icon-192.png" style="width:52px;height:52px;border-radius:14px"><div><div style="font-size:30px;font-weight:800;letter-spacing:.08em;line-height:1">YANSIN</div><div style="font-size:12px;color:#C9CDD4;font-weight:700;margin-top:6px">${`${st.name||''} ${st.lname||''}`.trim()||'Kişisel rapor'} · ${new Date().toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})}</div></div><div style="margin-left:auto;text-align:right"><div style="font-size:12px;color:#C9CDD4;font-weight:700">#60Challenge</div><div style="font-size:34px;font-weight:800;letter-spacing:-.04em;line-height:1">Gün ${dayN}<span style="color:#C6F53A;font-size:18px">/60</span></div></div></div>
+   <div style="padding:26px 40px 0"><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">${kpi(`${tg}/${log.length}`,'iyi ana öğün')}${kpi(best,'en uzun seri')}${kpi(`${actStreak('pills')} gün`,'F+M serisi')}${kpi(`${st.water.length} L`,'toplam su')}${kpi(st.sessions.length,'antrenman')}${kpi(`${Math.round(st.sessions.reduce((a,b)=>a+b.kcal,0))}`,'kcal yakıldı')}${kpi(lw?`${lw.kg.toFixed(1)} kg`:'—',`kilo · hedef ${goal}`)}${kpi(`${RANKS[rankOf(xp())][1]}`,`${xp()} xp`)}</div>
+   <div style="display:flex;gap:16px;margin-top:18px;background:#fff;border:1px solid #E6E8E1;border-radius:16px;padding:14px 16px">${mtr}</div>
+   <h3 style="font-size:12px;font-weight:800;color:#7A7F87;letter-spacing:.06em;margin:22px 0 10px">#60 GÜN HARİTASI</h3><div style="display:grid;grid-template-columns:repeat(15,1fr);gap:5px">${grid}</div>
+   <h3 style="font-size:12px;font-weight:800;color:#7A7F87;letter-spacing:.06em;margin:22px 0 10px">SON 14 GÜN</h3><table style="width:100%;border-collapse:collapse;font-size:12px;font-weight:600"><thead><tr style="color:#7A7F87;font-size:10px;text-align:left"><th>Tarih</th><th>İyi/öğün</th><th>Ara</th><th>F+M</th><th>Su</th><th>Antrenman</th><th>kcal</th><th>Puan</th></tr></thead><tbody>${rows||'<tr><td colspan=8 style="color:#7A7F87">kayıt yok</td></tr>'}</tbody></table>
+   <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:22px"><div><h3 style="font-size:12px;font-weight:800;color:#7A7F87;letter-spacing:.06em;margin:0 0 10px">KİLO</h3><table style="width:100%;border-collapse:collapse;font-size:12px;font-weight:600"><tbody>${wrows||'<tr><td style="color:#7A7F87">kayıt yok</td></tr>'}</tbody></table></div><div><h3 style="font-size:12px;font-weight:800;color:#7A7F87;letter-spacing:.06em;margin:0 0 10px">ANTRENMANLAR</h3><table style="width:100%;border-collapse:collapse;font-size:12px;font-weight:600"><tbody>${srows||'<tr><td style="color:#7A7F87">kayıt yok</td></tr>'}</tbody></table></div></div>
+   <div style="margin-top:26px;font-size:10px;color:#7A7F87;font-weight:700">YANSIN · kişisel takip raporu · tıbbi belge değildir</div></div>
+   <style>#rep td,#rep th{padding:6px 6px;border-bottom:1px solid #E6E8E1}</style></div>`; }
+$('pdf').onclick=async()=>{ $('pdfNote').textContent='PDF hazırlanıyor…'; let host; try{ if(!window.html2canvas) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'); if(!window.jspdf) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+  host=document.createElement('div'); host.style.cssText='position:fixed;left:-2000px;top:0;z-index:-1'; host.innerHTML=reportHTML(); document.body.appendChild(host); await new Promise(r=>setTimeout(r,300));
+  const canvas=await html2canvas(host.firstChild,{scale:2,useCORS:true,backgroundColor:'#F5F6F1'}); const { jsPDF }=window.jspdf; const doc=new jsPDF({unit:'mm',format:'a4'}); const W=210, H=297; const imgH=canvas.height*W/canvas.width; let pos=0; const pageC=document.createElement('canvas'); const pxPerMm=canvas.width/W; pageC.width=canvas.width; pageC.height=Math.floor(H*pxPerMm);
+  while(pos<canvas.height){ const c2=pageC.getContext('2d'); c2.fillStyle='#F5F6F1'; c2.fillRect(0,0,pageC.width,pageC.height); c2.drawImage(canvas,0,pos,canvas.width,pageC.height,0,0,pageC.width,pageC.height); if(pos>0) doc.addPage(); doc.addImage(pageC.toDataURL('image/jpeg',.92),'JPEG',0,0,W,H); pos+=pageC.height; }
+  host.remove(); const blob=doc.output('blob'); const file=new File([blob],`YANSIN-${new Date().toISOString().slice(0,10)}.pdf`,{type:'application/pdf'});
   if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:'YANSIN raporu'}).catch(()=>{}); } else { const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=file.name; a.target='_blank'; document.body.appendChild(a); a.click(); a.remove(); }
-  $('pdfNote').textContent='Hazır. Türkçe karakterler PDF fontu yüzünden sadeleştirildi.'; sGood(); }catch(e){ $('pdfNote').textContent='PDF oluşturulamadı (internet gerekir).'; } };
+  $('pdfNote').textContent='Hazır.'; sGood(); }catch(e){ if(host) host.remove(); $('pdfNote').textContent='PDF oluşturulamadı (internet gerekir).'; } };
 
 // ================= SAKİN OL / BOOST =================
 $('calmClose').onclick=()=>{ $('calm').classList.remove('open'); sGood(); word('DEVAM','big'); };
