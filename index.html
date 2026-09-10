@@ -116,7 +116,19 @@
   .gal figure{flex:none;width:120px}
   .gal img{width:120px;height:160px;object-fit:cover;border-radius:14px;display:block;background:var(--line)}
   .gal figcaption{font-size:11px;font-weight:700;color:var(--mute);margin-top:6px;text-align:center}
-  #wchart{width:100%;height:70px;display:block}
+  #wchart{width:100%;height:150px;display:block;background:var(--card);border:1px solid var(--line);border-radius:18px}
+  #journey{width:100%;height:auto;display:block;border-radius:22px;background:linear-gradient(180deg,#EAF2FF,#F7F9F1 60%,#E4EAD6)}
+  .wtop{display:flex;justify-content:space-between;align-items:flex-end}
+  .wtop .lab{display:block;font-size:11px;font-weight:700;color:var(--mute)} .wtop b{font-size:34px;font-weight:800;letter-spacing:-.05em;line-height:1}
+  .wtop .mid b{background:var(--lime);border-radius:10px;padding:2px 8px;font-size:22px} .wtop .right{text-align:right} .wtop .mid{text-align:center}
+  .stage{display:flex;justify-content:space-between;align-items:baseline;background:var(--ink);color:var(--card);border-radius:16px;padding:12px 16px}
+  .stage b{font-size:16px;font-weight:800;letter-spacing:-.02em} .stage span{font-size:12px;font-weight:700;color:var(--lime)}
+  .wentry{display:flex;gap:8px;align-items:stretch} .wentry .pillb{align-self:stretch;display:flex;align-items:center}
+  .wlist{display:flex;flex-direction:column;gap:6px}
+  .wrow{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:14px;font-weight:700}
+  .wrow .dt{color:var(--mute);font-size:12px;min-width:70px} .wrow .kg{font-size:18px;font-weight:800;letter-spacing:-.03em} .wrow .dl{font-size:12px;font-weight:800;border-radius:8px;padding:2px 7px}
+  .wrow .dl.down{background:var(--lime)} .wrow .dl.up{background:var(--grey)} .wrow .x{margin-left:auto;background:none;border:none;color:var(--mute);font-size:16px;font-weight:800;padding:4px 8px;cursor:pointer}
+  @keyframes pulse{0%,100%{r:7}50%{r:11}} .pulse{animation:pulse 1.2s ease-in-out infinite}
   @media (prefers-reduced-motion:reduce){.word,.d.pop,#flash.on,#app.shake{animation:none}}
 </style>
 </head>
@@ -201,22 +213,24 @@
 </div>
 
 <div id="psheet" class="sheet">
-  <h2>Profil</h2>
-  <div class="fields">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start"><h2>Yolculuk</h2><button class="btn" id="pclose" style="font-size:14px">kapat ✕</button></div>
+  <div class="wtop"><div><span class="lab">şu an</span><b id="wNow">—</b></div><div class="mid"><span class="lab">başlangıçtan</span><b id="wDelta">—</b></div><div class="right"><span class="lab">hedefe</span><b id="wLeft">—</b></div></div>
+  <svg id="journey" viewBox="0 0 340 170" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div class="stage"><b id="stageName">—</b><span id="stageSub"></span></div>
+  <div class="fields" style="grid-template-columns:1fr 1fr">
     <div class="f"><label>boy (cm)</label><input id="hgt" type="number" inputmode="numeric" placeholder="—"></div>
-    <div class="f"><label>kilo (kg)</label><input id="wgt" type="number" inputmode="decimal" step="0.1" placeholder="—"></div>
-    <div class="f"><label>hedef (kg)</label><input id="goal" type="number" inputmode="decimal" step="0.1" placeholder="—"></div>
+    <div class="f"><label>hedef (kg)</label><input id="goal" type="number" inputmode="decimal" step="0.1" placeholder="90"></div>
   </div>
-  <div class="kpi" id="pkpi"></div>
-  <div><h3>Kilo seyri</h3><svg id="wchart" viewBox="0 0 300 70" preserveAspectRatio="none"></svg></div>
+  <div class="wentry"><div class="f" style="flex:1"><label>bugünkü kilo</label><input id="wgt" type="number" inputmode="decimal" step="0.1" placeholder="—"></div><button class="pillb" id="wsave">Bugünü kaydet</button></div>
+  <div><h3>Tarih / kg</h3><svg id="wchart" viewBox="0 0 340 150" preserveAspectRatio="none"></svg></div>
+  <div class="wlist" id="wlist"></div>
   <div>
     <h3>Aylık foto — ayda 1</h3>
     <p class="note" id="photoNote"></p>
     <input type="file" id="photoIn" accept="image/*" style="display:none">
-    <button class="pillb" id="photoBtn" style="margin-top:10px">Bu ayın fotosunu yükle</button>
+    <button class="pillb ghost" id="photoBtn" style="margin-top:10px">Bu ayın fotosunu yükle</button>
     <div class="gal" id="gal" style="margin-top:12px"></div>
   </div>
-  <button class="pillb ghost" id="pclose">Kapat</button>
 </div>
 
 <script>
@@ -249,7 +263,7 @@ const actWeek=k=>st[k].filter(t=>t>=weekStart().getTime()).length;
 function actStreak(k){ let s=0, d=dayStart(); if(!actToday(k)) d-=864e5; while(st[k].some(t=>t>=d&&t<d+864e5)){ s++; d-=864e5; } return s; }
 
 // ---------- xp / rank ----------
-const RANKS=[[0,'Çaylak'],[100,'Düzenli'],[300,'Disiplinli'],[700,'Makine'],[1500,'Efsane'],[3000,'Başka Boyut']];
+const RANKS=[[0,'Çaylak'],[150,'Düzenli'],[400,'Disiplinli'],[800,'Sıkı'],[1400,'Makine'],[2200,'Zırhlı'],[3500,'Efsane'],[5500,'Titan'],[8000,'Başka Boyut'],[12000,'Final Boss']];
 function xp(){ let x=0,s=0; for(const e of log){ if(e.good){ s++; x+=(10+Math.min(s,10)*2)*(e.jackpot?3:1); } else if(!e.cheat) s=0; } return x+st.pills.length*15+(st.lift.length+st.cardio.length)*20; }
 function streakNow(){ let s=0; for(let i=log.length-1;i>=0;i--){ if(log[i].good) s++; else if(!log[i].cheat) break; } return s; }
 function rankOf(x){ let i=0; while(i+1<RANKS.length&&x>=RANKS[i+1][0]) i++; return i; }
@@ -457,17 +471,50 @@ $('share').onclick=()=>{ const w=thisWeek(), g=w.filter(e=>e.good).length; const
 // ---------- profile ----------
 const monthKey=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
 const MON=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+const GATE=2; // kg başına kapı
+function gates(){ const st0=st.weights[0]?st.weights[0].kg:null, goal=parseFloat(st.goal)||90; if(st0===null||st0<=goal) return null;
+  const n=Math.max(2,Math.ceil((st0-goal)/GATE)); const arr=[]; for(let i=1;i<=n;i++) arr.push(+(Math.max(goal,st0-i*GATE)).toFixed(1)); arr[arr.length-1]=goal; return {st0,goal,arr}; }
+const BOSSES=['Isınma','Kapı Bekçisi','Gölge','Çelik Kapı','Alev Duvarı','Buz Kalesi','Titan','Karanlık Lord','Ejderha','FINAL BOSS'];
+function journey(){ const g=gates(); const svg=$('journey'); const lw=st.weights[st.weights.length-1];
+  if(!g||!lw){ svg.innerHTML=`<text x="170" y="85" text-anchor="middle" font-size="13" font-weight="700" fill="#7A7F87">İlk kiloyu kaydet, yol açılsın.</text>`; $('stageName').textContent='Yol kapalı'; $('stageSub').textContent='hedef 90 kg'; return; }
+  const p=clamp((g.st0-lw.kg)/(g.st0-g.goal),0,1); const n=g.arr.length;
+  const path=[]; for(let i=0;i<=40;i++){ const x=20+i*7.5, y=110+Math.sin(i/40*Math.PI*2.2)*22-i*0.6; path.push([x,y]); }
+  const d=path.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' ');
+  const at=t=>{ const i=t*40, a=path[Math.floor(i)], b=path[Math.min(40,Math.ceil(i))], f=i-Math.floor(i); return [L(a[0],b[0],f),L(a[1],b[1],f)]; };
+  const [rx,ry]=at(p); const passed=g.arr.filter(w=>lw.kg<=w).length; const nextIdx=Math.min(passed,n-1);
+  const nodes=g.arr.map((w,i)=>{ const [x,y]=at((i+1)/n); const done=lw.kg<=w, final=i===n-1, next=i===nextIdx&&!done;
+    return `<g>${final?`<text x="${x}" y="${y-22}" text-anchor="middle" font-size="22">${done?'🏆':'👹'}</text>`:''}
+      <circle cx="${x}" cy="${y}" r="${final?11:7}" fill="${done?'#C6F53A':(final?'#15171A':'#fff')}" stroke="#15171A" stroke-width="2.5" class="${next?'pulse':''}"/>
+      ${done&&!final?`<text x="${x}" y="${y+3.5}" text-anchor="middle" font-size="9" font-weight="800">✓</text>`:''}
+      <text x="${x}" y="${y+24}" text-anchor="middle" font-size="9" font-weight="800" fill="${done?'#5E8A00':'#15171A'}">${w}</text></g>`; }).join('');
+  svg.innerHTML=`<defs><linearGradient id="jg" x1="0" x2="1"><stop offset="0" stop-color="#C6F53A"/><stop offset="1" stop-color="#A6DB1F"/></linearGradient></defs>
+    <path d="${d}" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#D9DCD3" stroke-width="10" stroke-linecap="round"/>
+    <path d="${d}" fill="none" stroke="url(#jg)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${p*330} 1000" pathLength="330"/>
+    <path d="${d}" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="4 8" opacity=".9"/>
+    <text x="20" y="${path[0][1]+26}" font-size="9" font-weight="800" fill="#7A7F87">${g.st0} başla</text>${nodes}
+    <g transform="translate(${rx} ${ry-6})"><circle cx="0" cy="0" r="12" fill="#15171A"/><text x="0" y="5" text-anchor="middle" font-size="14">${p>=1?'👑':'🏃'}</text></g>`;
+  if(p>=1){ $('stageName').textContent='FINAL BOSS YENİLDİ'; $('stageSub').textContent=`${g.goal} kg · efsane`; }
+  else{ const nx=g.arr[nextIdx]; const boss=BOSSES[Math.min(BOSSES.length-1,Math.round(nextIdx/(n-1)*(BOSSES.length-1)))]; $('stageName').textContent=`Bölüm ${passed+1}/${n} · ${nextIdx===n-1?'FINAL BOSS':boss}`; $('stageSub').textContent=`kapı ${nx} kg · ${(lw.kg-nx).toFixed(1)} kg kaldı`; } }
 function renderProfile(){
-  $('hgt').value=st.hgt||''; $('goal').value=st.goal||''; const lw=st.weights[st.weights.length-1]; $('wgt').value=lw?lw.kg:'';
-  let k=''; if(lw&&st.hgt){ const bmi=lw.kg/Math.pow(st.hgt/100,2); k+=`<div><b>${bmi.toFixed(1)}</b>bmi</div>`; }
-  if(st.weights.length>1){ const d=lw.kg-st.weights[0].kg; k+=`<div><b>${d>0?'+':''}${d.toFixed(1)}</b>kg başlangıçtan</div>`; }
-  if(lw&&st.goal){ k+=`<div><b>${(lw.kg-st.goal).toFixed(1)}</b>kg hedefe</div>`; }
-  k+=`<div><b>${st.photos.length}</b>aylık foto</div>`; $('pkpi').innerHTML=k;
-  const c=$('wchart'); const ws=st.weights.slice(-24); if(ws.length<2){ c.innerHTML=`<text x="0" y="40" fill="#7A7F87" font-size="11" font-weight="700">kilo girdikçe çizgi oluşur</text>`; }
-  else{ const min=Math.min(...ws.map(w=>w.kg),st.goal?+st.goal:Infinity)-1, max=Math.max(...ws.map(w=>w.kg))+1;
-    const pts=ws.map((w,i)=>[i/(ws.length-1)*300, 65-(w.kg-min)/(max-min)*60]); const d=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
-    const gy=st.goal?65-(st.goal-min)/(max-min)*60:null;
-    c.innerHTML=`${gy!==null?`<line x1="0" x2="300" y1="${gy}" y2="${gy}" stroke="#15171A" stroke-dasharray="4 4" opacity=".4"/>`:''}<path d="${d}" fill="none" stroke="#15171A" stroke-width="2.5" stroke-linejoin="round"/>${pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="#C6F53A" stroke="#15171A" stroke-width="1.5"/>`).join('')}`; }
+  $('hgt').value=st.hgt||''; $('goal').value=st.goal||''; const lw=st.weights[st.weights.length-1], goal=parseFloat(st.goal)||90;
+  $('wNow').textContent=lw?lw.kg.toFixed(1):'—'; $('wDelta').textContent=st.weights.length>1?((lw.kg-st.weights[0].kg)>0?'+':'')+(lw.kg-st.weights[0].kg).toFixed(1)+' kg':'—'; $('wLeft').textContent=lw?Math.max(0,lw.kg-goal).toFixed(1)+' kg':'—';
+  const tl=st.weights.some(w=>w.t>=dayStart()); $('wgt').value=tl?lw.kg:''; $('wsave').textContent=tl?'Güncelle':'Bugünü kaydet';
+  journey();
+  const c=$('wchart'); const ws=st.weights.slice(-40);
+  if(ws.length<2){ c.innerHTML=`<text x="170" y="80" text-anchor="middle" fill="#7A7F87" font-size="12" font-weight="700">iki kayıt sonra grafik çıkar</text>`; }
+  else{ const kgs=ws.map(w=>w.kg); const min=Math.floor(Math.min(...kgs,goal)-1), max=Math.ceil(Math.max(...kgs)+1); const X=i=>28+i/(ws.length-1)*300, Y=v=>18+(1-(v-min)/(max-min))*100;
+    const pts=ws.map((w,i)=>[X(i),Y(w.kg)]); const line=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+    const area=line+` L ${pts[pts.length-1][0].toFixed(1)} 118 L 28 118 Z`; const gy=Y(goal);
+    const ticks=[min,Math.round((min+max)/2),max].map(v=>`<text x="4" y="${Y(v)+3}" font-size="9" font-weight="700" fill="#7A7F87">${v}</text><line x1="28" x2="328" y1="${Y(v)}" y2="${Y(v)}" stroke="#E6E8E1"/>`).join('');
+    const lab=i=>{ const d=new Date(ws[i].t); return `${d.getDate()}/${d.getMonth()+1}`; }; const xl=[0,Math.floor((ws.length-1)/2),ws.length-1].filter((v,i,a)=>a.indexOf(v)===i).map(i=>`<text x="${X(i)}" y="140" text-anchor="middle" font-size="9" font-weight="700" fill="#7A7F87">${lab(i)}</text>`).join('');
+    c.innerHTML=`<defs><linearGradient id="ag" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#C6F53A" stop-opacity=".7"/><stop offset="1" stop-color="#C6F53A" stop-opacity="0"/></linearGradient></defs>${ticks}
+      <line x1="28" x2="328" y1="${gy}" y2="${gy}" stroke="#15171A" stroke-dasharray="4 4" opacity=".5"/><text x="328" y="${gy-4}" text-anchor="end" font-size="9" font-weight="800">hedef ${goal}</text>
+      <path d="${area}" fill="url(#ag)"/><path d="${line}" fill="none" stroke="#15171A" stroke-width="2.5" stroke-linejoin="round"/>
+      ${pts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="${i===pts.length-1?5:3.5}" fill="${i===pts.length-1?'#15171A':'#C6F53A'}" stroke="#15171A" stroke-width="1.5"/>`).join('')}
+      <text x="${pts[pts.length-1][0]}" y="${pts[pts.length-1][1]-10}" text-anchor="middle" font-size="11" font-weight="800">${kgs[kgs.length-1]}</text>${xl}`; }
+  const wl=$('wlist'); wl.innerHTML=''; [...st.weights].reverse().forEach((w,ri)=>{ const i=st.weights.length-1-ri; const prev=st.weights[i-1]; const dl=prev?w.kg-prev.kg:0; const d=new Date(w.t);
+    const row=document.createElement('div'); row.className='wrow'; row.innerHTML=`<span class="dt">${d.getDate()} ${MON[d.getMonth()]} ${String(d.getFullYear()).slice(2)}</span><span class="kg">${w.kg.toFixed(1)}</span>${prev?`<span class="dl ${dl<=0?'down':'up'}">${dl>0?'+':''}${dl.toFixed(1)}</span>`:'<span class="dl" style="background:var(--line)">başlangıç</span>'}<button class="x" data-i="${i}">✕</button>`; wl.appendChild(row); });
+  wl.querySelectorAll('.x').forEach(b=>b.onclick=()=>{ st.weights.splice(+b.dataset.i,1); save(); renderProfile(); vib(10); });
   const has=st.photos.some(p=>p.m===monthKey()); $('photoBtn').disabled=has;
   const nx=new Date(); nx.setMonth(nx.getMonth()+1,1); $('photoNote').textContent=has?`Bu ayın fotosu yüklendi. Sıradaki: 1 ${MON[nx.getMonth()]}.`:'Aynı ışık, aynı poz, aynı ayna. Ayda bir; sonra yan yana bak.';
   const g=$('gal'); g.innerHTML=''; [...st.photos].reverse().forEach(p=>{ const [y,m]=p.m.split('-'); const f=document.createElement('figure'); f.innerHTML=`<img src="${p.d}" alt=""><figcaption>${MON[+m-1]} ${y}</figcaption>`; g.appendChild(f); });
@@ -475,7 +522,15 @@ function renderProfile(){
 $('prof').onclick=()=>{ renderProfile(); $('psheet').classList.add('open'); }; $('pclose').onclick=()=>$('psheet').classList.remove('open');
 $('hgt').onchange=e=>{ st.hgt=e.target.value; save(); renderProfile(); };
 $('goal').onchange=e=>{ st.goal=e.target.value; save(); renderProfile(); };
-$('wgt').onchange=e=>{ const kg=parseFloat(e.target.value); if(!kg) return; const lw=st.weights[st.weights.length-1]; if(lw&&lw.t>=dayStart()) lw.kg=kg; else st.weights.push({t:Date.now(),kg}); save(); renderProfile(); sGood(); };
+$('wsave').onclick=()=>{ const kg=parseFloat($('wgt').value); if(!kg||kg<30||kg>300) return; const g0=gates(); const prevKg=st.weights.length?st.weights[st.weights.length-1].kg:null;
+  const lw=st.weights[st.weights.length-1]; if(lw&&lw.t>=dayStart()) lw.kg=kg; else st.weights.push({t:Date.now(),kg}); save(); renderProfile(); $('wgt').blur();
+  const goal=parseFloat(st.goal)||90; const g1=gates();
+  const r=$('wsave').getBoundingClientRect(); burst(80,['#C6F53A','#15171A','#fff'],r.left+r.width/2,r.top,3,7); sGood(); vib([20,30,60]);
+  if(g1&&prevKg!==null&&kg<prevKg){ const crossed=g1.arr.filter(w=>kg<=w&&prevKg>w).length;
+    if(kg<=goal){ setTimeout(()=>{ word('FINAL BOSS YENİLDİ 👑','huge'); shake(); for(let i=0;i<5;i++) setTimeout(()=>burst(160,['#C6F53A','#15171A','#fff','#FF5FA2'],innerWidth*(.15+.175*i),innerHeight*.4,3.4,11),i*140); sHuge(); vib([80,40,80,40,80,40,300]); },400); }
+    else if(crossed){ setTimeout(()=>{ word(`KAPI GEÇİLDİ · ${g1.arr.filter(w=>kg<=w).length}/${g1.arr.length}`,'huge'); shake(); for(let i=0;i<3;i++) setTimeout(()=>burst(140,['#C6F53A','#15171A','#fff'],innerWidth*(.25+.25*i),innerHeight*.4,3.2,10),i*130); sHuge(); vib([50,30,50,30,220]); },400); }
+    else { setTimeout(()=>word(`−${(prevKg-kg).toFixed(1)} kg · yaklaştın`,'big'),200); } }
+  else if(prevKg!==null&&kg>prevKg) setTimeout(()=>word('dalgalanma, yola devam','cool'),200); };
 $('photoBtn').onclick=()=>$('photoIn').click();
 $('photoIn').onchange=e=>{ const file=e.target.files[0]; if(!file) return; const img=new Image(); const u=URL.createObjectURL(file);
   img.onload=()=>{ const s=Math.min(1,720/Math.max(img.width,img.height)); const c=document.createElement('canvas'); c.width=img.width*s; c.height=img.height*s; c.getContext('2d').drawImage(img,0,0,c.width,c.height);
