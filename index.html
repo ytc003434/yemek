@@ -97,8 +97,10 @@
   .sheet.open{display:flex} .sheet>*{flex:none}
   .sheet h2{font-size:30px;font-weight:800;letter-spacing:-.04em}
   .sheet h3{font-size:13px;font-weight:700;color:var(--mute);margin-bottom:8px}
-  .hist{display:flex;gap:10px;align-items:flex-end;height:100px}
-  .hist div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--mute)}
+  .hist{display:flex;gap:8px;align-items:flex-end;height:130px}
+  .hist div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;font-size:9px;font-weight:700;color:var(--mute);text-align:center}
+  .hist b{font-size:13px;color:var(--ink)} .hist .ac{font-size:8px;min-height:10px;letter-spacing:-.02em}
+  .kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px} .kpi div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
   .hist i{display:block;width:100%;border-radius:8px;background:var(--lime);min-height:4px}
   .cal{display:flex;flex-direction:column;gap:8px}
   .cal a{display:flex;justify-content:space-between;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 16px;font-weight:700;font-size:14px}
@@ -110,8 +112,7 @@
   .f{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
   .f label{display:block;font-size:11px;font-weight:700;color:var(--mute)}
   .f input{width:100%;font:inherit;font-weight:800;font-size:20px;color:var(--ink);background:none;border:none;outline:none;margin-top:2px;letter-spacing:-.02em}
-  .kpi{display:flex;gap:16px;flex-wrap:wrap}
-  .kpi div{font-size:12px;font-weight:700;color:var(--mute)} .kpi b{display:block;font-size:24px;color:var(--ink);font-weight:800;letter-spacing:-.03em}
+  .kpi div{font-size:11px;font-weight:700;color:var(--mute)} .kpi b{display:block;font-size:22px;color:var(--ink);font-weight:800;letter-spacing:-.03em}
   .gal{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;touch-action:pan-x}
   .gal figure{flex:none;width:120px}
   .gal img{width:120px;height:160px;object-fit:cover;border-radius:14px;display:block;background:var(--line)}
@@ -173,7 +174,7 @@
 </div>
 
 <div id="sheet" class="sheet">
-  <h2>Özet</h2>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start"><h2>Özet</h2><button class="btn" id="close" style="font-size:14px">kapat ✕</button></div>
   <div><h3>Son 6 hafta — iyi yemek</h3><div class="hist" id="hist"></div></div>
   <div class="kpi" id="kpi"></div>
   <div>
@@ -185,12 +186,11 @@
     </div>
   </div>
   <div>
-    <h3>Kapalıyken de gelsin — Google Takvim</h3>
-    <p class="note">Dördüne de bas, her biri günlük tekrarlayan hatırlatıcı açar; kaydet.</p>
+    <h3>Alternatif — Google Takvim</h3>
+    <p class="note">Anımsatıcılar yerine Takvim istersen: dördüne bas, her biri günlük tekrarlayan hatırlatıcı açar.</p>
     <div class="cal" id="cal" style="margin-top:10px"></div>
   </div>
-  <button class="pillb ghost" id="share">Haftayı paylaş</button>
-  <button class="pillb ghost" id="close">Kapat</button>
+  <button class="pillb" id="share">Haftayı paylaş</button>
 </div>
 
 
@@ -338,7 +338,7 @@ function render(){
   const ws=weekStart(); const we=new Date(ws); we.setDate(we.getDate()+6);
   const f=d=>d.toLocaleDateString('tr-TR',{day:'numeric',month:'short'}); $('wk').textContent=`${f(ws)} – ${f(we)}`;
   const x=xp(), ri=rankOf(x), next=RANKS[ri+1]; $('rankName').textContent=RANKS[ri][1];
-  $('xpTxt').textContent=next?`${x} / ${next[0]} xp`:`${x} xp — zirve`;
+  const lwH=st.weights[st.weights.length-1], goalH=parseFloat(st.goal)||90; $('xpTxt').textContent=(next?`${x} / ${next[0]} xp`:`${x} xp — zirve`)+(lwH?` · hedefe ${Math.max(0,lwH.kg-goalH).toFixed(1)} kg`:'');
   $('xpBar').style.width=(next?((x-RANKS[ri][0])/(next[0]-RANKS[ri][0])*100):100)+'%';
   const td=today(), now=new Date(), sl=$('slots'); sl.innerHTML='';
   SLOTS.forEach((s,i)=>{ const el=document.createElement('div'); el.className='slot'; const e=td[i]; const due=new Date(); due.setHours(s.h,s.m,0,0);
@@ -440,7 +440,9 @@ function doAct(a,el){
 }
 
 // ---------- notifications ----------
-function notifState(){ const el=$('notifState'); if(!('Notification' in window)){ el.textContent='Bu tarayıcı bildirim desteklemiyor (iPhone Safari desteklemez) — Takvim butonlarını kullan.'; $('askNotif').style.display='none'; return; }
+const IOS=/iPhone|iPad|iPod/.test(navigator.userAgent);
+function notifState(){ const el=$('notifState'); if(IOS){ el.textContent='iPhone, web uygulamalarına doğrudan bildirim vermiyor. Hatırlatıcılar Anımsatıcılar uygulamasından geliyor: 08:30 · 14:00 · 20:00 · 23:00 (F+M). Değiştirmek istersen oradan.'; $('askNotif').style.display='none'; $('testNotif').style.display='none'; return; }
+  if(!('Notification' in window)){ el.textContent='Bu tarayıcı bildirim desteklemiyor (iPhone Safari desteklemez) — Takvim butonlarını kullan.'; $('askNotif').style.display='none'; return; }
   const p=Notification.permission; el.textContent=p==='granted'?'İzin verildi. Uygulama açık/arka plandayken 08:30 · 14:00 · 20:00 · 23:00 (F+M) bildirim gelir. Kapalıyken için Takvim.':p==='denied'?'İzin reddedilmiş. Tarayıcı ayarlarından açman lazım.':'Henüz izin yok.';
   $('askNotif').style.display=p==='granted'?'none':''; }
 function fire(title,body){ if(!('Notification' in window)||Notification.permission!=='granted') return; try{ new Notification(title,{body,tag:'yemek',renotify:true}).onclick=()=>window.focus(); }catch(e){} }
@@ -461,9 +463,12 @@ function calLinks(){ const c=$('cal'); c.innerHTML=''; const url=location.href.s
 // ---------- summary ----------
 function openSheet(){ const h=$('hist'); h.innerHTML=''; let max=1, rows=[];
   for(let k=5;k>=0;k--){ const ws=new Date(weekStart()); ws.setDate(ws.getDate()-7*k); const g=inWeek(ws.getTime()).filter(e=>e.good).length; max=Math.max(max,g); rows.push([ws,g]); }
-  rows.forEach(([ws,g])=>{ const d=document.createElement('div'); d.innerHTML=`<i style="height:${Math.max(4,g/Math.max(max,21)*90)}px"></i>${g}<span>${ws.getDate()}/${ws.getMonth()+1}</span>`; h.appendChild(d); });
+  rows.forEach(([ws,g],idx)=>{ const we=new Date(ws); we.setDate(we.getDate()+6); const wsT=ws.getTime(), weT=wsT+7*864e5;
+    const acts=['pills','lift','cardio'].map(k=>st[k].filter(t=>t>=wsT&&t<weT).length); const cur=idx===rows.length-1;
+    const d=document.createElement('div'); d.innerHTML=`<i style="height:${Math.max(4,g/21*70)}px;${cur?'':'opacity:.55'}"></i><b>${g}</b><span class="ac">${acts[0]?'💊'+acts[0]:''}${acts[1]?' 🏋️'+acts[1]:''}${acts[2]?' 🏃'+acts[2]:''}</span><span>${cur?'bu hafta':ws.getDate()+'–'+we.getDate()+' '+MON[we.getMonth()]}</span>`; h.appendChild(d); });
   const tg=log.filter(e=>e.good).length; let best=0,cur=0; for(const e of log){ cur=e.good?cur+1:0; best=Math.max(best,cur); }
-  $('kpi').innerHTML=`<div><b>${log.length}</b>yemek</div><div><b>${tg}</b>iyi</div><div><b>${best}</b>en uzun seri</div><div><b>${st.pills.length}</b>F+M toplam</div><div><b>${pillStreak()}</b>F+M seri</div><div><b>${st.lift.length}</b>ağırlık</div><div><b>${st.cardio.length}</b>kardiyo</div><div><b>${st.cheats||0}</b>serbest kart</div><div><b>${xp()}</b>xp</div>`;
+  const lw=st.weights[st.weights.length-1], goal=parseFloat(st.goal)||90; const days=log.length?Math.floor((dayStart()-dayStart(new Date(log[0].t)))/864e5)+1:0;
+  $('kpi').innerHTML=`<div><b>${days}</b>gün yolda</div><div><b>${tg}/${log.length}</b>iyi yemek</div><div><b>${best}</b>en uzun seri</div><div><b>${pillStreak()}</b>F+M seri · ${st.pills.length} toplam</div><div><b>${st.lift.length}</b>ağırlık</div><div><b>${st.cardio.length}</b>kardiyo</div><div><b>${lw?lw.kg.toFixed(1):'—'}</b>kg${st.weights.length>1?` · ${((lw.kg-st.weights[0].kg)>0?'+':'')+(lw.kg-st.weights[0].kg).toFixed(1)}`:''}</div><div><b>${lw?Math.max(0,lw.kg-goal).toFixed(1):'—'}</b>kg hedefe</div><div><b>${xp()}</b>xp · ${st.cheats||0} kart</div>`;
   notifState(); calLinks(); $('sheet').classList.add('open'); }
 $('stats').onclick=openSheet; $('close').onclick=()=>$('sheet').classList.remove('open');
 $('share').onclick=()=>{ const w=thisWeek(), g=w.filter(e=>e.good).length; const dots=Array.from({length:21},(_,i)=>w[i]?(w[i].good?'🟢':(w[i].cheat?'⚪':'🔘')):'⚫').join('');
@@ -524,13 +529,14 @@ $('prof').onclick=()=>{ renderProfile(); $('psheet').classList.add('open'); }; $
 $('hgt').onchange=e=>{ st.hgt=e.target.value; save(); renderProfile(); };
 $('goal').onchange=e=>{ st.goal=e.target.value; save(); renderProfile(); };
 $('wsave').onclick=()=>{ const kg=parseFloat($('wgt').value); if(!kg||kg<30||kg>300) return; const g0=gates(); const prevKg=st.weights.length?st.weights[st.weights.length-1].kg:null;
-  const lw=st.weights[st.weights.length-1]; if(lw&&lw.t>=dayStart()) lw.kg=kg; else st.weights.push({t:Date.now(),kg}); save(); renderProfile(); $('wgt').blur();
+  const lw=st.weights[st.weights.length-1]; if(lw&&lw.t>=dayStart()) lw.kg=kg; else st.weights.push({t:Date.now(),kg});
+  if(prevKg!==null&&kg<prevKg){ st.fit=clamp(st.fit+Math.round((prevKg-kg)*5),0,100); } save(); renderProfile(); render(); setFit(st.fit); $('wgt').blur();
   const goal=parseFloat(st.goal)||90; const g1=gates();
   const r=$('wsave').getBoundingClientRect(); burst(80,['#C6F53A','#15171A','#fff'],r.left+r.width/2,r.top,3,7); sGood(); vib([20,30,60]);
   if(g1&&prevKg!==null&&kg<prevKg){ const crossed=g1.arr.filter(w=>kg<=w&&prevKg>w).length;
     if(kg<=goal){ setTimeout(()=>{ word('FINAL BOSS YENİLDİ 👑','huge'); shake(); for(let i=0;i<5;i++) setTimeout(()=>burst(160,['#C6F53A','#15171A','#fff','#FF5FA2'],innerWidth*(.15+.175*i),innerHeight*.4,3.4,11),i*140); sHuge(); vib([80,40,80,40,80,40,300]); },400); }
     else if(crossed){ setTimeout(()=>{ word(`KAPI GEÇİLDİ · ${g1.arr.filter(w=>kg<=w).length}/${g1.arr.length}`,'huge'); shake(); for(let i=0;i<3;i++) setTimeout(()=>burst(140,['#C6F53A','#15171A','#fff'],innerWidth*(.25+.25*i),innerHeight*.4,3.2,10),i*130); sHuge(); vib([50,30,50,30,220]); },400); }
-    else { setTimeout(()=>word(`−${(prevKg-kg).toFixed(1)} kg · yaklaştın`,'big'),200); } }
+    else { setTimeout(()=>word(`−${(prevKg-kg).toFixed(1)} kg · +${Math.round((prevKg-kg)*5)} yakınlık`,'big'),200); } }
   else if(prevKg!==null&&kg>prevKg) setTimeout(()=>word('dalgalanma, yola devam','cool'),200); };
 $('photoBtn').onclick=()=>$('photoIn').click();
 $('photoIn').onchange=e=>{ const file=e.target.files[0]; if(!file) return; const img=new Image(); const u=URL.createObjectURL(file);
