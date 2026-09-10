@@ -139,6 +139,18 @@
   .wrow .dt{color:var(--mute);font-size:12px;min-width:70px} .wrow .kg{font-size:18px;font-weight:800;letter-spacing:-.03em} .wrow .dl{font-size:12px;font-weight:800;border-radius:8px;padding:2px 7px}
   .wrow .dl.down{background:var(--lime)} .wrow .dl.up{background:var(--grey)} .wrow .x{margin-left:auto;background:none;border:none;color:var(--mute);font-size:16px;font-weight:800;padding:4px 8px;cursor:pointer}
   @keyframes pulse{0%,100%{r:7}50%{r:11}} .pulse{animation:pulse 1.2s ease-in-out infinite}
+  .boost{display:flex;justify-content:space-between;align-items:center;background:var(--ink);color:var(--card);border-radius:18px;padding:14px 16px}
+  .boost b{display:block;font-size:16px;font-weight:800;letter-spacing:-.02em} .boost span{font-size:12px;color:#9AA0A8;font-weight:700}
+  .sheet.dark{background:#0F1113;color:#fff} .sheet.dark h2{color:#fff}
+  .pins{display:flex;gap:14px;justify-content:center;margin:10px 0} .pins i{width:16px;height:16px;border-radius:50%;border:2px solid #3A3F47} .pins i.on{background:var(--lime);border-color:var(--lime)}
+  .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:280px;width:100%;align-self:center}
+  .pad button{aspect-ratio:1.4;border-radius:18px;border:none;background:#1C1F24;color:#fff;font:inherit;font-size:24px;font-weight:800;cursor:pointer}
+  .pad button:active{background:var(--lime);color:var(--ink)} .pad button.del{font-size:16px;color:#9AA0A8}
+  .pins.err{animation:shake .4s}
+  .bprog{display:flex;gap:6px} .bprog i{flex:1;height:4px;border-radius:2px;background:#2A2E34} .bprog i.on{background:var(--lime)}
+  .bimgwrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;border-radius:22px;overflow:hidden;background:#1C1F24}
+  .bimgwrap img{max-width:100%;max-height:100%;object-fit:contain;display:block;border-radius:22px;animation:bin .6s cubic-bezier(.2,.8,.2,1)}
+  @keyframes bin{0%{opacity:0;transform:scale(.96)}100%{opacity:1;transform:none}}
   @media (prefers-reduced-motion:reduce){.word,.d.pop,#flash.on,#app.shake{animation:none}}
 </style>
 </head>
@@ -227,6 +239,20 @@
   <button class="pillb" id="calmClose">Tamam, geçti</button>
 </div>
 
+<div id="bsheet" class="sheet dark">
+  <div id="bpin">
+    <h2>Şifre</h2><p class="note" style="color:#9AA0A8">4 hane. Bu bölüm sadece senin için.</p>
+    <div class="pins" id="pins"><i></i><i></i><i></i><i></i></div>
+    <div class="pad" id="pad"></div>
+    <button class="btn" id="bclose0" style="color:#9AA0A8;align-self:center">vazgeç</button>
+  </div>
+  <div id="bshow" style="display:none;flex-direction:column;gap:14px;flex:1;min-height:0">
+    <div class="bprog" id="bprog"></div>
+    <div class="bimgwrap" id="bimgwrap"><img id="bimg" alt=""></div>
+    <div><h2 id="bt" style="color:#fff;font-size:26px"></h2><p id="bp" class="note" style="color:#C9CDD4;font-size:15px;margin-top:8px"></p></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto"><button class="btn" id="bclose" style="color:#9AA0A8">kapat</button><button class="pillb" id="bnext">Sonraki →</button></div>
+  </div>
+</div>
 <div id="psheet" class="sheet">
   <div style="display:flex;justify-content:space-between;align-items:flex-start"><h2>Yolculuk</h2><button class="btn" id="pclose" style="font-size:14px">kapat ✕</button></div>
   <div class="wtop"><div><span class="lab">şu an</span><b id="wNow">—</b></div><div class="mid"><span class="lab">başlangıçtan</span><b id="wDelta">—</b></div><div class="right"><span class="lab">hedefe</span><b id="wLeft">—</b></div></div>
@@ -239,6 +265,7 @@
   <div class="wentry"><div class="f" style="flex:1"><label>bugünkü kilo</label><input id="wgt" type="number" inputmode="decimal" step="0.1" placeholder="—"></div><button class="pillb" id="wsave">Bugünü kaydet</button></div>
   <div><h3>Tarih / kg</h3><svg id="wchart" viewBox="0 0 340 150" preserveAspectRatio="none"></svg></div>
   <div class="wlist" id="wlist"></div>
+  <div class="boost"><div><b>Motivasyon boost</b><span>şifreli · kötü günler için</span></div><button class="pillb" id="boostBtn" style="background:var(--ink);color:var(--lime)">Aç</button></div>
   <div>
     <h3>Aylık foto — ayda 1</h3>
     <p class="note" id="photoNote"></p>
@@ -606,6 +633,28 @@ function processDays(){
 
 function openCalm(){ $('calm').classList.add('open'); vib(10); }
 $('calmClose').onclick=()=>{ $('calm').classList.remove('open'); sGood(); word('DEVAM','big'); };
+
+
+// ---------- motivasyon boost (şifreli) ----------
+(function(){ let pin='', slides=null, idx=0; const pins=$('pins'), pad=$('pad');
+  '123456789⌫0✓'.split('').forEach(ch=>{ const b=document.createElement('button'); b.textContent=ch; if(ch==='⌫'||ch==='✓') b.className='del'; b.onclick=()=>{ A(); if(ch==='⌫'){ pin=pin.slice(0,-1); } else if(ch==='✓'){ if(pin.length===4) tryOpen(); return; } else if(pin.length<4){ pin+=ch; sTick(); } draw(); if(pin.length===4) tryOpen(); }; pad.appendChild(b); });
+  function draw(){ [...pins.children].forEach((i,k)=>i.classList.toggle('on',k<pin.length)); }
+  const b64=x=>Uint8Array.from(atob(x),c=>c.charCodeAt(0));
+  async function tryOpen(){ try{ const res=await fetch('boost.json',{cache:'force-cache'}); const j=await res.json();
+      const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pin),'PBKDF2',false,['deriveKey']);
+      const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(j.salt),iterations:j.iter,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
+      const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(j.iv)},key,b64(j.ct)); slides=JSON.parse(new TextDecoder().decode(plain));
+      for(const sl of slides){ if(sl.img){ const raw=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(sl.img.iv)},key,b64(sl.img.ct)); sl.url=URL.createObjectURL(new Blob([raw],{type:'image/jpeg'})); } }
+      pin=''; draw(); idx=0; $('bpin').style.display='none'; $('bshow').style.display='flex'; show(); sGood(); vib([20,30,60]);
+    }catch(e){ pin=''; draw(); pins.classList.remove('err'); void pins.offsetWidth; pins.classList.add('err'); sBad(); vib([60,40,60]); } }
+  function show(){ const sl=slides[idx]; $('bprog').innerHTML=slides.map((_,k)=>`<i class="${k<=idx?'on':''}"></i>`).join('');
+    const img=$('bimg'); img.style.display=sl.url?'block':'none'; if(sl.url){ img.src=''; requestAnimationFrame(()=>img.src=sl.url); } $('bimgwrap').style.display=sl.url?'flex':'none';
+    $('bt').textContent=sl.t; $('bp').textContent=sl.p; $('bnext').textContent=idx===slides.length-1?'Kapat. Git yap.':'Sonraki →'; sTick(); }
+  $('bnext').onclick=()=>{ if(idx<slides.length-1){ idx++; show(); } else close(true); };
+  function close(fin){ $('bsheet').classList.remove('open'); $('bpin').style.display=''; $('bshow').style.display='none'; if(slides) slides.forEach(sl=>sl.url&&URL.revokeObjectURL(sl.url)); slides=null; if(fin){ flash('radial-gradient(circle, rgba(198,245,58,.7), transparent 60%)'); word('GİT YAP','huge'); sHuge(); vib([40,30,40,30,150]); } }
+  $('bclose').onclick=()=>close(false); $('bclose0').onclick=()=>close(false);
+  $('boostBtn').onclick=()=>{ pin=''; draw(); $('bsheet').classList.add('open'); };
+})();
 
 // ---------- boot ----------
 processDays(); render(); setFit(st.fit,false); checkSlots();
