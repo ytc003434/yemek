@@ -6,160 +6,187 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Yakın">
+<meta name="apple-mobile-web-app-title" content="YANSIN">
 <meta name="theme-color" content="#F5F6F1">
-<title>Yakın</title>
+<title>YANSIN</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#F5F6F1;--card:#FFFFFF;--ink:#15171A;--mute:#7A7F87;--line:#E6E8E1;--lime:#C6F53A;--lime2:#A6DB1F;--limedeep:#5E8A00;--grey:#C9CDD4;--pinkl:#FFB4D1;--pink:#FF5FA2}
+  :root{--bg:#F5F6F1;--card:#FFFFFF;--ink:#15171A;--ink2:#1C1F24;--mute:#7A7F87;--line:#E6E8E1;--lime:#C6F53A;--lime2:#A6DB1F;--limedeep:#5E8A00;--grey:#C9CDD4;--pinkl:#FFB4D1;--pink:#FF5FA2;--nav:64px}
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:"Manrope",system-ui,sans-serif;user-select:none;-webkit-user-select:none;touch-action:none}
-  #app{height:100dvh;display:flex;flex-direction:column;gap:12px;padding:calc(env(safe-area-inset-top) + 12px) 18px calc(env(safe-area-inset-bottom) + 12px);position:relative;overflow:hidden}
-  #flash{position:fixed;inset:0;pointer-events:none;opacity:0;z-index:5}
-  #flash.on{animation:flash .55s ease-out}
-  @keyframes flash{0%{opacity:.9}100%{opacity:0}}
-  #app.shake{animation:shake .45s}
-  #hbar{position:fixed;left:18px;right:18px;top:calc(env(safe-area-inset-top) + 14px);z-index:30;display:none;flex-direction:column;gap:8px;align-items:center}
-  #hbar.on{display:flex} .hb{width:100%;height:18px;border-radius:9px;background:rgba(21,23,26,.12);overflow:hidden;box-shadow:0 8px 24px -10px rgba(0,0,0,.35)}
-  .hb i{display:block;height:100%;width:0;background:var(--hbc,#78DC50);border-radius:9px}
-  #hbTxt{font-size:16px;font-weight:800;letter-spacing:-.03em;background:var(--card);border-radius:999px;padding:4px 12px;border:1px solid var(--line)}
-  @keyframes shake{0%,100%{transform:none}20%{transform:translate(-6px,2px)}40%{transform:translate(6px,-3px)}60%{transform:translate(-4px,1px)}80%{transform:translate(4px,-1px)}}
+  input,textarea{user-select:text;-webkit-user-select:text}
+  #app{height:100dvh;display:flex;flex-direction:column;position:relative;overflow:hidden}
+  .top{display:flex;align-items:center;justify-content:center;gap:8px;padding:calc(env(safe-area-inset-top) + 10px) 18px 6px;flex:none}
+  .top img{width:26px;height:26px;border-radius:7px} .top b{font-size:17px;font-weight:800;letter-spacing:.08em}
+  .page{flex:1;min-height:0;display:none;flex-direction:column;gap:10px;padding:4px 18px 10px;overflow:hidden}
+  .page.on{display:flex}
+  .page.scroll{overflow-y:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch;padding-bottom:20px} .page.scroll>*{flex:none}
+  nav{flex:none;height:calc(var(--nav) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);display:flex;background:var(--card);border-top:1px solid var(--line)}
+  nav button{flex:1;border:none;background:none;font:inherit;font-size:10px;font-weight:800;color:var(--mute);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;letter-spacing:.02em}
+  nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  nav button.on{color:var(--ink)} nav button.on svg{stroke:var(--ink)} nav button.on .dot{width:4px;height:4px;border-radius:50%;background:var(--lime)}
 
-  header{display:flex;justify-content:space-between;align-items:flex-start;flex:none}
-  .stat{font-size:13px;font-weight:700;color:var(--mute);letter-spacing:-.01em}
-  .stat b{font-size:34px;line-height:1;display:block;font-weight:800;color:var(--ink);letter-spacing:-.04em}
-  .stat.s b{background:var(--lime);border-radius:10px;padding:2px 8px;display:inline-block;margin-bottom:4px}
-  .stat.r{text-align:right}
-  .rank{flex:none}
-  .rank .name{font-size:15px;font-weight:800;letter-spacing:-.02em}
-  .rank .name span{color:var(--mute);font-weight:700;font-size:12px;margin-left:8px}
-  .bar{height:6px;border-radius:3px;background:var(--line);margin-top:6px;overflow:hidden}
-  .bar i{display:block;height:100%;width:0;background:var(--ink);transition:width .6s cubic-bezier(.2,.8,.2,1)}
+  #flash{position:fixed;inset:0;pointer-events:none;opacity:0;z-index:5}
+  #flash.on{animation:flash .55s ease-out} @keyframes flash{0%{opacity:.9}100%{opacity:0}}
+  #app.shake{animation:shake .45s} @keyframes shake{0%,100%{transform:none}20%{transform:translate(-6px,2px)}40%{transform:translate(6px,-3px)}60%{transform:translate(-4px,1px)}80%{transform:translate(4px,-1px)}}
+  #hbar{position:fixed;left:18px;right:18px;top:calc(env(safe-area-inset-top) + 14px);z-index:30;display:none;flex-direction:column;gap:8px;align-items:center}
+  #hbar.on{display:flex} .hb{width:100%;height:18px;border-radius:9px;background:rgba(21,23,26,.12);overflow:hidden}
+  .hb i{display:block;height:100%;width:0;background:var(--hbc,#78DC50);border-radius:9px}
+  #hbTxt{font-size:16px;font-weight:800;background:var(--card);border-radius:999px;padding:4px 12px;border:1px solid var(--line)}
+
+  header.stats{display:flex;justify-content:space-between;align-items:flex-start;flex:none}
+  .stat{font-size:12px;font-weight:700;color:var(--mute)} .stat b{font-size:30px;line-height:1;display:block;font-weight:800;color:var(--ink);letter-spacing:-.04em}
+  .stat.s b{background:var(--lime);border-radius:10px;padding:2px 8px;display:inline-block;margin-bottom:4px} .stat.r{text-align:right}
+  .stat.burn b{color:#E8590C} 
+  .rank{flex:none} .rank .name{font-size:14px;font-weight:800} .rank .name span{color:var(--mute);font-weight:700;font-size:11px;margin-left:8px}
+  .bar{height:6px;border-radius:3px;background:var(--line);margin-top:5px;overflow:hidden} .bar i{display:block;height:100%;width:0;background:var(--ink);transition:width .6s}
 
   .slots{display:flex;gap:6px;flex:none}
-  #acts .slot{min-height:46px;padding:7px 10px} #acts .slot b{font-size:13px}
-  .q{position:absolute;top:6px;right:8px;width:20px;height:20px;border-radius:50%;background:var(--ink);color:var(--card);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:2}
-  #calm p{font-size:15px;line-height:1.5;font-weight:600;color:var(--ink)} #calm p.m{color:var(--mute);font-size:13px}
-  .big{font-size:22px;font-weight:800;letter-spacing:-.03em;line-height:1.25}
-  .fact{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;gap:14px;align-items:baseline}
-  .fact b{font-size:28px;font-weight:800;letter-spacing:-.04em;flex:none;min-width:70px} .fact span{font-size:13px;font-weight:600;color:var(--mute);line-height:1.4}
-  .steps{display:flex;flex-direction:column;gap:8px} .steps div{background:var(--lime);border-radius:14px;padding:12px 14px;font-size:14px;font-weight:700}
-  .slot.lift.done{background:#DCE3FF;border-color:#DCE3FF} .slot.lift .fill{background:#B9C6FF}
-  .slot.cardio.done{background:#FFE1B8;border-color:#FFE1B8} .slot.cardio .fill{background:#FFC98A}
-  .slot{flex:1;border-radius:14px;padding:9px 10px;background:var(--card);font-size:11px;font-weight:700;color:var(--mute);border:1px solid var(--line);position:relative;overflow:hidden;min-height:54px}
-  .slot b{display:block;font-size:14px;color:var(--ink);margin-top:1px;position:relative;letter-spacing:-.02em}
-  .slot.good{background:var(--lime);border-color:var(--lime);color:var(--limedeep)}
-  .slot.bad{background:var(--grey);border-color:var(--grey);color:#5B6068}
-  .slot.now{border-color:var(--ink)} .slot.miss{opacity:.45}
-  #pill{cursor:pointer;touch-action:none}
-  #pill .fill{position:absolute;left:0;right:0;bottom:0;height:0;background:var(--pinkl);transition:height .05s linear}
-  #pill.done{background:var(--pinkl);border-color:var(--pinkl)}
-  #pill span.e{position:relative;font-size:12px}
+  .slot{flex:1;border-radius:14px;padding:8px 9px;background:var(--card);font-size:10px;font-weight:700;color:var(--mute);border:1px solid var(--line);position:relative;overflow:hidden;min-height:50px}
+  .slot b{display:block;font-size:13px;color:var(--ink);margin-top:1px;position:relative;letter-spacing:-.02em}
+  .slot.good{background:var(--lime);border-color:var(--lime);color:var(--limedeep)} .slot.bad{background:var(--grey);border-color:var(--grey);color:#5B6068}
+  .slot.cheat{background:var(--card);border-color:var(--ink)} .slot.now{border-color:var(--ink)} .slot.miss{opacity:.45}
+  .slot.snack{min-height:40px;padding:6px 9px;cursor:pointer} .slot.snack b{font-size:12px}
+  #acts .slot{min-height:46px;padding:7px 10px;cursor:pointer} #acts .slot b{font-size:13px}
+  .slot .fill{position:absolute;left:0;right:0;bottom:0;height:0;background:var(--pinkl);transition:height .05s linear}
+  #pill.done{background:var(--pinkl);border-color:var(--pinkl)} .q{position:absolute;top:6px;right:8px;width:20px;height:20px;border-radius:50%;background:var(--ink);color:var(--card);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:2}
+  .slot.lift.done{background:#DCE3FF;border-color:#DCE3FF} .slot.cardio.done{background:#FFE1B8;border-color:#FFE1B8}
 
   main{flex:1;min-height:0;display:flex;align-items:stretch;justify-content:center;position:relative}
-  #card{width:100%;max-width:360px;border-radius:28px;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;padding:14px 16px;position:relative;will-change:transform;cursor:grab;box-shadow:0 24px 50px -30px rgba(21,23,26,.25);min-height:0}
+  #card{width:100%;border-radius:26px;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;padding:12px 14px;position:relative;will-change:transform;cursor:grab;box-shadow:0 24px 50px -30px rgba(21,23,26,.25);min-height:0}
   #card.snap{transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .35s}
+  #tint{position:absolute;inset:0;border-radius:26px;opacity:0;pointer-events:none}
   #sceneWrap{flex:1;min-height:0;position:relative;display:flex;gap:8px}
   #strip{width:52px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:4px}
-  #scene{flex:1;min-height:0;min-width:0;border-radius:18px;display:block;transition:filter .25s}
-  #zoneG,#zoneR{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .2s;border-radius:18px}
+  #wlab{font-size:11px;font-weight:800;color:var(--mute);text-align:center;line-height:1} #wlab b{display:block;font-size:20px;color:var(--ink);letter-spacing:-.04em;margin:2px 0} #wlab.full b{color:#2F8FE0}
+  #fire{flex:1;min-height:0;min-width:0;border-radius:18px;background:var(--ink);position:relative;overflow:hidden;transition:filter .25s;display:flex;flex-direction:column}
+  #zoneG,#zoneR{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .2s;border-radius:18px;z-index:4}
   #zoneG{background:radial-gradient(circle at 100% 0%, rgba(120,220,80,.85), rgba(120,220,80,.25) 45%, transparent 70%)}
   #zoneR{background:radial-gradient(circle at 0% 100%, rgba(255,80,80,.85), rgba(255,80,80,.25) 45%, transparent 70%)}
-  #glass{position:absolute;left:4px;top:10px;width:44px;height:58px;touch-action:none;cursor:grab;z-index:3;filter:drop-shadow(0 6px 10px rgba(21,23,26,.25));transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+  #glass{position:absolute;left:4px;top:10px;width:44px;height:58px;touch-action:none;cursor:grab;z-index:6;filter:drop-shadow(0 6px 10px rgba(21,23,26,.25));transition:transform .35s cubic-bezier(.2,.8,.2,1)}
   #glass svg{width:100%;height:100%;overflow:visible} #glass.drag{transition:none}
-  #drops{position:absolute;left:50%;top:70%;width:0;height:0}
-  .drop{position:absolute;font-size:12px;animation:fall .7s linear forwards}
+  #drops{position:absolute;left:50%;top:70%;width:0;height:0} .drop{position:absolute;font-size:12px;animation:fall .7s linear forwards}
   @keyframes fall{0%{transform:translate(0,0);opacity:1}100%{transform:translate(var(--dx),70px);opacity:0}}
-  #wlab{font-size:11px;font-weight:800;color:var(--mute);text-align:center;line-height:1} #wlab b{display:block;font-size:20px;color:var(--ink);letter-spacing:-.04em;margin:2px 0}
-  #wlab.full b{color:#2F8FE0}
-  .dist{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;flex:none}
-  .dist b{font-size:24px;font-weight:800;letter-spacing:-.04em}
-  .dist span{font-size:12px;font-weight:700;color:var(--mute);text-align:right}
-  #card h1{font-size:19px;line-height:1.05;font-weight:800;letter-spacing:-.03em;margin-top:6px;flex:none}
-  .hint{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--mute);margin-top:6px;flex:none}
-  .hint .r{color:var(--limedeep)} .hint .l{color:#5B6068}
-  #tint{position:absolute;inset:0;border-radius:28px;opacity:0;pointer-events:none}
+  /* fire */
+  .fl{position:absolute;left:50%;bottom:22%;border-radius:50% 50% 45% 45%;filter:blur(var(--b,8px));transform-origin:50% 100%;mix-blend-mode:screen}
+  .fl.a{width:46%;height:60%;background:radial-gradient(ellipse at 50% 90%, #fff 0%, #C6F53A 35%, rgba(198,245,58,0) 75%);animation:fa 1.1s ease-in-out infinite alternate}
+  .fl.b{width:34%;height:70%;background:radial-gradient(ellipse at 50% 90%, #E8FFA0 0%, #A6DB1F 40%, rgba(166,219,31,0) 75%);animation:fb .8s ease-in-out infinite alternate}
+  .fl.c{width:20%;height:44%;background:radial-gradient(ellipse at 50% 90%, #fff 0%, #F3FFC8 50%, rgba(255,255,255,0) 80%);animation:fc .6s ease-in-out infinite alternate;--b:4px}
+  @keyframes fa{from{transform:translateX(-50%) scale(var(--s,1)) skewX(-3deg)}to{transform:translateX(-50%) scale(calc(var(--s,1)*1.06),calc(var(--s,1)*1.1)) skewX(3deg)}}
+  @keyframes fb{from{transform:translateX(-48%) scale(var(--s,1)) skewX(4deg)}to{transform:translateX(-52%) scale(calc(var(--s,1)*1.08),calc(var(--s,1)*1.14)) skewX(-4deg)}}
+  @keyframes fc{from{transform:translateX(-50%) scale(var(--s,1))}to{transform:translateX(-50%) scale(calc(var(--s,1)*1.05),calc(var(--s,1)*1.2))}}
+  .ember{position:absolute;bottom:25%;width:4px;height:4px;border-radius:50%;background:var(--lime);opacity:0;animation:em 2.4s linear infinite}
+  @keyframes em{0%{transform:translate(0,0) scale(1);opacity:0}10%{opacity:.9}100%{transform:translate(var(--ex),-160px) scale(.2);opacity:0}}
+  .base{position:absolute;left:0;right:0;bottom:0;height:24%;background:radial-gradient(ellipse at 50% 100%, rgba(198,245,58,.35), transparent 70%)}
+  .meters{position:absolute;left:10px;right:10px;bottom:10px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;z-index:3}
+  .mt{background:rgba(255,255,255,.08);backdrop-filter:blur(8px);border-radius:12px;padding:7px 8px;color:#fff}
+  .mt small{display:block;font-size:9px;font-weight:800;color:#C9CDD4;letter-spacing:.04em} .mt b{font-size:15px;font-weight:800;letter-spacing:-.03em;display:block;margin:1px 0 4px}
+  .mt i{display:block;height:3px;border-radius:2px;background:rgba(255,255,255,.15);overflow:hidden} .mt i::after{content:'';display:block;height:100%;width:var(--p,0%);background:var(--lime);transition:width .8s}
+  .lvl{position:absolute;top:10px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:baseline;color:#fff;z-index:3}
+  .lvl b{font-size:26px;font-weight:800;letter-spacing:-.04em} .lvl span{font-size:11px;font-weight:700;color:#C9CDD4;text-align:right}
+  .lvl b em{font-style:normal;color:var(--lime)}
+  #card h1{font-size:18px;line-height:1.05;font-weight:800;letter-spacing:-.03em;margin-top:8px;flex:none}
+  .hint{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--mute);margin-top:4px;flex:none} .hint .r{color:var(--limedeep)}
 
-  #rise{position:fixed;inset:0;pointer-events:none;z-index:6;display:flex;align-items:center;justify-content:center}
+  #rise{position:fixed;inset:0;pointer-events:none;z-index:60;display:flex;align-items:center;justify-content:center}
   .word{position:absolute;font-weight:800;text-align:center;letter-spacing:-.04em;white-space:nowrap;animation:rise 1.4s cubic-bezier(.1,.9,.3,1) forwards;padding:4px 14px;border-radius:14px}
-  .word.big{font-size:40px;color:var(--ink);background:var(--lime)}
-  .word.huge{font-size:44px;color:var(--lime);background:var(--ink);animation-duration:2.2s}
-  .word.pinkw{font-size:40px;color:var(--ink);background:var(--pinkl);animation-duration:2.2s}
-  .word.cool{font-size:24px;color:var(--ink);background:var(--grey)}
-  .word.xp{font-size:18px;color:var(--mute);margin-top:70px;animation-duration:1.1s}
+  .word.big{font-size:38px;color:var(--ink);background:var(--lime)} .word.huge{font-size:42px;color:var(--lime);background:var(--ink);animation-duration:2.2s}
+  .word.pinkw{font-size:38px;color:var(--ink);background:var(--pinkl);animation-duration:2.2s} .word.cool{font-size:22px;color:var(--ink);background:var(--grey)}
+  .word.xp{font-size:17px;color:var(--mute);margin-top:70px;animation-duration:1.1s}
   @keyframes rise{0%{transform:translateY(60px) scale(.7);opacity:0}15%{opacity:1;transform:translateY(0) scale(1.05)}75%{opacity:1}100%{transform:translateY(-220px) scale(1);opacity:0}}
-  canvas{position:fixed;inset:0;pointer-events:none;z-index:4}
+  canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:55}
 
-  footer{display:flex;flex-direction:column;gap:8px;flex:none}
-  .weeklabel{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--mute)}
-  #grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-  .col{display:flex;flex-direction:column;gap:5px;align-items:center}
-  .col small{font-size:10px;font-weight:700;color:var(--mute)}
-  .col.today small{color:var(--ink)}
-  .d{width:100%;aspect-ratio:1;border-radius:50%;background:var(--line);transition:transform .3s,background .3s;position:relative;display:flex;align-items:center;justify-content:center;font-size:13px}
-  .d.good{background:var(--lime)} .d.bad{background:var(--grey)} .d.cheat{background:var(--card);border:2px solid var(--ink)}
-  .slot.cheat{background:var(--card);border-color:var(--ink)}
-  .d.pop{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
-  .d .pe{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.2))}
+  .weeklabel{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--mute);flex:none}
+  #grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;flex:none}
+  .col{display:flex;flex-direction:column;gap:4px;align-items:center} .col small{font-size:9px;font-weight:700;color:var(--mute)} .col.today small{color:var(--ink)}
+  .d{width:100%;aspect-ratio:1;border-radius:50%;background:var(--line);transition:transform .3s,background .3s;position:relative;display:flex;align-items:center;justify-content:center}
+  .d.good{background:var(--lime)} .d.bad{background:var(--grey)} .d.cheat{background:var(--card);border:2px solid var(--ink)} .d.pop{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+  .d .pe{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px}
   @keyframes pop{0%{transform:scale(.3)}60%{transform:scale(1.35)}100%{transform:scale(1)}}
-  .row{display:flex;justify-content:center;gap:2px;flex-wrap:wrap}
+  .tools{display:flex;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;flex:none}
+  .tools button{flex:1;border:none;background:none;font:inherit;font-size:12px;font-weight:800;color:var(--ink);padding:10px 4px;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;border-right:1px solid var(--line)}
+  .tools button:last-child{border-right:none} .tools button:disabled{color:var(--grey)} .tools button svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .tools button.on{color:var(--limedeep)}
+
+  h2{font-size:26px;font-weight:800;letter-spacing:-.04em} h3{font-size:12px;font-weight:800;color:var(--mute);margin-bottom:8px;letter-spacing:.04em;text-transform:uppercase}
+  .note{font-size:13px;color:var(--mute);line-height:1.45;font-weight:600}
+  .pillb{align-self:flex-start;font:inherit;font-weight:800;font-size:14px;border:none;border-radius:999px;padding:12px 18px;cursor:pointer;color:var(--ink);background:var(--lime)}
+  .pillb.ghost{background:var(--card);border:1px solid var(--line)} .pillb.dark{background:var(--ink);color:var(--lime)} .pillb:disabled{opacity:.4} .pillb.sm{padding:8px 14px;font-size:13px}
   .btn{font:inherit;font-weight:700;font-size:12px;color:var(--mute);background:none;border:none;padding:6px 9px;cursor:pointer}
-  .btn:disabled{opacity:.3} .btn.on{color:var(--ink)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+  .kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px} .kpi div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:11px;font-weight:700;color:var(--mute)} .kpi b{display:block;font-size:22px;color:var(--ink);font-weight:800;letter-spacing:-.03em}
+  .fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px} .f{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+  .f label{display:block;font-size:11px;font-weight:700;color:var(--mute)} .f input{width:100%;font:inherit;font-weight:800;font-size:18px;color:var(--ink);background:none;border:none;outline:none;margin-top:2px;letter-spacing:-.02em}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+  /* diet */
+  .dslot{display:flex;flex-direction:column;gap:8px} .dhead{display:flex;justify-content:space-between;align-items:baseline} .dhead b{font-size:16px;font-weight:800} .dhead span{font-size:11px;font-weight:700;color:var(--mute)}
+  .dhead .done{background:var(--lime);border-radius:8px;padding:2px 8px;color:var(--limedeep);font-size:11px;font-weight:800}
+  .rail{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;touch-action:pan-x;-webkit-overflow-scrolling:touch;padding:2px 2px 6px;scrollbar-width:none} .rail::-webkit-scrollbar{display:none}
+  .opt{flex:none;width:82%;scroll-snap-align:center;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+  .opt .n{font-size:11px;font-weight:800;color:var(--mute)} .opt .t{font-size:17px;font-weight:800;letter-spacing:-.03em;line-height:1.15}
+  .opt ul{list-style:none;display:flex;flex-direction:column;gap:3px;font-size:13px;font-weight:600;color:#3A3F47} .opt ul li::before{content:'·';margin-right:6px;color:var(--limedeep)}
+  .mac{display:flex;gap:6px;font-size:11px;font-weight:800} .mac span{background:var(--bg);border-radius:8px;padding:3px 7px} .mac span.k{background:var(--ink);color:var(--lime)}
+  .opt .pillb{margin-top:auto;align-self:stretch;text-align:center} .opt.eaten{border-color:var(--lime);background:linear-gradient(180deg,#fff,#F4FFD6)}
+  .dots{display:flex;gap:4px;justify-content:center} .dots i{width:5px;height:5px;border-radius:50%;background:var(--line)} .dots i.on{background:var(--ink)}
+  .plan{background:var(--ink);color:#fff;border-radius:20px;padding:16px} .plan b{font-size:15px;font-weight:800} .plan p{font-size:12px;color:#C9CDD4;font-weight:600;line-height:1.45;margin-top:6px}
+  .plan .mac span{background:rgba(255,255,255,.1);color:#fff} .plan .mac span.k{background:var(--lime);color:var(--ink)}
+
+  /* cardio */
+  .modes{display:grid;grid-template-columns:1fr 1fr;gap:8px} .mode{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+  .mode .e{font-size:22px} .mode .t{font-size:14px;font-weight:800;letter-spacing:-.02em} .mode .k{font-size:11px;font-weight:700;color:var(--mute)}
+  .mode .mins{display:flex;align-items:center;gap:6px} .mode .mins button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--bg);font:inherit;font-weight:800;font-size:16px;cursor:pointer}
+  .mode .mins b{font-size:15px;min-width:44px;text-align:center}
+  .timer{background:var(--ink);color:#fff;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center}
+  .timer .big{font-size:56px;font-weight:800;letter-spacing:-.05em;font-variant-numeric:tabular-nums;line-height:1} .timer .kc{font-size:22px;font-weight:800;color:var(--lime)} .timer .sub{font-size:12px;color:#C9CDD4;font-weight:700}
+  .tring{width:100%;height:8px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden} .tring i{display:block;height:100%;width:0;background:var(--lime);transition:width 1s linear}
+  .sess{display:flex;flex-direction:column;gap:6px} .srow{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:13px;font-weight:700}
+  .srow .kc{margin-left:auto;font-weight:800;color:#E8590C} .srow .x{background:none;border:none;color:var(--mute);font-size:16px;font-weight:800;padding:4px 8px;cursor:pointer}
+
+  /* 60 */
+  .c60{background:var(--ink);color:#fff;border-radius:24px;padding:18px;display:flex;gap:16px;align-items:center}
+  .ring{width:110px;height:110px;flex:none} .c60 .t{font-size:13px;color:#C9CDD4;font-weight:700} .c60 .n{font-size:38px;font-weight:800;letter-spacing:-.05em;line-height:1} .c60 .n em{font-style:normal;color:var(--lime);font-size:20px}
+  .cgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:5px} .cd{aspect-ratio:1;border-radius:6px;background:var(--line);position:relative;font-size:8px;font-weight:800;display:flex;align-items:center;justify-content:center;color:var(--mute)}
+  .cd.s1{background:#E4F3B5} .cd.s2{background:#D3EE85} .cd.s3{background:var(--lime)} .cd.s4{background:var(--lime2);color:#fff} .cd.s5{background:var(--ink);color:var(--lime)} .cd.today{outline:2px solid var(--ink);outline-offset:1px} .cd.future{opacity:.35}
+  .legend{display:flex;gap:10px;font-size:10px;font-weight:700;color:var(--mute);flex-wrap:wrap} .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+
+  /* profile */
+  .pro{display:flex;gap:14px;align-items:center} .ava{width:72px;height:72px;border-radius:50%;background:var(--line);overflow:hidden;flex:none;display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;border:2px solid var(--card);box-shadow:0 0 0 2px var(--lime)}
+  .ava img{width:100%;height:100%;object-fit:cover} .pro .nm{font-size:20px;font-weight:800;letter-spacing:-.03em} .pro .sub{font-size:12px;color:var(--mute);font-weight:700}
+  .wtop{display:flex;justify-content:space-between;align-items:flex-end} .wtop>div{display:flex;flex-direction:column;gap:6px} .wtop .lab{font-size:11px;font-weight:700;color:var(--mute)} .wtop b{font-size:30px;font-weight:800;letter-spacing:-.05em;line-height:1}
+  .wtop .mid b{background:var(--lime);border-radius:10px;padding:4px 10px;font-size:18px;display:inline-block} .wtop .right{text-align:right} .wtop .mid{text-align:center}
+  #journey{width:100%;height:180px;display:block;border-radius:22px;background:linear-gradient(180deg,#EAF2FF,#F7F9F1 60%,#E4EAD6)}
+  .stage{display:flex;justify-content:space-between;align-items:baseline;background:var(--ink);color:var(--card);border-radius:16px;padding:12px 16px} .stage b{font-size:15px;font-weight:800} .stage span{font-size:12px;font-weight:700;color:var(--lime)}
+  .wentry{display:flex;gap:8px;align-items:stretch} .wentry .pillb{align-self:stretch;display:flex;align-items:center}
+  #wchart{width:100%;height:150px;display:block;background:var(--card);border:1px solid var(--line);border-radius:18px}
+  .wlist{display:flex;flex-direction:column;gap:6px} .wrow{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:14px;font-weight:700}
+  .wrow .dt{color:var(--mute);font-size:12px;min-width:70px} .wrow .kg{font-size:18px;font-weight:800} .wrow .dl{font-size:12px;font-weight:800;border-radius:8px;padding:2px 7px} .wrow .dl.down{background:var(--lime)} .wrow .dl.up{background:var(--grey)}
+  .wrow .x{margin-left:auto;background:none;border:none;color:var(--mute);font-size:16px;font-weight:800;padding:4px 8px;cursor:pointer}
+  .gal{display:grid;grid-template-columns:repeat(4,1fr);gap:8px} .gal figure{position:relative} .gal img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;display:block;background:var(--line);cursor:pointer}
+  .gal .x{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(21,23,26,.75);color:#fff;border:none;font-size:12px;font-weight:800;cursor:pointer}
+  .gal figcaption{font-size:10px;font-weight:700;color:var(--mute);margin-top:4px;text-align:center}
+  .mon{display:flex;flex-direction:column;gap:6px}
+  #lightbox{position:fixed;inset:0;z-index:70;background:rgba(15,17,19,.96);display:none;align-items:center;justify-content:center;padding:20px} #lightbox.open{display:flex} #lightbox img{max-width:100%;max-height:100%;border-radius:16px}
+  .boost{display:flex;justify-content:space-between;align-items:center;background:var(--ink);color:var(--card);border-radius:18px;padding:14px 16px} .boost b{display:block;font-size:15px;font-weight:800} .boost span{font-size:12px;color:#9AA0A8;font-weight:700}
+  .remrow{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 8px 8px 14px;font-size:13px;font-weight:700} .remrow input{font:inherit;font-weight:800;font-size:15px;border:none;background:var(--bg);border-radius:8px;padding:6px 8px;color:var(--ink)} .remrow .pillb{margin-left:auto}
 
   .sheet{position:fixed;inset:0;z-index:20;background:var(--bg);padding:calc(env(safe-area-inset-top) + 20px) 20px calc(env(safe-area-inset-bottom) + 24px);display:none;flex-direction:column;gap:18px;overflow:auto;touch-action:pan-y;-webkit-overflow-scrolling:touch}
   .sheet.open{display:flex} .sheet>*{flex:none}
-  .sheet h2{font-size:30px;font-weight:800;letter-spacing:-.04em}
-  .sheet h3{font-size:13px;font-weight:700;color:var(--mute);margin-bottom:8px}
-  .hist{display:flex;gap:8px;align-items:flex-end;height:130px}
-  .hist div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;font-size:9px;font-weight:700;color:var(--mute);text-align:center}
-  .hist b{font-size:13px;color:var(--ink)} .hist .ac{font-size:8px;min-height:10px;letter-spacing:-.02em}
-  .kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px} .kpi div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
-  .hist i{display:block;width:100%;border-radius:8px;background:var(--lime);min-height:4px}
-  .cal{display:flex;flex-direction:column;gap:8px}
-  .cal a{display:flex;justify-content:space-between;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 16px;font-weight:700;font-size:14px}
-  .cal a span{color:var(--mute);font-size:12px}
-  .note{font-size:13px;color:var(--mute);line-height:1.45;font-weight:600}
-  .pillb{align-self:flex-start;font:inherit;font-weight:800;font-size:14px;border:none;border-radius:999px;padding:12px 18px;cursor:pointer;color:var(--ink);background:var(--lime)}
-  .pillb.ghost{background:var(--card);border:1px solid var(--line)} .pillb:disabled{opacity:.4}
-  .fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-  .f{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
-  .f label{display:block;font-size:11px;font-weight:700;color:var(--mute)}
-  .f input{width:100%;font:inherit;font-weight:800;font-size:20px;color:var(--ink);background:none;border:none;outline:none;margin-top:2px;letter-spacing:-.02em}
-  .kpi div{font-size:11px;font-weight:700;color:var(--mute)} .kpi b{display:block;font-size:22px;color:var(--ink);font-weight:800;letter-spacing:-.03em}
-  .gal{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;touch-action:pan-x}
-  .gal figure{flex:none;width:120px}
-  .gal img{width:120px;height:160px;object-fit:cover;border-radius:14px;display:block;background:var(--line)}
-  .gal figcaption{font-size:11px;font-weight:700;color:var(--mute);margin-top:6px;text-align:center}
-  #wchart{width:100%;height:150px;display:block;background:var(--card);border:1px solid var(--line);border-radius:18px}
-  #journey{width:100%;height:190px;display:block;border-radius:22px;background:linear-gradient(180deg,#EAF2FF,#F7F9F1 60%,#E4EAD6)}
-  .wtop{display:flex;justify-content:space-between;align-items:flex-end}
-  .wtop .lab{display:block;font-size:11px;font-weight:700;color:var(--mute)} .wtop b{font-size:34px;font-weight:800;letter-spacing:-.05em;line-height:1}
-  .wtop .mid b{background:var(--lime);border-radius:10px;padding:4px 10px;font-size:20px;display:inline-block;margin-top:6px}
-  .wtop>div{display:flex;flex-direction:column;gap:6px} .wtop .right{text-align:right} .wtop .mid{text-align:center}
-  .stage{display:flex;justify-content:space-between;align-items:baseline;background:var(--ink);color:var(--card);border-radius:16px;padding:12px 16px}
-  .stage b{font-size:16px;font-weight:800;letter-spacing:-.02em} .stage span{font-size:12px;font-weight:700;color:var(--lime)}
-  .wentry{display:flex;gap:8px;align-items:stretch} .wentry .pillb{align-self:stretch;display:flex;align-items:center}
-  .wlist{display:flex;flex-direction:column;gap:6px}
-  .wrow{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:14px;font-weight:700}
-  .wrow .dt{color:var(--mute);font-size:12px;min-width:70px} .wrow .kg{font-size:18px;font-weight:800;letter-spacing:-.03em} .wrow .dl{font-size:12px;font-weight:800;border-radius:8px;padding:2px 7px}
-  .wrow .dl.down{background:var(--lime)} .wrow .dl.up{background:var(--grey)} .wrow .x{margin-left:auto;background:none;border:none;color:var(--mute);font-size:16px;font-weight:800;padding:4px 8px;cursor:pointer}
-  @keyframes pulse{0%,100%{r:7}50%{r:11}} .pulse{animation:pulse 1.2s ease-in-out infinite}
-  .boost{display:flex;justify-content:space-between;align-items:center;background:var(--ink);color:var(--card);border-radius:18px;padding:14px 16px}
-  .boost b{display:block;font-size:16px;font-weight:800;letter-spacing:-.02em} .boost span{font-size:12px;color:#9AA0A8;font-weight:700}
   .sheet.dark{background:#0F1113;color:#fff;z-index:40} .sheet.dark h2{color:#fff}
-  .pins{display:flex;gap:14px;justify-content:center;margin:10px 0} .pins i{width:16px;height:16px;border-radius:50%;border:2px solid #3A3F47} .pins i.on{background:var(--lime);border-color:var(--lime)}
-  .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:280px;width:100%;align-self:center}
-  .pad button{aspect-ratio:1.4;border-radius:18px;border:none;background:#1C1F24;color:#fff;font:inherit;font-size:24px;font-weight:800;cursor:pointer}
-  .pad button:active{background:var(--lime);color:var(--ink)} .pad button.del{font-size:16px;color:#9AA0A8}
-  .pins.err{animation:shake .4s}
+  #calm p{font-size:15px;line-height:1.5;font-weight:600;color:var(--ink)} #calm p.m{color:var(--mute);font-size:13px} .bigp{font-size:21px;font-weight:800;letter-spacing:-.03em;line-height:1.25}
+  .fact{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;gap:14px;align-items:baseline} .fact b{font-size:26px;font-weight:800;letter-spacing:-.04em;flex:none;min-width:70px} .fact span{font-size:13px;font-weight:600;color:var(--mute);line-height:1.4}
+  .steps{display:flex;flex-direction:column;gap:8px} .steps div{background:var(--lime);border-radius:14px;padding:12px 14px;font-size:14px;font-weight:700}
+  .pins{display:flex;gap:14px;justify-content:center;margin:10px 0} .pins i{width:16px;height:16px;border-radius:50%;border:2px solid #3A3F47} .pins i.on{background:var(--lime);border-color:var(--lime)} .pins.err{animation:shake .4s}
+  .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:280px;width:100%;align-self:center} .pad button{aspect-ratio:1.4;border-radius:18px;border:none;background:#1C1F24;color:#fff;font:inherit;font-size:24px;font-weight:800;cursor:pointer} .pad button:active{background:var(--lime);color:var(--ink)} .pad button.del{font-size:16px;color:#9AA0A8}
   .bprog{display:flex;gap:6px} .bprog i{flex:1;height:4px;border-radius:2px;background:#2A2E34} .bprog i.on{background:var(--lime)}
-  .bimgwrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;border-radius:22px;overflow:hidden;background:#1C1F24}
-  .bimgwrap img{max-width:100%;max-height:100%;object-fit:contain;display:block;border-radius:22px;animation:bin .6s cubic-bezier(.2,.8,.2,1)}
+  .bimgwrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;border-radius:22px;overflow:hidden;background:#1C1F24} .bimgwrap img{max-width:100%;max-height:100%;object-fit:contain;display:block;border-radius:22px;animation:bin .6s}
   @keyframes bin{0%{opacity:0;transform:scale(.96)}100%{opacity:1;transform:none}}
-  @media (prefers-reduced-motion:reduce){.word,.d.pop,#flash.on,#app.shake{animation:none}}
+  .hist{display:flex;gap:8px;align-items:flex-end;height:130px} .hist div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;font-size:9px;font-weight:700;color:var(--mute);text-align:center} .hist i{display:block;width:100%;border-radius:8px;background:var(--lime);min-height:4px} .hist b{font-size:13px;color:var(--ink)} .hist .ac{font-size:8px;min-height:10px}
+  @keyframes pulse{0%,100%{r:7}50%{r:11}} .pulse{animation:pulse 1.2s ease-in-out infinite}
+  @media (prefers-reduced-motion:reduce){.word,.d.pop,#flash.on,#app.shake,.fl,.ember{animation:none}}
 </style>
 </head>
 <body>
@@ -167,521 +194,560 @@
 <div id="hbar"><div class="hb"><i id="hbFill"></i></div><span id="hbTxt"></span></div>
 <canvas id="fx"></canvas>
 <div id="rise"></div>
+<div id="lightbox"><img id="lbimg" alt=""></div>
 
 <div id="app">
-  <header>
-    <div class="stat s"><b id="streak">0</b>seri</div>
-    <div class="stat r"><b id="rate">—</b>bu hafta</div>
-  </header>
-  <div class="rank">
-    <div class="name"><span id="rankName" style="color:var(--bone);font-size:15px;margin:0"></span><span id="xpTxt"></span></div>
-    <div class="bar"><i id="xpBar"></i></div>
-  </div>
-  <div class="slots" id="slots"></div>
-  <div class="slots" id="acts"></div>
+  <div class="top"><img src="icon-192.png" alt=""><b>YANSIN</b></div>
 
-  <main>
-    <div id="card">
-      <div id="tint"></div>
-      <div id="sceneWrap"><div id="strip"><div id="wlab">💧<b>0</b>L</div></div><svg id="scene" viewBox="0 0 340 210" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"></svg>
-        <div id="glass"><svg viewBox="0 0 60 80"><defs><clipPath id="gc"><path d="M 12 6 L 48 6 L 43 74 L 17 74 Z"/></clipPath></defs>
-          <g clip-path="url(#gc)"><rect id="gw" x="0" y="20" width="60" height="60" fill="#5FB9FF"/><rect id="gw2" x="0" y="20" width="60" height="4" fill="#BFE5FF" opacity=".9"/></g>
-          <path d="M 12 6 L 48 6 L 43 74 L 17 74 Z" fill="none" stroke="#15171A" stroke-width="3" stroke-linejoin="round"/>
-          <circle id="gring" cx="30" cy="40" r="34" fill="none" stroke="#5FB9FF" stroke-width="3" stroke-dasharray="0 1000" transform="rotate(-90 30 40)" opacity="0"/></svg>
-          <div id="drops"></div></div>
-        <div id="zoneG"></div><div id="zoneR"></div></div>
-      <div class="dist"><b id="distPct">0%</b><span id="distTxt"></span></div>
-      <h1 id="title">Yemek yedin. Nasıldı?</h1>
-      <div class="hint"><span class="l" id="hintL">← kötü</span><span class="r">iyi →</span></div>
-    </div>
-  </main>
-
-  <footer>
+  <!-- ANA -->
+  <section class="page on" id="pg-home">
+    <header class="stats">
+      <div class="stat s"><b id="streak">0</b>seri</div>
+      <div class="stat burn"><b id="burn">0</b>kcal yandı 🔥</div>
+      <div class="stat r"><b id="rate">—</b>bu hafta</div>
+    </header>
+    <div class="rank"><div class="name"><span id="rankName" style="color:var(--ink);font-size:14px;margin:0"></span><span id="xpTxt"></span></div><div class="bar"><i id="xpBar"></i></div></div>
+    <div class="slots" id="slots"></div>
+    <div class="slots" id="snacks"></div>
+    <div class="slots" id="acts"></div>
+    <main>
+      <div id="card">
+        <div id="tint"></div>
+        <div id="sceneWrap">
+          <div id="strip"><div id="wlab">💧<b>0</b>L</div></div>
+          <div id="fire">
+            <div class="lvl"><b><em id="lvlPct">0</em>%</b><span id="lvlTxt"></span></div>
+            <div class="base"></div><div class="fl a" id="fla"></div><div class="fl b" id="flb"></div><div class="fl c" id="flc"></div>
+            <div id="embers"></div>
+            <div class="meters" id="meters"></div>
+          </div>
+          <div id="glass"><svg viewBox="0 0 60 80"><defs><clipPath id="gc"><path d="M 12 6 L 48 6 L 43 74 L 17 74 Z"/></clipPath></defs>
+            <g clip-path="url(#gc)"><rect id="gw" x="0" y="20" width="60" height="60" fill="#5FB9FF"/><rect id="gw2" x="0" y="20" width="60" height="4" fill="#BFE5FF" opacity=".9"/></g>
+            <path d="M 12 6 L 48 6 L 43 74 L 17 74 Z" fill="none" stroke="#15171A" stroke-width="3" stroke-linejoin="round"/>
+            <circle id="gring" cx="30" cy="40" r="34" fill="none" stroke="#5FB9FF" stroke-width="3" stroke-dasharray="0 1000" transform="rotate(-90 30 40)" opacity="0"/></svg><div id="drops"></div></div>
+          <div id="zoneG"></div><div id="zoneR"></div>
+        </div>
+        <h1 id="title">Yemek yedin. Nasıldı?</h1>
+        <div class="hint"><span class="l" id="hintL">← kötü</span><span class="r">iyi →</span></div>
+      </div>
+    </main>
     <div class="weeklabel"><span id="wk"></span><span id="cnt">0 / 21</span></div>
     <div id="grid"></div>
-    <div class="row">
-      <button class="btn" id="undo" disabled>geri al</button>
-      <button class="btn" id="snd">ses: açık</button>
-      <button class="btn" id="prof">profil</button>
-      <button class="btn" id="stats">özet & bildirim</button>
+    <div class="tools">
+      <button id="undo"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>geri</button>
+      <button id="redo"><svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h3"/></svg>ileri</button>
+      <button id="snd"><svg viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg><span id="sndT">ses</span></button>
+      <button id="stats"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg>özet</button>
     </div>
-  </footer>
+  </section>
+
+  <!-- DIYET -->
+  <section class="page scroll" id="pg-diet">
+    <h2>Diyet</h2>
+    <div class="plan" id="planBox"></div>
+    <div id="dietSlots" style="display:flex;flex-direction:column;gap:18px"></div>
+  </section>
+
+  <!-- KARDIYO -->
+  <section class="page scroll" id="pg-cardio">
+    <h2>Kardiyo & Antrenman</h2>
+    <div class="timer" id="timerBox" style="display:none">
+      <div class="sub" id="tName"></div><div class="big" id="tTime">00:00</div><div class="kc" id="tKcal">0 kcal</div>
+      <div class="tring"><i id="tRing"></i></div>
+      <div class="row" style="justify-content:center"><button class="pillb" id="tStop">Bitir ✓</button><button class="pillb ghost" id="tCancel" style="color:#fff;background:transparent;border-color:#3A3F47">İptal</button></div>
+    </div>
+    <p class="note" id="cardioNote"></p>
+    <div class="modes" id="modes"></div>
+    <div><h3>Bugün & bu hafta</h3><div class="kpi" id="ckpi"></div></div>
+    <div><h3>Son antrenmanlar</h3><div class="sess" id="sess"></div></div>
+  </section>
+
+  <!-- 60 -->
+  <section class="page scroll" id="pg-60">
+    <h2>#60Challenge</h2>
+    <div class="c60"><svg class="ring" viewBox="0 0 100 100" id="c60ring"></svg><div><div class="t" id="c60range"></div><div class="n"><span id="c60day">1</span><em>/60</em></div><div class="t" id="c60sub"></div></div></div>
+    <div class="legend"><span><i style="background:var(--line)"></i>boş</span><span><i style="background:#E4F3B5"></i>1</span><span><i style="background:#D3EE85"></i>2</span><span><i style="background:var(--lime)"></i>3</span><span><i style="background:var(--lime2)"></i>4</span><span><i style="background:var(--ink)"></i>5 mükemmel</span></div>
+    <div class="cgrid" id="cgrid"></div>
+    <p class="note">Gün puanı: 3 iyi ana öğün (+1 her biri), F+M, 2 L+ su → 5 = mükemmel gün. Antrenman ve ara öğünler xp'ye gider.</p>
+    <div class="kpi" id="c60kpi"></div>
+  </section>
+
+  <!-- PROFIL -->
+  <section class="page scroll" id="pg-profile">
+    <div class="pro"><div class="ava" id="ava">🙂</div><div><div class="nm" id="proName">—</div><div class="sub" id="proSub"></div></div><input type="file" id="avaIn" accept="image/*" style="display:none"></div>
+    <div class="fields"><div class="f"><label>ad</label><input id="fname" placeholder="Ad"></div><div class="f"><label>soyad</label><input id="lname" placeholder="Soyad"></div><div class="f"><label>doğum</label><input id="dob" type="date"></div></div>
+    <div class="wtop"><div><span class="lab">şu an</span><b id="wNow">—</b></div><div class="mid"><span class="lab">başlangıçtan</span><b id="wDelta">—</b></div><div class="right"><span class="lab">hedefe</span><b id="wLeft">—</b></div></div>
+    <svg id="journey" viewBox="0 0 340 170" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="stage"><b id="stageName">—</b><span id="stageSub"></span></div>
+    <div class="fields"><div class="f"><label>boy (cm)</label><input id="hgt" type="number" inputmode="numeric" placeholder="—"></div><div class="f"><label>hedef (kg)</label><input id="goal" type="number" inputmode="decimal" step="0.1" placeholder="88"></div><div class="f"><label>bugünkü kilo</label><input id="wgt" type="number" inputmode="decimal" step="0.1" placeholder="—"></div></div>
+    <button class="pillb" id="wsave" style="align-self:stretch;text-align:center">Bugünü kaydet</button>
+    <div><h3>Tarih / kg</h3><svg id="wchart" viewBox="0 0 340 150" preserveAspectRatio="none"></svg></div>
+    <div class="wlist" id="wlist"></div>
+    <div class="boost"><div><b>Motivasyon boost</b><span>şifreli · kötü günler için</span></div><button class="pillb dark" id="boostBtn">Aç</button></div>
+    <div><h3>Aylık foto — ayda 4'e kadar</h3><p class="note" id="photoNote"></p><input type="file" id="photoIn" accept="image/*" style="display:none"><button class="pillb ghost sm" id="photoBtn" style="margin-top:8px">+ Foto ekle</button><div class="mon" id="gal" style="margin-top:12px"></div></div>
+    <div><h3>Hatırlatıcılar</h3><p class="note">Saati değiştir, "Takvime" bas: iPhone Takvim'e günlük tekrarlayan alarm olarak eklenir. Anımsatıcılar'daki eskileri silmeyi unutma.</p><div id="rems" style="display:flex;flex-direction:column;gap:6px;margin-top:8px"></div></div>
+  </section>
+
+  <nav>
+    <button data-pg="home" class="on"><svg viewBox="0 0 24 24"><path d="M3 11 12 3l9 8v10H3z"/><path d="M9 21v-6h6v6"/></svg>Ana<i class="dot"></i></button>
+    <button data-pg="diet"><svg viewBox="0 0 24 24"><path d="M4 12h16"/><path d="M6 12a6 6 0 0 1 12 0"/><path d="M8 16h8"/></svg>Diyet<i class="dot"></i></button>
+    <button data-pg="cardio"><svg viewBox="0 0 24 24"><path d="M13 3 6 14h5l-1 7 8-11h-5z"/></svg>Kardiyo<i class="dot"></i></button>
+    <button data-pg="60"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>#60<i class="dot"></i></button>
+    <button data-pg="profile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profil<i class="dot"></i></button>
+  </nav>
 </div>
 
+<!-- ÖZET -->
 <div id="sheet" class="sheet">
   <div style="display:flex;justify-content:space-between;align-items:flex-start"><h2>Özet</h2><button class="btn" id="close" style="font-size:14px">kapat ✕</button></div>
-  <div><h3>Son 6 hafta — iyi yemek</h3><div class="hist" id="hist"></div></div>
+  <div><h3>Son 6 hafta — iyi ana öğün</h3><div class="hist" id="hist"></div></div>
   <div class="kpi" id="kpi"></div>
-  <div>
-    <h3>Bildirimler</h3>
-    <p class="note" id="notifState"></p>
-    <div class="row" style="justify-content:flex-start;gap:10px;margin-top:10px">
-      <button class="pillb" id="askNotif">Bildirimlere izin ver</button>
-      <button class="pillb ghost" id="testNotif">Test et</button>
-    </div>
-  </div>
-  <div>
-    <h3>Alternatif — Google Takvim</h3>
-    <p class="note">Anımsatıcılar yerine Takvim istersen: dördüne bas, her biri günlük tekrarlayan hatırlatıcı açar.</p>
-    <div class="cal" id="cal" style="margin-top:10px"></div>
-  </div>
-  <button class="pillb" id="share">Haftayı paylaş</button>
+  <div class="row"><button class="pillb" id="pdf">📄 PDF çıktı al</button><button class="pillb ghost" id="share">Haftayı paylaş</button></div>
+  <p class="note" id="pdfNote"></p>
 </div>
 
-
+<!-- SAKİN OL -->
 <div id="calm" class="sheet">
   <h2>Sakin ol. Rakamlara bak.</h2>
-  <p class="big">Bugün hapı aldın ya da almadın — iki durumda da şu an kafanda dönen şey bir yan etki değil, Reddit'in yan etkisi.</p>
-  <p>Finasterid dünyanın en çok çalışılmış ilaçlarından biri. 1 mg dozunda, onay çalışmalarında cinsel yan etki bildiren erkek oranı yaklaşık %4'tü; şeker hapı (plasebo) alan grupta bu oran %2 civarıydı. Yani ilacın kendine ait ek riski birkaç yüzde puanı — ve bu vakaların büyük çoğunluğu ya kullanırken kendiliğinden geçti ya da bırakınca düzeldi.</p>
-  <div class="fact"><b>%15 → %44</b><span>Aynı ilaç, aynı doz. Yan etkiler anlatılmadan verilen grupta %15, "cinsel yan etki yapabilir" denilen grupta %44 şikâyet. Bu bir nocebo çalışması; korku, yan etkinin ta kendisini üretiyor.</span></div>
-  <div class="fact"><b>~3 puan</b><span>İlacın plaseboya göre gerçek ek yan etki farkı. Reddit'te okuduğun her şey bu küçük dilimin, on binlerce sorunsuz kullanıcının sesi olmadığı bir yerde toplanmış hâli.</span></div>
-  <div class="fact"><b>10 milyon+</b><span>Yıllardır kullanan erkek sayısı bu ölçekte. Sorun yaşamayan hiç kimse gidip "bugün de bir şey olmadı" diye post açmıyor.</span></div>
-  <p class="m">Kalıcı sendrom iddiaları bilim dünyasında hâlâ tartışmalı; bildirilen vaka sayısı kullanan milyonlara oranla son derece küçük ve büyük kısmında kanıt seviyesi zayıf. Bu, "sıfır" demek değil — ama bir Reddit sayfasının sana hissettirdiğinden çok, çok uzak.</p>
+  <p class="bigp">Bugün hapı aldın ya da almadın — iki durumda da şu an kafanda dönen şey bir yan etki değil, Reddit'in yan etkisi.</p>
+  <p>Finasterid dünyanın en çok çalışılmış ilaçlarından biri. 1 mg dozunda, onay çalışmalarında cinsel yan etki bildiren erkek oranı yaklaşık %4'tü; plasebo grubunda %2 civarıydı. İlacın kendine ait ek riski birkaç yüzde puanı — ve bu vakaların büyük çoğunluğu ya kullanırken kendiliğinden geçti ya da bırakınca düzeldi.</p>
+  <div class="fact"><b>%15 → %44</b><span>Aynı ilaç, aynı doz. Yan etkiler anlatılmadan verilen grupta %15, "cinsel yan etki yapabilir" denilen grupta %44 şikâyet. Nocebo: korku, yan etkinin ta kendisini üretiyor.</span></div>
+  <div class="fact"><b>~3 puan</b><span>İlacın plaseboya göre gerçek ek yan etki farkı. Reddit bu küçük dilimin toplandığı yer; sorunsuz milyonlar orada yok.</span></div>
+  <div class="fact"><b>10 milyon+</b><span>Yıllardır kullanan erkek sayısı bu ölçekte. Kimse "bugün de bir şey olmadı" diye post açmıyor.</span></div>
+  <p class="m">Kalıcı sendrom iddiaları bilim dünyasında tartışmalı; bildirilen vaka sayısı kullanan milyonlara oranla çok küçük, kanıt seviyesi zayıf. "Sıfır" değil — ama bir Reddit sayfasının hissettirdiğinden çok uzak.</p>
   <h3>Şimdi ne yapacaksın</h3>
-  <div class="steps">
-    <div>1. Google'ı ve Reddit'i kapat. Şu an okuyacağın hiçbir şey seni rahatlatmayacak, algoritma korkuyu ödüllendiriyor.</div>
-    <div>2. Vücudunu tarama. Hissettiğin şey "acaba" ile bakınca büyüyen normal dalgalanma. Bugün bir şey ölçmek zorunda değilsin.</div>
-    <div>3. Kararı tek başına Reddit'le değiştirme. Rahatsızlık iki haftadan uzun sürerse dermatoloğunla konuş; o senin için karar verecek doğru kişi, yabancılar değil.</div>
-    <div>4. Bu ekranı kapat, sağa kaydır, devam et.</div>
-  </div>
-  <p class="m">Bu bir bilgilendirme, tıbbi tavsiye değil. Rakamlar 1 mg finasterid faz III çalışmaları ve nocebo araştırmalarından; ilaç kararların doktorunla.</p>
+  <div class="steps"><div>1. Google'ı ve Reddit'i kapat. Algoritma korkuyu ödüllendiriyor.</div><div>2. Vücudunu tarama. "Acaba" ile bakınca büyüyen normal dalgalanma.</div><div>3. İki haftayı geçen bir şey olursa dermatoloğunla konuş; karar oradan, yabancılardan değil.</div><div>4. Bu ekranı kapat, sağa kaydır, devam et.</div></div>
+  <p class="m">Bilgilendirme, tıbbi tavsiye değil. Rakamlar 1 mg finasterid faz III çalışmaları ve nocebo araştırmalarından; ilaç kararların doktorunla.</p>
   <button class="pillb" id="calmClose">Tamam, geçti</button>
 </div>
 
+<!-- BOOST -->
 <div id="bsheet" class="sheet dark">
-  <div id="bpin">
-    <h2>Şifre</h2><p class="note" style="color:#9AA0A8">4 hane. Bu bölüm sadece senin için.</p>
-    <div class="pins" id="pins"><i></i><i></i><i></i><i></i></div>
-    <div class="pad" id="pad"></div>
-    <button class="btn" id="bclose0" style="color:#9AA0A8;align-self:center">vazgeç</button>
-  </div>
+  <div id="bpin"><h2>Şifre</h2><p class="note" style="color:#9AA0A8">4 hane. Bu bölüm sadece senin için.</p><div class="pins" id="pins"><i></i><i></i><i></i><i></i></div><div class="pad" id="pad"></div><button class="btn" id="bclose0" style="color:#9AA0A8;align-self:center">vazgeç</button></div>
   <div id="bshow" style="display:none;flex-direction:column;gap:14px;flex:1;min-height:0">
-    <div class="bprog" id="bprog"></div>
-    <div class="bimgwrap" id="bimgwrap"><img id="bimg" alt=""></div>
-    <div><h2 id="bt" style="color:#fff;font-size:26px"></h2><p id="bp" class="note" style="color:#C9CDD4;font-size:15px;margin-top:8px"></p></div>
+    <div class="bprog" id="bprog"></div><div class="bimgwrap" id="bimgwrap"><img id="bimg" alt=""></div>
+    <div><h2 id="bt" style="color:#fff;font-size:24px"></h2><p id="bp" class="note" style="color:#C9CDD4;font-size:15px;margin-top:8px"></p></div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto"><button class="btn" id="bclose" style="color:#9AA0A8">kapat</button><button class="pillb" id="bnext">Sonraki →</button></div>
   </div>
 </div>
-<div id="psheet" class="sheet">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start"><h2>Yolculuk</h2><button class="btn" id="pclose" style="font-size:14px">kapat ✕</button></div>
-  <div class="wtop"><div><span class="lab">şu an</span><b id="wNow">—</b></div><div class="mid"><span class="lab">başlangıçtan</span><b id="wDelta">—</b></div><div class="right"><span class="lab">hedefe</span><b id="wLeft">—</b></div></div>
-  <svg id="journey" viewBox="0 0 340 170" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg>
-  <div class="stage"><b id="stageName">—</b><span id="stageSub"></span></div>
-  <div class="fields" style="grid-template-columns:1fr 1fr">
-    <div class="f"><label>boy (cm)</label><input id="hgt" type="number" inputmode="numeric" placeholder="—"></div>
-    <div class="f"><label>hedef (kg)</label><input id="goal" type="number" inputmode="decimal" step="0.1" placeholder="90"></div>
-  </div>
-  <div class="wentry"><div class="f" style="flex:1"><label>bugünkü kilo</label><input id="wgt" type="number" inputmode="decimal" step="0.1" placeholder="—"></div><button class="pillb" id="wsave">Bugünü kaydet</button></div>
-  <div><h3>Tarih / kg</h3><svg id="wchart" viewBox="0 0 340 150" preserveAspectRatio="none"></svg></div>
-  <div class="wlist" id="wlist"></div>
-  <div class="boost"><div><b>Motivasyon boost</b><span>şifreli · kötü günler için</span></div><button class="pillb" id="boostBtn" style="background:var(--ink);color:var(--lime)">Aç</button></div>
-  <div>
-    <h3>Aylık foto — ayda 1</h3>
-    <p class="note" id="photoNote"></p>
-    <input type="file" id="photoIn" accept="image/*" style="display:none">
-    <button class="pillb ghost" id="photoBtn" style="margin-top:10px">Bu ayın fotosunu yükle</button>
-    <div class="gal" id="gal" style="margin-top:12px"></div>
-  </div>
-</div>
-
 <script>
-// ---------- storage ----------
+// ================= STORAGE =================
 const KEY='yemek_log_v2', SKEY='yemek_settings';
-let log=[], st={sound:true,notified:{},fit:18,pills:[],hgt:'',goal:'',weights:[],photos:[],processed:0,cheats:0,weekDone:0,lift:[],cardio:[],water:[]};
+let log=[], st={sound:true,notified:{},fit:18,pills:[],lift:[],cardio:[],water:[],hgt:'',goal:'',weights:[],photos:[],processed:0,cheats:0,weekDone:0,sessions:[],snacks:[],name:'',lname:'',dob:'2002-01-18',avatar:'',c60:'2026-09-10',rems:{k:'08:30',o:'14:00',a:'20:00',f:'23:00'},active:null};
 try{ log=JSON.parse(localStorage.getItem(KEY)||'[]'); st=Object.assign(st,JSON.parse(localStorage.getItem(SKEY)||'{}')); }catch(e){}
+// migrate: old photos {m,d} → {m,d,t}
+st.photos=(st.photos||[]).map(p=>p.t?p:Object.assign(p,{t:Date.now()}));
+if(!st.goal) st.goal='88';
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(log)); localStorage.setItem(SKEY,JSON.stringify(st)); return true; }catch(e){ return false; } }
+let redo=[]; // {k, item}
 
-// ---------- time ----------
-const SLOTS=[{h:8,m:30,n:'Kahvaltı'},{h:14,m:0,n:'Öğle'},{h:20,m:0,n:'Akşam'}];
-const PILL={h:23,m:0,n:'F+M'};
+// ================= TIME =================
+const $=id=>document.getElementById(id);
+const L=(a,b,t)=>a+(b-a)*t, clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function weekStart(d=new Date()){ const x=new Date(d); x.setHours(0,0,0,0); const day=(x.getDay()+6)%7; x.setDate(x.getDate()-day); return x; }
 const dayStart=(d=new Date())=>{ const x=new Date(d); x.setHours(0,0,0,0); return x.getTime(); };
 const inWeek=ws=>log.filter(e=>e.t>=ws&&e.t<ws+7*864e5);
 const thisWeek=()=>inWeek(weekStart().getTime());
 const today=()=>log.filter(e=>e.t>=dayStart());
-
+const inDay=(arr,ds)=>arr.filter(x=>(x.t??x)>=ds&&(x.t??x)<ds+864e5);
 const hhmm=(h,m)=>`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const MON=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+const DAYS=['Pt','Sa','Ça','Pe','Cu','Ct','Pa'];
+const fmtD=d=>`${d.getDate()} ${MON[d.getMonth()]}`;
 
-
-// ---------- günlük aksiyonlar: F+M / ağırlık / kardiyo ----------
-const ACTS=[
- {k:'pills',cls:'pill',e:'💊',n:'F+M',fit:8,xp:15,word:'+15 SAÇ KÖKÜ',wcls:'pinkw',cols:['#FFB4D1','#FF5FA2','#15171A','#C6F53A'],flash:'rgba(255,180,209,.9)',weekly:false},
- {k:'lift',cls:'lift',e:'🏋️',n:'Ağırlık',fit:7,xp:20,word:'KAS DOLUYOR',wcls:'huge',cols:['#B9C6FF','#4A6CFF','#15171A','#C6F53A'],flash:'rgba(185,198,255,.9)',weekly:true},
- {k:'cardio',cls:'cardio',e:'🏃',n:'Kardiyo',fit:6,xp:20,word:'KALP ATIYOR',wcls:'huge',cols:['#FFC98A','#FF8A1A','#15171A','#C6F53A'],flash:'rgba(255,201,138,.9)',weekly:true}];
-const actToday=k=>st[k].some(t=>t>=dayStart());
-const actWeek=k=>st[k].filter(t=>t>=weekStart().getTime()).length;
-function actStreak(k){ let s=0, d=dayStart(); if(!actToday(k)) d-=864e5; while(st[k].some(t=>t>=d&&t<d+864e5)){ s++; d-=864e5; } return s; }
-
-// ---------- xp / rank ----------
+// ================= DATA =================
+const MAIN=[{id:'k',n:'Kahvaltı',h:8,m:30},{id:'o',n:'Öğle',h:14,m:0},{id:'a',n:'Akşam',h:20,m:0}];
+const SNK=[{id:'s1',n:'Ara 1',h:11,m:0},{id:'s2',n:'Ara 2',h:17,m:0},{id:'s3',n:'Ara 3',h:22,m:0}];
+const PILL={h:23,m:0,n:'F+M'};
 const RANKS=[[0,'Çaylak'],[150,'Düzenli'],[400,'Disiplinli'],[800,'Sıkı'],[1400,'Makine'],[2200,'Zırhlı'],[3500,'Efsane'],[5500,'Titan'],[8000,'Başka Boyut'],[12000,'Final Boss']];
-function xp(){ let x=0,s=0; for(const e of log){ if(e.good){ s++; x+=(10+Math.min(s,10)*2)*(e.jackpot?3:1); } else if(!e.cheat) s=0; } return x+st.pills.length*15+(st.lift.length+st.cardio.length)*20+st.water.length*5; }
-function streakNow(){ let s=0; for(let i=log.length-1;i>=0;i--){ if(log[i].good) s++; else if(!log[i].cheat) break; } return s; }
-function rankOf(x){ let i=0; while(i+1<RANKS.length&&x>=RANKS[i+1][0]) i++; return i; }
-const pillToday=()=>actToday('pills'); const pillStreak=()=>actStreak('pills');
-
-// ---------- copy ----------
-const GOOD=["YAKLAŞTIN","GLOW +1","YÜZÜN PARLIYOR","FOTOLARDA NET","CİLT LEVEL UP","TEMİZ ENERJİ","ÇENE HATTI GELİYOR","BUGÜN KAZANDIN","MAKİNE GİBİ","ATEŞ ATEŞ","DİSİPLİN = ÖZGÜRLÜK","KIZLAR FARK ETTİ"];
+const GOOD=["YANIYOR","GLOW +1","YÜZÜN PARLIYOR","FOTOLARDA NET","ÇENE HATTI GELİYOR","TEMİZ ENERJİ","BUGÜN KAZANDIN","MAKİNE GİBİ","DİSİPLİN = ÖZGÜRLÜK","AYNADA FARK VAR"];
 const STREAK={3:"3 SERİ — ISINDIN",5:"5 SERİ — RİTİM TUTTU",10:"10 SERİ — DURDURULAMAZ",21:"21 SERİ — TAM HAFTA"};
 const MILESTONE={7:"7 İYİ — 1/3 GİTTİ",14:"14 İYİ — GÖRÜNÜYOR",21:"21/21 — MÜKEMMEL HAFTA"};
 const BAD=["Kayıt alındı.","Oldu bir kere.","Sıfırlıyoruz.","Sonraki yemek seninki.","Sessiz. Geçti."];
 const TITLES=["Yemek yedin. Nasıldı?","Sıradaki. Ne yedin?","Bir tane daha. Nasıldı?"];
-const DIST=p=>p<.15?'aynı şehirde bile değiller':p<.3?'uzaktan bakıyorlar':p<.45?'fark ettiler':p<.6?'göz teması':p<.75?'yaklaşıyorlar':p<.9?'konuşma mesafesi':p<1?'yan yana':'parti başladı';
+const LVLTXT=p=>p<.15?'kıvılcım':p<.3?'tutuştu':p<.45?'alev aldı':p<.6?'ısınıyor':p<.75?'harlıyor':p<.9?'kor gibi':p<1?'yangın':'YANSIN';
 
-// ---------- sound ----------
+// Diyet — 99 kg, 198 cm, erkek, haftada 3 ağırlık. Hedef ~2400 kcal / P 200 / K 220 / Y 75. Düşük tuz, yüksek potasyum, 3 L su.
+const DIET=[
+ {id:'k',n:'Kahvaltı',kcal:500,opts:[
+  {t:'Yumurta & yulaf',i:['4 yumurta (2 tam + 2 beyaz), az yağda','50 g yulaf, tarçın, 1 muz','Kahve, sade'],k:510,p:40,c:55,f:14},
+  {t:'Yoğurt kasesi',i:['300 g süzme yoğurt %2','40 g yulaf + 15 g ceviz','1 avuç yaban mersini','1 tk bal'],k:490,p:38,c:52,f:15},
+  {t:'Menemen protein',i:['3 yumurta + 100 g yumurta beyazı','Domates, biber, soğan — tuz yok, baharat serbest','1 dilim tam tahıl ekmek'],k:480,p:44,c:32,f:20},
+  {t:'Lor & ekmek',i:['200 g lor peyniri','2 dilim tam çavdar ekmek','Domates, salatalık, roka','1 tk zeytinyağı'],k:500,p:45,c:48,f:14},
+  {t:'Protein pancake',i:['1 ölçek whey + 40 g yulaf + 1 yumurta + 1 muz, tavada','Üstüne 100 g yoğurt, çilek'],k:520,p:46,c:60,f:10},
+  {t:'Hızlı sabah',i:['1 ölçek whey + 300 ml süt','2 haşlanmış yumurta','1 elma + 10 badem'],k:480,p:48,c:42,f:16}]},
+ {id:'s1',n:'Ara 1 · 11:00',kcal:200,opts:[
+  {t:'Yoğurt + meyve',i:['150 g süzme yoğurt','1 avuç çilek veya kivi'],k:180,p:18,c:16,f:4},
+  {t:'Whey shake',i:['1 ölçek whey + su','1 küçük muz'],k:210,p:25,c:24,f:2},
+  {t:'Yumurta + havuç',i:['2 haşlanmış yumurta','2 havuç, çubuk'],k:190,p:14,c:14,f:10},
+  {t:'Ton balığı',i:['1 küçük kutu ton (suda)','Salatalık, limon'],k:150,p:28,c:4,f:2},
+  {t:'Badem + elma',i:['15 badem','1 elma'],k:200,p:6,c:24,f:10},
+  {t:'Ayran & çubuk',i:['1 bardak ayran (tuzsuz, ev yapımı)','10 tam tahıl kraker'],k:190,p:10,c:24,f:6}]},
+ {id:'o',n:'Öğle',kcal:650,opts:[
+  {t:'Tavuk & pirinç',i:['200 g ızgara tavuk göğsü','150 g pişmiş esmer pirinç','Bol yeşil salata, limon, 1 tk zeytinyağı'],k:640,p:58,c:62,f:12},
+  {t:'Kıyma bowl',i:['180 g %5 yağlı dana kıyma, tavada baharatlı','120 g bulgur pilavı','Yoğurt 100 g, domates, soğan'],k:660,p:54,c:58,f:20},
+  {t:'Somon & patates',i:['180 g fırın somon','200 g haşlanmış patates','Brokoli, kabak'],k:650,p:46,c:48,f:26},
+  {t:'Hindi wrap',i:['1 tam tahıl lavaş','150 g hindi füme (az tuzlu)','Bol yeşillik, 2 yk süzme yoğurt sos'],k:600,p:52,c:55,f:14},
+  {t:'Köfte & mercimek',i:['4 ızgara köfte (yağsız kıyma)','1 kase mercimek çorbası (tuz az)','Salata'],k:640,p:55,c:50,f:20},
+  {t:'Tavuk şiş & salata',i:['220 g tavuk şiş','1 ince pide yerine 100 g bulgur','Kırmızı lahana, roka, domates'],k:630,p:60,c:52,f:14}]},
+ {id:'s2',n:'Ara 2 · 17:00 (antrenman öncesi)',kcal:200,opts:[
+  {t:'Muz + whey',i:['1 muz','½ ölçek whey + su'],k:200,p:14,c:34,f:1},
+  {t:'Pirinç keki + yoğurt',i:['3 pirinç patlağı','150 g süzme yoğurt'],k:210,p:18,c:30,f:3},
+  {t:'Yulaf + süt',i:['30 g yulaf','200 ml süt %1'],k:200,p:12,c:32,f:4},
+  {t:'Hurma + badem',i:['3 hurma','8 badem'],k:190,p:4,c:34,f:6},
+  {t:'Ekmek + lor',i:['1 dilim tam tahıl','80 g lor'],k:180,p:16,c:20,f:4},
+  {t:'Kefir + meyve',i:['250 ml sade kefir','1 şeftali veya elma'],k:200,p:10,c:30,f:5}]},
+ {id:'a',n:'Akşam',kcal:650,opts:[
+  {t:'Levrek & sebze',i:['250 g fırın levrek','300 g fırın sebze (kabak, biber, patlıcan)','1 dilim tam tahıl ekmek'],k:620,p:52,c:40,f:24},
+  {t:'Tavuk sote',i:['220 g tavuk, sebzeli sote','100 g kinoa','Yoğurt 100 g'],k:640,p:60,c:50,f:14},
+  {t:'Dana bonfile',i:['180 g bonfile ızgara','200 g fırın tatlı patates','Ispanak, sarımsak'],k:660,p:50,c:52,f:22},
+  {t:'Omlet gecesi',i:['2 yumurta + 150 g beyaz, mantar, ıspanak','150 g lor','Salata, 1 dilim ekmek'],k:600,p:62,c:30,f:22},
+  {t:'Karides & pirinç',i:['250 g karides, sarımsak, limon','120 g esmer pirinç','Kabak spagetti'],k:610,p:55,c:52,f:14},
+  {t:'Hindi köfte',i:['200 g hindi kıyma köftesi','100 g bulgur','Yoğurtlu salata, közlenmiş biber'],k:630,p:56,c:52,f:16}]},
+ {id:'s3',n:'Ara 3 · 22:00 (gece proteini)',kcal:200,opts:[
+  {t:'Süzme yoğurt',i:['250 g süzme yoğurt','Tarçın'],k:180,p:24,c:12,f:4},
+  {t:'Lor & salatalık',i:['150 g lor','1 salatalık'],k:170,p:24,c:8,f:4},
+  {t:'Kazein / whey',i:['1 ölçek kazein veya whey + su'],k:130,p:25,c:3,f:1},
+  {t:'Yumurta beyazı',i:['200 g yumurta beyazı, tavada','Baharat'],k:110,p:22,c:2,f:0},
+  {t:'Kefir',i:['300 ml sade kefir'],k:180,p:10,c:14,f:8},
+  {t:'Peynir & ceviz',i:['100 g az tuzlu beyaz peynir','5 ceviz'],k:220,p:16,c:4,f:16}]}];
+const PLAN={kcal:2400,p:200,c:220,f:75};
+
+// Kardiyo modları (MET)
+const MODES=[
+ {id:'walk',e:'🚶',n:'Yürüyüş',met:3.5,min:30,cardio:true},{id:'fast',e:'🏃‍♂️',n:'Tempolu yürüyüş',met:4.8,min:30,cardio:true},{id:'run',e:'🏃',n:'Koşu',met:9.8,min:20,cardio:true},
+ {id:'bike',e:'🚴',n:'Bisiklet',met:7,min:30,cardio:true},{id:'swim',e:'🏊',n:'Yüzme',met:7,min:30,cardio:true},{id:'stairs',e:'🪜',n:'Merdiven',met:8,min:15,cardio:true},
+ {id:'hiit',e:'⚡',n:'HIIT',met:10,min:15,cardio:true},{id:'basket',e:'🏀',n:'Basketbol',met:7.5,min:45,cardio:true},{id:'lift',e:'🏋️',n:'Ağırlık antrenmanı',met:5.5,min:60,cardio:false},{id:'row',e:'🚣',n:'Kürek / eliptik',met:6.5,min:25,cardio:true}];
+const kg=()=>{ const w=st.weights[st.weights.length-1]; return w?w.kg:99; };
+const kcalMin=met=>met*3.5*kg()/200;
+
+// ================= XP / RANK =================
+function xp(){ let x=0,s=0; for(const e of log){ if(e.good){ s++; x+=(10+Math.min(s,10)*2)*(e.jackpot?3:1); } else if(!e.cheat) s=0; }
+  return x+st.pills.length*15+st.snacks.length*8+st.sessions.reduce((a,b)=>a+Math.round(b.kcal/10),0)+st.water.length*5+(st.lift.length+st.cardio.length)*20; }
+function rankOf(x){ let i=0; while(i+1<RANKS.length&&x>=RANKS[i+1][0]) i++; return i; }
+function streakNow(){ let s=0; for(let i=log.length-1;i>=0;i--){ if(log[i].good) s++; else if(!log[i].cheat) break; } return s; }
+const actToday=k=>st[k].some(t=>t>=dayStart());
+function actStreak(k){ let s=0, d=dayStart(); if(!actToday(k)) d-=864e5; while(st[k].some(t=>t>=d&&t<d+864e5)){ s++; d-=864e5; } return s; }
+const waterToday=()=>st.water.filter(t=>t>=dayStart()).length;
+const burnToday=()=>Math.round(inDay(st.sessions,dayStart()).reduce((a,b)=>a+b.kcal,0));
+const liftDays=(n)=>{ const from=dayStart()-(n-1)*864e5; return new Set(st.sessions.filter(s=>s.type==='lift'&&s.t>=from).map(s=>dayStart(new Date(s.t)))).size + new Set(st.lift.filter(t=>t>=from).map(t=>dayStart(new Date(t)))).size; };
+function dayScore(ds){ const meals=inDay(log,ds); const good=Math.min(3,meals.filter(e=>e.good).length); const pill=inDay(st.pills,ds).length>0?1:0; const water=inDay(st.water,ds).length>=2?1:0; return good+pill+water; }
+
+// ================= SOUND =================
 let ac, unlocked=false;
-function A(){ if(!st.sound) return null; try{ if(!ac) ac=new (window.AudioContext||window.webkitAudioContext)(); if(ac.state!=='running'){ ac.resume().catch(()=>{}); if(ac.state==='closed'){ ac=new (window.AudioContext||window.webkitAudioContext)(); unlocked=false; } } return ac; }catch(e){ return null; } }
-function unlock(){ const a=A(); if(!a) return; try{ if(a.state!=='running') a.resume().catch(()=>{}); const b=a.createBuffer(1,1,22050), s=a.createBufferSource(); s.buffer=b; s.connect(a.destination); s.start(0); unlocked=true; }catch(e){} }
+function A(){ if(!st.sound) return null; try{ if(!ac) ac=new (window.AudioContext||window.webkitAudioContext)(); if(ac.state!=='running'){ ac.resume().catch(()=>{}); if(ac.state==='closed'){ ac=new (window.AudioContext||window.webkitAudioContext)(); } } return ac; }catch(e){ return null; } }
+function unlock(){ const a=A(); if(!a) return; try{ const b=a.createBuffer(1,1,22050), s=a.createBufferSource(); s.buffer=b; s.connect(a.destination); s.start(0); unlocked=true; }catch(e){} }
 ['touchstart','touchend','mousedown','click','keydown'].forEach(ev=>addEventListener(ev,unlock,{passive:true,capture:true}));
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&ac) ac.resume().catch(()=>{}); });
-addEventListener('pageshow',()=>{ if(ac) ac.resume().catch(()=>{}); });
-addEventListener('focus',()=>{ if(ac) ac.resume().catch(()=>{}); });
-function tone(f,t0,dur,type='sine',g=.18){ const a=A(); if(!a) return; const o=a.createOscillator(), v=a.createGain(); o.type=type; o.frequency.setValueAtTime(f,a.currentTime+t0);
-  v.gain.setValueAtTime(0,a.currentTime+t0); v.gain.linearRampToValueAtTime(g,a.currentTime+t0+.01); v.gain.exponentialRampToValueAtTime(.001,a.currentTime+t0+dur);
-  o.connect(v).connect(a.destination); o.start(a.currentTime+t0); o.stop(a.currentTime+t0+dur+.05); }
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&ac) ac.resume().catch(()=>{}); }); addEventListener('pageshow',()=>{ if(ac) ac.resume().catch(()=>{}); });
+function tone(f,t0,dur,type='sine',g=.18){ const a=A(); if(!a) return; const o=a.createOscillator(), v=a.createGain(); o.type=type; o.frequency.setValueAtTime(f,a.currentTime+t0); v.gain.setValueAtTime(0,a.currentTime+t0); v.gain.linearRampToValueAtTime(g,a.currentTime+t0+.01); v.gain.exponentialRampToValueAtTime(.001,a.currentTime+t0+dur); o.connect(v).connect(a.destination); o.start(a.currentTime+t0); o.stop(a.currentTime+t0+dur+.05); }
 const sGood=()=>{ [523,659,784,1046].forEach((f,i)=>tone(f,i*.06,.35,'triangle')); tone(1568,.26,.5,'sine',.08); };
 const sHuge=()=>{ [392,523,659,784,1046,1318].forEach((f,i)=>tone(f,i*.08,.6,'triangle',.2)); [784,1046].forEach((f,i)=>tone(f,.6+i*.1,1.2,'sine',.12)); };
 const sBad=()=>{ tone(180,0,.25,'sawtooth',.08); tone(120,.08,.35,'sine',.12); };
-const sTick=()=>tone(900,0,.05,'square',.04);
-const sCharge=k=>tone(200+k*900,0,.08,'sine',.05);
+const sTick=()=>tone(900,0,.05,'square',.04); const sCharge=k=>tone(200+k*900,0,.08,'sine',.05);
 
-// ---------- scene (yol: solda erkekler, sağda kızlar) ----------
-const $=id=>document.getElementById(id);
-const L=(a,b,t)=>a+(b-a)*t;
-function man(x,y,s,c,i){ return `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="62" rx="14" ry="3" fill="#000" opacity=".25"/>
-  <rect x="-6" y="34" width="5" height="26" rx="2.5" fill="${c}"/><rect x="1" y="34" width="5" height="26" rx="2.5" fill="${c}"/>
-  <path d="M -11 12 h 22 l -3 24 h -16 z" fill="${c}"/><rect x="-16" y="13" width="5" height="18" rx="2.5" fill="${c}" transform="rotate(${i?-8:8} -13 13)"/><rect x="11" y="13" width="5" height="18" rx="2.5" fill="${c}" transform="rotate(${i?8:-8} 13 13)"/>
-  <circle cx="0" cy="2" r="8" fill="#E2AE84"/><path d="M -8 0 q 8 -10 16 0 q -8 -3 -16 0 z" fill="#2A1B36"/></g>`; }
-function woman(x,y,s,hair,dress,i){ return `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="62" rx="14" ry="3" fill="#000" opacity=".25"/>
-  <rect x="-5" y="40" width="4" height="20" rx="2" fill="#E2AE84"/><rect x="1" y="40" width="4" height="20" rx="2" fill="#E2AE84"/>
-  <path d="M -7 12 h 14 l 8 30 h -30 z" fill="${dress}"/><rect x="-14" y="13" width="4.5" height="17" rx="2.2" fill="#E2AE84" transform="rotate(${i?12:-4} -12 13)"/><rect x="9.5" y="13" width="4.5" height="17" rx="2.2" fill="#E2AE84" transform="rotate(${i?4:-12} 12 13)"/>
-  <path d="M -10 4 q 0 -16 10 -16 q 10 0 10 16 l 2 18 h -6 l -1 -14 h -10 l -1 14 h -6 z" fill="${hair}"/><circle cx="0" cy="2" r="7.5" fill="#E2AE84"/>
-  <path d="M -7 -2 q 7 -8 14 0 q -7 -4 -14 0 z" fill="${hair}"/><circle cx="-2.5" cy="2" r=".9" fill="#2A1B36"/><circle cx="2.5" cy="2" r=".9" fill="#2A1B36"/><path d="M -2 6 q 2 1.6 4 0" stroke="#C0396A" stroke-width=".9" fill="none"/></g>`; }
-function drawScene(p){ p=clamp(p,0,1); const svg=$('scene'); const mx=L(30,140,p), wx=L(310,200,p), y=120;
-  const hearts=p>.55?[0,1,2,3].map(i=>`<text x="${L(wx-10,mx+10,i/3)}" y="${88-(i%2)*12-p*20}" font-size="${8+p*6}" opacity="${clamp((p-.55)/.45,0,1)*(.6+(i%2)*.4)}">💗</text>`).join(''):'';
-  const party=p>=1?`<text x="170" y="40" font-size="26" text-anchor="middle">🎉</text><text x="60" y="60" font-size="18">✨</text><text x="270" y="55" font-size="18">✨</text>`:'';
-  svg.innerHTML=`<defs><linearGradient id="sky" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#EAF2FF"/><stop offset="1" stop-color="#F7F9F1"/></linearGradient>
-  <linearGradient id="road" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#D9DCD3"/><stop offset="1" stop-color="#C3C7BD"/></linearGradient>
-  <radialGradient id="glow"><stop offset="0" stop-color="#C6F53A" stop-opacity="${p*.7}"/><stop offset="1" stop-color="#C6F53A" stop-opacity="0"/></radialGradient></defs>
-  <rect width="340" height="210" rx="14" fill="url(#sky)"/>
-  <circle cx="${L(60,170,p)}" cy="${L(70,40,p)}" r="${L(14,22,p)}" fill="#C6F53A" opacity="${L(.6,1,p)}"/>
-  <rect y="120" width="340" height="90" fill="#E4EAD6"/>
-  <path d="M 130 120 L 210 120 L 340 210 L 0 210 Z" fill="url(#road)"/>
-  <path d="M 170 120 L 170 210" stroke="#fff" stroke-width="2" stroke-dasharray="8 10" opacity=".9"/>
-  <ellipse cx="170" cy="150" rx="${L(20,160,p)}" ry="${L(10,60,p)}" fill="url(#glow)"/>
-  ${man(mx-26,y+6,.85,'#3A3F47',0)}${man(mx,y,1,'#15171A',1)}${man(mx+24,y+8,.8,'#5B6068',0)}
-  ${woman(wx-24,y+8,.8,'#7A3B1E','#FF5FA2',1)}${woman(wx,y,1,'#2A1B36','#15171A',0)}${woman(wx+26,y+6,.85,'#E9B84A','#C6F53A',1)}
-  ${hearts}${party}`; }
-let curFit=st.fit;
-function setFit(f,animate=true){ f=clamp(f,0,100); const from=curFit; curFit=f; $('distPct').textContent=Math.round(f)+'% yakın'; $('distTxt').textContent=DIST(f/100);
-  if(!animate){ drawScene(f/100); return; } const t0=performance.now(); (function step(now){ const k=Math.min(1,(now-t0)/700), e=1-Math.pow(1-k,3); drawScene(L(from,f,e)/100); if(k<1) requestAnimationFrame(step); })(t0); }
-
-// ---------- render ----------
-function render(){
-  const w=thisWeek(); const good=w.filter(e=>e.good).length;
-  $('cnt').textContent=`${w.length} / 21`;
-  $('rate').textContent=w.length?Math.round(good/w.length*100)+'%':'—';
-  $('streak').textContent=streakNow();
-  const g=$('grid'); g.innerHTML=''; const wsT=weekStart().getTime(); const DAYS=['Pt','Sa','Ça','Pe','Cu','Ct','Pa'];
-  for(let d=0;d<7;d++){ const ds=wsT+d*864e5, de=ds+864e5; const meals=log.filter(e=>e.t>=ds&&e.t<de).slice(0,3); const wl=st.water.filter(t=>t>=ds&&t<de).length; const pill=st.pills.some(t=>t>=ds&&t<de), lf=st.lift.some(t=>t>=ds&&t<de), cd=st.cardio.some(t=>t>=ds&&t<de);
-    const col=document.createElement('div'); col.className='col'+(dayStart()===ds?' today':''); col.innerHTML=`<small>${DAYS[d]}</small>`;
-    for(let m=0;m<3;m++){ const dot=document.createElement('div'); dot.className='d'; if(meals[m]) dot.classList.add(meals[m].good?'good':(meals[m].cheat?'cheat':'bad')); if(meals[m]&&meals[m].jackpot) dot.innerHTML='<span class="pe">⭐</span>'; if(m===2&&pill) dot.innerHTML='<span class="pe">💊</span>'; if(m===1&&(lf||cd)) dot.innerHTML=`<span class="pe">${lf&&cd?'💪':(lf?'🏋️':'🏃')}</span>`; dot.dataset.k=d+'-'+m; col.appendChild(dot); }
-    const wd=document.createElement('small'); wd.style.color='#5FB9FF'; wd.textContent=wl?`${wl}L`:' '; wd.style.minHeight='12px'; col.appendChild(wd);
-    g.appendChild(col); }
-  $('undo').disabled=!(log.length||st.water.length||st.pills.length||st.lift.length||st.cardio.length);
-  const ws=weekStart(); const we=new Date(ws); we.setDate(we.getDate()+6);
-  const f=d=>d.toLocaleDateString('tr-TR',{day:'numeric',month:'short'}); $('wk').textContent=`${f(ws)} – ${f(we)}`;
-  const x=xp(), ri=rankOf(x), next=RANKS[ri+1]; $('rankName').textContent=RANKS[ri][1];
-  const lwH=st.weights[st.weights.length-1], goalH=parseFloat(st.goal)||90; $('xpTxt').textContent=(next?`${x} / ${next[0]} xp`:`${x} xp — zirve`)+(lwH?` · hedefe ${Math.max(0,lwH.kg-goalH).toFixed(1)} kg`:'');
-  $('xpBar').style.width=(next?((x-RANKS[ri][0])/(next[0]-RANKS[ri][0])*100):100)+'%';
-  const td=today(), now=new Date(), sl=$('slots'); sl.innerHTML='';
-  SLOTS.forEach((s,i)=>{ const el=document.createElement('div'); el.className='slot'; const e=td[i]; const due=new Date(); due.setHours(s.h,s.m,0,0);
-    if(e) el.classList.add(e.good?'good':(e.cheat?'cheat':'bad')); else if(now>due&&now-due>3*36e5) el.classList.add('miss'); else if(Math.abs(now-due)<9e5) el.classList.add('now');
-    el.innerHTML=`${s.n}<b>${e?(e.good?'iyi':(e.cheat?'serbest':'kötü')):hhmm(s.h,s.m)}</b>`; sl.appendChild(el); });
-  const ar=$('acts'); ar.innerHTML='';
-  ACTS.forEach(a=>{ const el=document.createElement('div'); el.className='slot '+a.cls; if(a.k==='pills') el.id='pill'; const done=actToday(a.k); if(done) el.classList.add('done');
-    const sub=done?(a.weekly?`✓ ${actWeek(a.k)}/hafta`:`✓ ${actStreak(a.k)} gün`):(a.weekly?`${actWeek(a.k)}/hafta`:'basılı tut');
-    el.innerHTML=`<div class="fill"></div><span class="e">${a.e} ${a.n}</span><b>${sub}</b>${a.k==='pills'?'<span class="q" id="fmq">?</span>':''}`; ar.appendChild(el); bindAct(el,a); if(a.k==='pills') el.querySelector('#fmq').addEventListener('click',ev=>{ ev.stopPropagation(); openCalm(); }); });
-  $('hintL').textContent=st.cheats>0?`← serbest kart ×${st.cheats}`:'← kötü';
-  if(typeof waterLabel==='function') waterLabel();
-  $('snd').textContent='ses: '+(st.sound?'açık':'kapalı'); $('snd').classList.toggle('on',st.sound);
-}
-
-// ---------- fx ----------
+// ================= FX =================
 const cv=$('fx'), ctx=cv.getContext('2d'); let parts=[], anim=false;
 function resize(){ cv.width=innerWidth*devicePixelRatio; cv.height=innerHeight*devicePixelRatio; ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); } resize(); addEventListener('resize',resize);
-function burst(n,colors,x,y,spread,v0=6){ for(let i=0;i<n;i++){ const a=-Math.PI/2+(Math.random()-.5)*spread, v=v0+Math.random()*9;
-  parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,dec:.008+Math.random()*.012,r:3+Math.random()*7,c:colors[Math.floor(Math.random()*colors.length)],rot:Math.random()*6,vr:(Math.random()-.5)*.3}); } if(!anim) tick(); }
-function tick(){ anim=true; ctx.clearRect(0,0,innerWidth,innerHeight); parts=parts.filter(p=>p.life>0);
-  for(const p of parts){ p.x+=p.vx; p.y+=p.vy; p.vy+=.18; p.vx*=.98; p.life-=p.dec; p.rot+=p.vr; ctx.save(); ctx.globalAlpha=Math.max(p.life,0); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.fillStyle=p.c; ctx.beginPath(); ctx.ellipse(0,0,p.r,p.r*1.7,0,0,Math.PI*2); ctx.fill(); ctx.restore(); }
-  if(parts.length) requestAnimationFrame(tick); else anim=false; }
+function burst(n,colors,x,y,spread,v0=6){ for(let i=0;i<n;i++){ const a=-Math.PI/2+(Math.random()-.5)*spread, v=v0+Math.random()*9; parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,dec:.008+Math.random()*.012,r:3+Math.random()*7,c:colors[Math.floor(Math.random()*colors.length)],rot:Math.random()*6,vr:(Math.random()-.5)*.3}); } if(!anim) tick(); }
+function tick(){ anim=true; ctx.clearRect(0,0,innerWidth,innerHeight); parts=parts.filter(p=>p.life>0); for(const p of parts){ p.x+=p.vx; p.y+=p.vy; p.vy+=.18; p.vx*=.98; p.life-=p.dec; p.rot+=p.vr; ctx.save(); ctx.globalAlpha=Math.max(p.life,0); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.fillStyle=p.c; ctx.beginPath(); ctx.ellipse(0,0,p.r,p.r*1.7,0,0,Math.PI*2); ctx.fill(); ctx.restore(); } if(parts.length) requestAnimationFrame(tick); else anim=false; }
 function word(txt,cls){ const el=document.createElement('div'); el.className='word '+cls; el.textContent=txt; $('rise').appendChild(el); setTimeout(()=>el.remove(),2300); }
 const vib=p=>{ try{ navigator.vibrate&&navigator.vibrate(p); }catch(e){} };
 function flash(bg){ const f=$('flash'); f.style.background=bg; f.classList.remove('on'); void f.offsetWidth; f.classList.add('on'); }
 function shake(){ $('app').classList.remove('shake'); void $('app').offsetWidth; $('app').classList.add('shake'); }
-function celebrate(gc,streak,gain){
-  const cx=innerWidth/2, cy=innerHeight*.5;
-  burst(90,['#C6F53A','#15171A','#A6DB1F','#ffffff'],cx,cy,2.4); setTimeout(()=>burst(50,['#C6F53A','#15171A'],cx,cy,3),120);
-  flash('radial-gradient(circle at 50% 60%, rgba(198,245,58,.85), rgba(198,245,58,.2) 60%, transparent)');
-  const m=MILESTONE[gc]||STREAK[streak];
-  if(m){ word(m,'huge'); setTimeout(()=>burst(160,['#C6F53A','#15171A','#fff'],cx,cy*.6,3.4,9),350); setTimeout(()=>burst(120,['#C6F53A','#15171A'],cx*.3,cy,2,8),600); setTimeout(()=>burst(120,['#C6F53A','#15171A'],cx*1.7,cy,2,8),700); shake(); vib([40,60,40,60,160]); sHuge(); }
-  else{ word(GOOD[Math.floor(Math.random()*GOOD.length)],'big'); vib([30,40,80]); sGood(); }
-  setTimeout(()=>word(`+${gain} xp`,'xp'),200);
-}
+const LIME=['#C6F53A','#15171A','#A6DB1F','#ffffff'];
+function bigShow(txt,cls='huge',cols=LIME){ word(txt,cls); shake(); for(let i=0;i<3;i++) setTimeout(()=>burst(140,cols,innerWidth*(.25+.25*i),innerHeight*.4,3.2,10),i*130); sHuge(); vib([50,30,50,30,220]); }
+function celebrate(gc,streak,gain){ const cx=innerWidth/2, cy=innerHeight*.5; burst(90,LIME,cx,cy,2.4); setTimeout(()=>burst(50,['#C6F53A','#15171A'],cx,cy,3),120); flash('radial-gradient(circle at 50% 60%, rgba(198,245,58,.85), rgba(198,245,58,.2) 60%, transparent)');
+  const m=MILESTONE[gc]||STREAK[streak]; if(m) bigShow(m); else { word(GOOD[Math.floor(Math.random()*GOOD.length)],'big'); vib([30,40,80]); sGood(); } setTimeout(()=>word(`+${gain} xp`,'xp'),200); }
 function soften(){ flash('radial-gradient(circle at 50% 60%, rgba(201,205,212,.7), transparent 65%)'); word(BAD[Math.floor(Math.random()*BAD.length)],'cool'); vib(15); sBad(); }
-function rankUp(name){ setTimeout(()=>{ word('RÜTBE: '+name.toUpperCase(),'huge'); burst(200,['#fff','#C6F53A','#15171A'],innerWidth/2,innerHeight*.5,6.3,10); sHuge(); vib([80,50,80,50,200]); },900); }
-function meet(){ setTimeout(()=>{ word('BULUŞTULAR 🎉','pinkw'); for(let i=0;i<4;i++) setTimeout(()=>burst(120,['#FFB4D1','#C6F53A','#15171A','#FF5FA2'],innerWidth*(.2+.2*i),innerHeight*.45,3,9),i*150); shake(); sHuge(); vib([60,40,60,40,60,40,200]); },1000); }
+function rankUp(name){ setTimeout(()=>bigShow('RÜTBE: '+name.toUpperCase()),900); }
 
-// ---------- swipe ----------
+// ================= NAV =================
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b)); document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id==='pg-'+b.dataset.pg)); sTick(); vib(6);
+  ({diet:renderDiet,cardio:renderCardio,'60':render60,profile:renderProfile,home:render})[b.dataset.pg](); });
+</script>
+<script>
+// ================= FIRE SCENE =================
+(function(){ const em=$('embers'); for(let i=0;i<14;i++){ const e=document.createElement('i'); e.className='ember'; e.style.left=(30+Math.random()*40)+'%'; e.style.setProperty('--ex',(Math.random()*80-40)+'px'); e.style.animationDelay=(Math.random()*2.4)+'s'; e.style.animationDuration=(1.8+Math.random()*1.4)+'s'; em.appendChild(e); } })();
+function meters(){ // Yüz / Saç / Göğüs / Göbek
+  const d3=[0,1,2].map(i=>dayStart()-i*864e5); let wDays=0, badN=0, mealsN=0; d3.forEach(ds=>{ if(inDay(st.water,ds).length>=2) wDays++; const m=inDay(log,ds); mealsN+=m.length; badN+=m.filter(e=>!e.good&&!e.cheat).length; });
+  const face=clamp(Math.round(wDays/3*50+(mealsN?(1-badN/mealsN):0.5)*50),0,100);
+  const hair=clamp(Math.round(actStreak('pills')*3.4),0,100);
+  const chest=clamp(Math.round(liftDays(14)/6*100),0,100);
+  const belly=clamp(Math.round(st.fit),0,100);
+  return [{n:'YÜZ',v:face},{n:'SAÇ',v:hair},{n:'GÖĞÜS',v:chest},{n:'GÖBEK',v:belly}]; }
+let curFit=st.fit;
+function drawFire(p){ p=clamp(p,0,1); const s=.45+p*.9; ['fla','flb','flc'].forEach(id=>$(id).style.setProperty('--s',s.toFixed(3))); $('fire').style.setProperty('--glow',p); $('lvlPct').textContent=Math.round(p*100); $('lvlTxt').textContent=LVLTXT(p);
+  $('embers').style.opacity=clamp(p*1.4,.15,1); }
+function setFit(f,animate=true){ f=clamp(f,0,100); const from=curFit; curFit=f; if(!animate){ drawFire(f/100); return; } const t0=performance.now(); (function step(now){ const k=Math.min(1,(now-t0)/700), e=1-Math.pow(1-k,3); drawFire(L(from,f,e)/100); if(k<1) requestAnimationFrame(step); })(t0); }
+function drawMeters(){ $('meters').innerHTML=meters().map(m=>`<div class="mt"><small>${m.n}</small><b>${m.v}%</b><i style="--p:${m.v}%"></i></div>`).join(''); }
+
+// ================= HOME RENDER =================
+function slotEntry(id){ const td=today(); const e=td.find(x=>x.slot===id); if(e) return e; const un=td.filter(x=>!x.slot); const idx=MAIN.findIndex(s=>s.id===id); const taken=MAIN.slice(0,idx).filter(s=>!td.some(x=>x.slot===s.id)).length; return un[taken]||null; }
+function render(){
+  const w=thisWeek(); const good=w.filter(e=>e.good).length;
+  $('cnt').textContent=`${w.length} / 21`; $('rate').textContent=w.length?Math.round(good/w.length*100)+'%':'—'; $('streak').textContent=streakNow(); $('burn').textContent=burnToday();
+  const g=$('grid'); g.innerHTML=''; const wsT=weekStart().getTime();
+  for(let d=0;d<7;d++){ const ds=wsT+d*864e5; const meals=inDay(log,ds).slice(0,3); const pill=inDay(st.pills,ds).length>0, wl=inDay(st.water,ds).length; const tr=inDay(st.sessions,ds); const lf=tr.some(s=>s.type==='lift')||inDay(st.lift,ds).length>0, cd=tr.some(s=>s.type!=='lift')||inDay(st.cardio,ds).length>0;
+    const col=document.createElement('div'); col.className='col'+(dayStart()===ds?' today':''); col.innerHTML=`<small>${DAYS[d]}</small>`;
+    for(let m=0;m<3;m++){ const dot=document.createElement('div'); dot.className='d'; if(meals[m]) dot.classList.add(meals[m].good?'good':(meals[m].cheat?'cheat':'bad')); if(meals[m]&&meals[m].jackpot) dot.innerHTML='<span class="pe">⭐</span>'; if(m===2&&pill) dot.innerHTML='<span class="pe">💊</span>'; if(m===1&&(lf||cd)) dot.innerHTML=`<span class="pe">${lf&&cd?'💪':(lf?'🏋️':'🏃')}</span>`; dot.dataset.k=d+'-'+m; col.appendChild(dot); }
+    const wd=document.createElement('small'); wd.style.color='#5FB9FF'; wd.style.minHeight='12px'; wd.textContent=wl?`${wl}L`:' '; col.appendChild(wd); g.appendChild(col); }
+  $('undo').disabled=!(log.length||st.water.length||st.pills.length||st.snacks.length||st.sessions.length); $('redo').disabled=!redo.length;
+  const ws=weekStart(); const we=new Date(ws); we.setDate(we.getDate()+6); $('wk').textContent=`${fmtD(ws)} – ${fmtD(we)}`;
+  const x=xp(), ri=rankOf(x), next=RANKS[ri+1]; $('rankName').textContent=RANKS[ri][1]; const lw=st.weights[st.weights.length-1], goal=parseFloat(st.goal)||88;
+  $('xpTxt').textContent=(next?`${x} / ${next[0]} xp`:`${x} xp — zirve`)+(lw?` · hedefe ${Math.max(0,lw.kg-goal).toFixed(1)} kg`:''); $('xpBar').style.width=(next?((x-RANKS[ri][0])/(next[0]-RANKS[ri][0])*100):100)+'%';
+  // main slots
+  const now=new Date(), sl=$('slots'); sl.innerHTML='';
+  MAIN.forEach(s=>{ const el=document.createElement('div'); el.className='slot'; const e=slotEntry(s.id); const due=new Date(); due.setHours(s.h,s.m,0,0);
+    if(e) el.classList.add(e.good?'good':(e.cheat?'cheat':'bad')); else if(now>due&&now-due>3*36e5) el.classList.add('miss'); else if(Math.abs(now-due)<9e5) el.classList.add('now');
+    el.innerHTML=`${s.n}<b>${e?(e.plan?e.plan:(e.good?'iyi':(e.cheat?'serbest':'kötü'))):hhmm(s.h,s.m)}</b>`; sl.appendChild(el); });
+  // snacks
+  const sn=$('snacks'); sn.innerHTML='';
+  SNK.forEach(s=>{ const el=document.createElement('div'); el.className='slot snack'; const e=inDay(st.snacks,dayStart()).find(x=>x.slot===s.id); if(e) el.classList.add('good'); el.innerHTML=`${s.n}<b>${e?(e.plan||'✓ +8 xp'):hhmm(s.h,s.m)}</b>`; el.onclick=()=>toggleSnack(s.id); sn.appendChild(el); });
+  // acts
+  const ar=$('acts'); ar.innerHTML='';
+  const pl=document.createElement('div'); pl.className='slot'; pl.id='pill'; const pd=actToday('pills'); if(pd) pl.classList.add('done'); pl.innerHTML=`<div class="fill"></div><span>💊 F+M</span><b>${pd?`✓ ${actStreak('pills')} gün`:'basılı tut'}</b><span class="q" id="fmq">?</span>`; ar.appendChild(pl); bindPill(pl); pl.querySelector('#fmq').addEventListener('click',ev=>{ ev.stopPropagation(); $('calm').classList.add('open'); vib(10); });
+  const tr=inDay(st.sessions,dayStart()); const lf=tr.filter(s=>s.type==='lift'), cd=tr.filter(s=>s.type!=='lift');
+  const l=document.createElement('div'); l.className='slot lift'+(lf.length?' done':''); l.innerHTML=`<span>🏋️ Ağırlık</span><b>${lf.length?`✓ ${Math.round(lf.reduce((a,b)=>a+b.min,0))} dk`:liftDays(7)+'/3 hafta'}</b>`; l.onclick=()=>go('cardio'); ar.appendChild(l);
+  const c=document.createElement('div'); c.className='slot cardio'+(cd.length?' done':''); c.innerHTML=`<span>🏃 Kardiyo</span><b>${cd.length?`✓ ${Math.round(cd.reduce((a,b)=>a+b.kcal,0))} kcal`:'başla →'}</b>`; c.onclick=()=>go('cardio'); ar.appendChild(c);
+  $('hintL').textContent=st.cheats>0?`← serbest kart ×${st.cheats}`:'← kötü'; $('snd').classList.toggle('on',st.sound); $('sndT').textContent=st.sound?'ses açık':'ses kapalı';
+  waterLabel(); drawMeters(); }
+function go(pg){ document.querySelector(`nav button[data-pg="${pg}"]`).click(); }
+
+// ================= SWIPE =================
 const card=$('card'), tint=$('tint'); let sx=0,sy=0,dx=0,dragging=false,titleIdx=0,lastTick=false; const TH=90;
 function pos(e){ const t=e.touches?e.touches[0]:e; return [t.clientX,t.clientY]; }
-function start(e){ if(e.target.closest&&(e.target.closest('.slot')||e.target.closest('#glass')||e.target.closest('#strip'))) return; [sx,sy]=pos(e); dx=0; dragging=true; card.classList.remove('snap'); A(); }
-function move(e){ if(!dragging) return; const [x,y]=pos(e); dx=x-sx; const dy=(y-sy)*.25;
-  card.style.transform=`translate(${dx}px,${dy}px) rotate(${dx/18}deg)`; const k=Math.min(Math.abs(dx)/TH,1);
-  tint.style.opacity=k*.55; tint.style.background=dx>0?'#C6F53A':'#C9CDD4';
-  const past=k>=1; if(past!==lastTick){ lastTick=past; if(past){ sTick(); vib(8); } }
-  $('title').innerHTML=k>.6?(dx>0?'İyi.':'Kötü.'):TITLES[titleIdx]; drawScene(clamp((st.fit+dx/TH*6)/100,0,1)); }
+function start(e){ if(e.target.closest&&(e.target.closest('#glass')||e.target.closest('#strip'))) return; [sx,sy]=pos(e); dx=0; dragging=true; card.classList.remove('snap'); A(); }
+function move(e){ if(!dragging) return; const [x,y]=pos(e); dx=x-sx; const dy=(y-sy)*.25; card.style.transform=`translate(${dx}px,${dy}px) rotate(${dx/18}deg)`; const k=Math.min(Math.abs(dx)/TH,1);
+  tint.style.opacity=k*.55; tint.style.background=dx>0?'#C6F53A':'#C9CDD4'; const past=k>=1; if(past!==lastTick){ lastTick=past; if(past){ sTick(); vib(8); } }
+  $('title').innerHTML=k>.6?(dx>0?'İyi.':'Kötü.'):TITLES[titleIdx]; drawFire(clamp((st.fit+dx/TH*6)/100,0,1)); }
 function end(){ if(!dragging) return; dragging=false; lastTick=false; card.classList.add('snap');
   if(Math.abs(dx)>=TH){ const good=dx>0; card.style.transform=`translate(${good?600:-600}px,-40px) rotate(${good?30:-30}deg)`; card.style.opacity=0; setTimeout(()=>commit(good),180); }
-  else{ card.style.transform=''; tint.style.opacity=0; $('title').innerHTML=TITLES[titleIdx]; drawScene(st.fit/100); } }
-function commit(good){
-  const before=xp(), rBefore=rankOf(before), fitBefore=st.fit;
-  const entry={t:Date.now(),good}; let cheat=false, jack=false;
+  else{ card.style.transform=''; tint.style.opacity=0; $('title').innerHTML=TITLES[titleIdx]; drawFire(st.fit/100); } }
+function resetCard(){ setTimeout(()=>{ card.classList.remove('snap'); card.style.transform='translateY(30px) scale(.94)'; card.style.opacity=0; tint.style.opacity=0; $('title').innerHTML=TITLES[titleIdx]; requestAnimationFrame(()=>{ card.classList.add('snap'); card.style.transform=''; card.style.opacity=1; }); },420); }
+function firstFreeSlot(){ return (MAIN.find(s=>!slotEntry(s.id))||{}).id||null; }
+function commit(good,slot=null,plan=null){
+  const before=xp(), rBefore=rankOf(before), fitBefore=st.fit; redo=[];
+  const entry={t:Date.now(),good,slot:slot||firstFreeSlot()}; if(plan) entry.plan=plan; let cheat=false, jack=false;
   if(!good&&st.cheats>0){ cheat=true; entry.cheat=true; entry.good=false; st.cheats--; }
   if(good&&Math.random()<.08){ jack=true; entry.jackpot=true; }
-  log.push(entry); st.fit=clamp(st.fit+(good?6:(cheat?0:-5)),0,100); save(); render();
-  setTimeout(()=>setFit(st.fit),380); if(st.fit>=100&&fitBefore<100) meet();
-  if(jack) setTimeout(()=>{ word('JACKPOT ×3 ⭐','huge'); shake(); for(let i=0;i<3;i++) setTimeout(()=>burst(140,['#C6F53A','#15171A','#fff','#FF5FA2'],innerWidth*(.25+.25*i),innerHeight*.4,3.2,10),i*130); sHuge(); vib([50,30,50,30,50,30,220]); },700);
-  if(cheat){ flash('radial-gradient(circle at 50% 60%, rgba(255,255,255,.9), transparent 65%)'); word(`SERBEST YEMEK · seri korundu`,'cool'); vib(20); sTick(); titleIdx=(titleIdx+1)%TITLES.length;
-    setTimeout(()=>{ card.classList.remove('snap'); card.style.transform='translateY(30px) scale(.94)'; card.style.opacity=0; tint.style.opacity=0; $('title').innerHTML=TITLES[titleIdx]; requestAnimationFrame(()=>{ card.classList.add('snap'); card.style.transform=''; card.style.opacity=1; }); },420); return; }
-  const after=xp(), w=thisWeek(), gc=w.filter(e=>e.good).length; const s=streakNow();
+  log.push(entry); st.fit=clamp(st.fit+(good?6:(cheat?0:-5)),0,100); save(); render(); setTimeout(()=>setFit(st.fit),380);
+  const after=xp(), w=thisWeek(), gc=w.filter(e=>e.good).length; const s=streakNow(); titleIdx=(titleIdx+1)%TITLES.length;
   const tdN=today().length-1, dIdx=(new Date().getDay()+6)%7; const dot=document.querySelector(`.d[data-k="${dIdx}-${Math.min(tdN,2)}"]`); if(dot) dot.classList.add('pop');
+  if(cheat){ flash('radial-gradient(circle, rgba(255,255,255,.9), transparent 65%)'); word('SERBEST YEMEK · seri korundu','cool'); vib(20); sTick(); resetCard(); return; }
   good?celebrate(gc,s,after-before):soften();
-  if(rankOf(after)>rBefore) rankUp(RANKS[rankOf(after)][1]);
-  titleIdx=(titleIdx+1)%TITLES.length;
-  setTimeout(()=>{ card.classList.remove('snap'); card.style.transform='translateY(30px) scale(.94)'; card.style.opacity=0; tint.style.opacity=0; $('title').innerHTML=TITLES[titleIdx];
-    requestAnimationFrame(()=>{ card.classList.add('snap'); card.style.transform=''; card.style.opacity=1; }); },420);
-}
+  if(jack) setTimeout(()=>bigShow('JACKPOT ×3 ⭐','huge',['#C6F53A','#15171A','#fff','#FF5FA2']),700);
+  if(st.fit>=100&&fitBefore<100) setTimeout(()=>bigShow('YANSIN 🔥 %100'),1000);
+  if(rankOf(after)>rBefore) rankUp(RANKS[rankOf(after)][1]); resetCard(); }
 card.addEventListener('touchstart',start,{passive:true}); card.addEventListener('touchmove',move,{passive:true}); card.addEventListener('touchend',end);
 card.addEventListener('mousedown',start); addEventListener('mousemove',move); addEventListener('mouseup',end);
 addEventListener('keydown',e=>{ if(e.key==='ArrowRight'){dx=TH;dragging=true;end();} if(e.key==='ArrowLeft'){dx=-TH;dragging=true;end();} });
-$('undo').onclick=()=>{ const cands=[]; if(log.length) cands.push({k:'meal',t:log[log.length-1].t}); ['water','pills','lift','cardio'].forEach(k=>{ if(st[k].length) cands.push({k,t:st[k][st[k].length-1]}); }); if(!cands.length) return;
-  const c=cands.sort((a,b)=>b.t-a.t)[0];
-  if(c.k==='meal'){ const e=log.pop(); if(e.cheat) st.cheats++; else st.fit=clamp(st.fit-(e.good?6:-5),0,100); word('yemek geri alındı','cool'); }
-  else { st[c.k].pop(); const f={water:1,pills:8,lift:7,cardio:6}[c.k]; st.fit=clamp(st.fit-f,0,100); word({water:'su',pills:'F+M',lift:'ağırlık',cardio:'kardiyo'}[c.k]+' geri alındı','cool'); }
-  save(); render(); setFit(st.fit); vib(10); if(typeof waterLabel==='function') waterLabel(); };
+
+// ================= UNDO / REDO =================
+const FITV={water:1,pills:8,snacks:0,sessions:0};
+$('undo').onclick=()=>{ const c=[]; if(log.length) c.push({k:'meal',t:log[log.length-1].t}); ['water','pills','snacks','sessions'].forEach(k=>{ if(st[k].length){ const it=st[k][st[k].length-1]; c.push({k,t:it.t??it}); } }); if(!c.length) return;
+  const top=c.sort((a,b)=>b.t-a.t)[0]; let item;
+  if(top.k==='meal'){ item=log.pop(); if(item.cheat) st.cheats++; else st.fit=clamp(st.fit-(item.good?6:-5),0,100); }
+  else { item=st[top.k].pop(); st.fit=clamp(st.fit-(FITV[top.k]||0),0,100); }
+  redo.push({k:top.k,item}); save(); render(); setFit(st.fit); vib(10); word({meal:'yemek',water:'su',pills:'F+M',snacks:'ara öğün',sessions:'antrenman'}[top.k]+' geri alındı','cool'); };
+$('redo').onclick=()=>{ const r=redo.pop(); if(!r) return; if(r.k==='meal'){ log.push(r.item); if(r.item.cheat) st.cheats=Math.max(0,st.cheats-1); else st.fit=clamp(st.fit+(r.item.good?6:-5),0,100); } else { st[r.k].push(r.item); st.fit=clamp(st.fit+(FITV[r.k]||0),0,100); }
+  save(); render(); setFit(st.fit); vib(10); word('ileri alındı','cool'); };
 $('snd').onclick=()=>{ st.sound=!st.sound; save(); render(); if(st.sound){ unlock(); sTick(); } };
 
-// ---------- basılı tut mekaniği ----------
-function bindAct(el,a){
-  const fill=()=>el.querySelector('.fill'); const HOLD=1500; let hold=null,k=0,tapT=0;
-  const down=e=>{ if(e.target.classList&&e.target.classList.contains('q')) return; if(actToday(a.k)){ tapT=performance.now(); return; } e.preventDefault&&e.preventDefault(); A(); const t0=performance.now(); let lastS=0;
-    hold=requestAnimationFrame(function step(now){ k=Math.min(1,(now-t0)/HOLD); if(fill()) fill().style.height=k*100+'%';
-      if(k-lastS>.12){ lastS=k; sCharge(k); vib(6); }
-      if(k>=1){ hold=null; doAct(a,el); } else hold=requestAnimationFrame(step); }); };
-  const up=()=>{ if(tapT&&performance.now()-tapT<400){ tapT=0; st[a.k]=st[a.k].filter(t=>t<dayStart()); st.fit=clamp(st.fit-a.fit,0,100); save(); render(); setFit(st.fit); vib(10); word(`${a.n} geri alındı`,'cool'); return; } tapT=0;
-    if(hold){ cancelAnimationFrame(hold); hold=null; } if(k<1&&fill()){ fill().style.transition='height .25s'; fill().style.height='0%'; setTimeout(()=>{ if(fill()) fill().style.transition=''; },260); } k=0; };
-  el.addEventListener('touchstart',down,{passive:false}); el.addEventListener('touchend',up); el.addEventListener('touchcancel',up);
-  el.addEventListener('mousedown',down); el.addEventListener('mouseup',up); el.addEventListener('mouseleave',up);
-}
-function doAct(a,el){
-  const rBefore=rankOf(xp()), fitBefore=st.fit;
-  st[a.k].push(Date.now()); st.fit=clamp(st.fit+a.fit,0,100); save();
-  const r=el.getBoundingClientRect(); const cx=r.left+r.width/2, cy=r.top+r.height/2; render();
-  flash(`radial-gradient(circle at ${Math.round(cx/innerWidth*100)}% ${Math.round(cy/innerHeight*100)}%, ${a.flash}, transparent 55%)`);
-  burst(120,a.cols,cx,cy,6.3,7); for(let i=0;i<3;i++) setTimeout(()=>burst(90,a.cols,innerWidth*(.25+.25*i),innerHeight*.4,3.2,9),200+i*160);
-  const both=actToday('lift')&&actToday('cardio')&&a.k!=='pills';
-  word(a.word,a.wcls); setTimeout(()=>word(a.weekly?`${a.n} ${actWeek(a.k)}. antrenman · +${a.xp} xp`:`F+M gün ${actStreak('pills')} · +${a.xp} xp`,'xp'),300);
-  if(both) setTimeout(()=>{ word('ÇİFT ANTRENMAN 💪','huge'); burst(160,['#B9C6FF','#FFC98A','#15171A','#C6F53A'],innerWidth/2,innerHeight*.45,5,10); },1100);
-  shake(); vib([50,30,50,30,50,30,250]); sHuge();
-  setTimeout(()=>setFit(st.fit),300); if(st.fit>=100&&fitBefore<100) meet();
-  if(rankOf(xp())>rBefore) rankUp(RANKS[rankOf(xp())][1]);
-}
+// ================= ARA ÖĞÜN =================
+function toggleSnack(slot,plan=null){ const i=st.snacks.findIndex(x=>x.t>=dayStart()&&x.slot===slot); if(i>=0){ st.snacks.splice(i,1); save(); render(); word('ara öğün kaldırıldı','cool'); vib(10); return; }
+  redo=[]; st.snacks.push({t:Date.now(),slot,plan}); save(); render(); const el=[...$('snacks').children][SNK.findIndex(s=>s.id===slot)]; const r=el.getBoundingClientRect(); burst(50,LIME,r.left+r.width/2,r.top,3,6); sGood(); vib([20,30]); word('ARA ÖĞÜN · metabolizma açık · +8 xp','big'); }
 
-// ---------- notifications ----------
-const IOS=/iPhone|iPad|iPod/.test(navigator.userAgent);
-function notifState(){ const el=$('notifState'); if(IOS){ el.textContent='iPhone, web uygulamalarına doğrudan bildirim vermiyor. Hatırlatıcılar Anımsatıcılar uygulamasından geliyor: 08:30 · 14:00 · 20:00 · 23:00 (F+M). Değiştirmek istersen oradan.'; $('askNotif').style.display='none'; $('testNotif').style.display='none'; return; }
-  if(!('Notification' in window)){ el.textContent='Bu tarayıcı bildirim desteklemiyor (iPhone Safari desteklemez) — Takvim butonlarını kullan.'; $('askNotif').style.display='none'; return; }
-  const p=Notification.permission; el.textContent=p==='granted'?'İzin verildi. Uygulama açık/arka plandayken 08:30 · 14:00 · 20:00 · 23:00 (F+M) bildirim gelir. Kapalıyken için Takvim.':p==='denied'?'İzin reddedilmiş. Tarayıcı ayarlarından açman lazım.':'Henüz izin yok.';
-  $('askNotif').style.display=p==='granted'?'none':''; }
-function fire(title,body){ if(!('Notification' in window)||Notification.permission!=='granted') return; try{ new Notification(title,{body,tag:'yemek',renotify:true}).onclick=()=>window.focus(); }catch(e){} }
-const MSGS=[['Kahvaltı zamanı','Yedin mi? Sağa kaydır, alevi gör.'],['Öğle','Seri bekliyor. Bugün kaç iyi?'],['Akşam','Günün son yemeği. Kapat gel.'],['F+M zamanı 💊','Basılı tut, +15 saç kökü.']];
-function checkSlots(){ const now=new Date(), key=now.toDateString();
-  [...SLOTS,PILL].forEach((s,i)=>{ const due=new Date(); due.setHours(s.h,s.m,0,0); const id=key+'#'+i;
-    if(now>=due&&now-due<20*6e4&&!st.notified[id]){ st.notified[id]=1; for(const k in st.notified) if(!k.startsWith(key)) delete st.notified[k]; save(); fire(...MSGS[i]); } });
-  render(); }
-setInterval(checkSlots,30000);
-$('askNotif').onclick=()=>Notification.requestPermission().then(notifState);
-$('testNotif').onclick=()=>{ if(!('Notification' in window)) return; if(Notification.permission!=='granted') return Notification.requestPermission().then(p=>{notifState(); if(p==='granted') fire('Test','Çalışıyor.');}); fire('Test','Çalışıyor. Şimdi sağa kaydır.'); };
-function calLinks(){ const c=$('cal'); c.innerHTML=''; const url=location.href.split('#')[0];
-  [...SLOTS,PILL].forEach((s,i)=>{ const d=new Date(); d.setHours(s.h,s.m,0,0); if(d<new Date()) d.setDate(d.getDate()+1); const e=new Date(d.getTime()+5*6e4);
-    const f=x=>x.toISOString().replace(/[-:]|\.\d{3}/g,'');
-    const href='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent((i==3?'💊 ':'🔥 ')+MSGS[i][0])+'&dates='+f(d)+'/'+f(e)+'&recur='+encodeURIComponent('RRULE:FREQ=DAILY')+'&details='+encodeURIComponent(MSGS[i][1]+'\n'+url);
-    const a=document.createElement('a'); a.href=href; a.target='_blank'; a.rel='noopener'; a.innerHTML=`${s.n} <span>${hhmm(s.h,s.m)} · her gün</span>`; c.appendChild(a); }); }
+// ================= F+M =================
+function bindPill(el){ const fill=()=>el.querySelector('.fill'); const HOLD=1500; let hold=null,k=0,tapT=0;
+  const down=e=>{ if(e.target.classList.contains('q')) return; if(actToday('pills')){ tapT=performance.now(); return; } e.preventDefault&&e.preventDefault(); A(); const t0=performance.now(); let lastS=0;
+    hold=requestAnimationFrame(function step(now){ k=Math.min(1,(now-t0)/HOLD); if(fill()) fill().style.height=k*100+'%'; if(k-lastS>.12){ lastS=k; sCharge(k); vib(6); } if(k>=1){ hold=null; takePill(el); } else hold=requestAnimationFrame(step); }); };
+  const up=()=>{ if(tapT&&performance.now()-tapT<400){ tapT=0; st.pills=st.pills.filter(t=>t<dayStart()); st.fit=clamp(st.fit-8,0,100); save(); render(); setFit(st.fit); vib(10); word('F+M geri alındı','cool'); return; } tapT=0; if(hold){ cancelAnimationFrame(hold); hold=null; } if(k<1&&fill()){ fill().style.transition='height .25s'; fill().style.height='0%'; setTimeout(()=>{ if(fill()) fill().style.transition=''; },260); } k=0; };
+  el.addEventListener('touchstart',down,{passive:false}); el.addEventListener('touchend',up); el.addEventListener('touchcancel',up); el.addEventListener('mousedown',down); el.addEventListener('mouseup',up); el.addEventListener('mouseleave',up); }
+function takePill(el){ const rBefore=rankOf(xp()); redo=[]; st.pills.push(Date.now()); st.fit=clamp(st.fit+8,0,100); save(); const r=el.getBoundingClientRect(); render();
+  flash('radial-gradient(circle at 20% 35%, rgba(255,180,209,.9), rgba(255,95,162,.2) 55%, transparent)'); burst(120,['#FFB4D1','#FF5FA2','#15171A','#C6F53A'],r.left+r.width/2,r.top+r.height/2,6.3,7);
+  for(let i=0;i<3;i++) setTimeout(()=>burst(90,['#FFB4D1','#C6F53A','#15171A'],innerWidth*(.25+.25*i),innerHeight*.4,3.2,9),200+i*160);
+  word('+15 SAÇ KÖKÜ','pinkw'); setTimeout(()=>word(`F+M gün ${actStreak('pills')} · +15 xp`,'xp'),300); shake(); vib([50,30,50,30,50,30,250]); sHuge(); setTimeout(()=>setFit(st.fit),300); if(rankOf(xp())>rBefore) rankUp(RANKS[rankOf(xp())][1]); }
 
-// ---------- summary ----------
-function openSheet(){ const h=$('hist'); h.innerHTML=''; let max=1, rows=[];
-  for(let k=5;k>=0;k--){ const ws=new Date(weekStart()); ws.setDate(ws.getDate()-7*k); const g=inWeek(ws.getTime()).filter(e=>e.good).length; max=Math.max(max,g); rows.push([ws,g]); }
-  rows.forEach(([ws,g],idx)=>{ const we=new Date(ws); we.setDate(we.getDate()+6); const wsT=ws.getTime(), weT=wsT+7*864e5;
-    const acts=['pills','lift','cardio'].map(k=>st[k].filter(t=>t>=wsT&&t<weT).length); const cur=idx===rows.length-1;
-    const d=document.createElement('div'); d.innerHTML=`<i style="height:${Math.max(4,g/21*70)}px;${cur?'':'opacity:.55'}"></i><b>${g}</b><span class="ac">${acts[0]?'💊'+acts[0]:''}${acts[1]?' 🏋️'+acts[1]:''}${acts[2]?' 🏃'+acts[2]:''}</span><span>${cur?'bu hafta':ws.getDate()+'–'+we.getDate()+' '+MON[we.getMonth()]}</span>`; h.appendChild(d); });
-  const tg=log.filter(e=>e.good).length; let best=0,cur=0; for(const e of log){ cur=e.good?cur+1:0; best=Math.max(best,cur); }
-  const lw=st.weights[st.weights.length-1], goal=parseFloat(st.goal)||90; const days=log.length?Math.floor((dayStart()-dayStart(new Date(log[0].t)))/864e5)+1:0;
-  $('kpi').innerHTML=`<div><b>${days}</b>gün yolda</div><div><b>${tg}/${log.length}</b>iyi yemek</div><div><b>${best}</b>en uzun seri</div><div><b>${pillStreak()}</b>F+M seri · ${st.pills.length} toplam</div><div><b>${st.lift.length}</b>ağırlık</div><div><b>${st.cardio.length}</b>kardiyo</div><div><b>${st.water.length}</b>L su · ${waterToday()} bugün</div><div><b>${lw?lw.kg.toFixed(1):'—'}</b>kg${st.weights.length>1?` · ${((lw.kg-st.weights[0].kg)>0?'+':'')+(lw.kg-st.weights[0].kg).toFixed(1)}`:''}</div><div><b>${lw?Math.max(0,lw.kg-goal).toFixed(1):'—'}</b>kg hedefe</div><div><b>${xp()}</b>xp · ${st.cheats||0} kart</div>`;
-  notifState(); calLinks(); $('sheet').classList.add('open'); }
-$('stats').onclick=openSheet; $('close').onclick=()=>$('sheet').classList.remove('open');
-$('share').onclick=()=>{ const w=thisWeek(), g=w.filter(e=>e.good).length; const dots=Array.from({length:21},(_,i)=>w[i]?(w[i].good?'🟢':(w[i].cheat?'⚪':'🔘')):'⚫').join('');
-  const txt=`Bu hafta ${g}/${w.length} iyi yemek · 🏋️ ${actWeek('lift')} · 🏃 ${actWeek('cardio')} · 💧 ${waterToday()} L · F+M ${pillStreak()} gün\n${dots}\nRütbe: ${RANKS[rankOf(xp())][1]} · ${Math.round(st.fit)}% yakın`; if(navigator.share) navigator.share({text:txt}).catch(()=>{}); else { try{ navigator.clipboard.writeText(txt); }catch(e){} } };
-
-// ---------- profile ----------
-const monthKey=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-const MON=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
-const GATE=2; // kg başına kapı
-function gates(){ const st0=st.weights[0]?st.weights[0].kg:null, goal=parseFloat(st.goal)||90; if(st0===null||st0<=goal) return null;
-  const n=Math.max(2,Math.ceil((st0-goal)/GATE)); const arr=[]; for(let i=1;i<=n;i++) arr.push(+(Math.max(goal,st0-i*GATE)).toFixed(1)); arr[arr.length-1]=goal; return {st0,goal,arr}; }
-const BOSSES=['Isınma','Kapı Bekçisi','Gölge','Çelik Kapı','Alev Duvarı','Buz Kalesi','Titan','Karanlık Lord','Ejderha','FINAL BOSS'];
-function journey(){ const g=gates(); const svg=$('journey'); const lw=st.weights[st.weights.length-1];
-  if(!g||!lw){ svg.innerHTML=`<text x="170" y="85" text-anchor="middle" font-size="13" font-weight="700" fill="#7A7F87">İlk kiloyu kaydet, yol açılsın.</text>`; $('stageName').textContent='Yol kapalı'; $('stageSub').textContent='hedef 90 kg'; return; }
-  const p=clamp((g.st0-lw.kg)/(g.st0-g.goal),0,1); const n=g.arr.length;
-  const path=[]; for(let i=0;i<=40;i++){ const x=22+i*7.4, y=100+Math.sin(i/40*Math.PI*2.2)*30-i*0.5; path.push([x,y]); }
-  const d=path.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' ');
-  const at=t=>{ const i=t*40, a=path[Math.floor(i)], b=path[Math.min(40,Math.ceil(i))], f=i-Math.floor(i); return [L(a[0],b[0],f),L(a[1],b[1],f)]; };
-  const [rx,ry]=at(p); const passed=g.arr.filter(w=>lw.kg<=w).length; const nextIdx=Math.min(passed,n-1);
-  const nodes=g.arr.map((w,i)=>{ const [x,y]=at((i+1)/n); const done=lw.kg<=w, final=i===n-1, next=i===nextIdx&&!done;
-    return `<g>${final?`<text x="${x}" y="${y-22}" text-anchor="middle" font-size="22">${done?'🏆':'👹'}</text>`:''}
-      <circle cx="${x}" cy="${y}" r="${final?11:7}" fill="${done?'#C6F53A':(final?'#15171A':'#fff')}" stroke="#15171A" stroke-width="2.5" class="${next?'pulse':''}"/>
-      ${done&&!final?`<text x="${x}" y="${y+3.5}" text-anchor="middle" font-size="9" font-weight="800">✓</text>`:''}
-      <text x="${x}" y="${y+24}" text-anchor="middle" font-size="9" font-weight="800" fill="${done?'#5E8A00':'#15171A'}">${w}</text></g>`; }).join('');
-  svg.innerHTML=`<defs><linearGradient id="jg" x1="0" x2="1"><stop offset="0" stop-color="#C6F53A"/><stop offset="1" stop-color="#A6DB1F"/></linearGradient></defs>
-    <path d="${d}" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#D9DCD3" stroke-width="10" stroke-linecap="round"/>
-    <path d="${d}" fill="none" stroke="url(#jg)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${p*330} 1000" pathLength="330"/>
-    <path d="${d}" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="4 8" opacity=".9"/>
-    <text x="20" y="${path[0][1]+26}" font-size="9" font-weight="800" fill="#7A7F87">${g.st0} başla</text>${nodes}
-    <g transform="translate(${rx} ${ry-6})"><circle cx="0" cy="0" r="12" fill="#15171A"/><text x="0" y="5" text-anchor="middle" font-size="14">${p>=1?'👑':'🏃'}</text></g>`;
-  if(p>=1){ $('stageName').textContent='FINAL BOSS YENİLDİ'; $('stageSub').textContent=`${g.goal} kg · efsane`; }
-  else{ const nx=g.arr[nextIdx]; const boss=BOSSES[Math.min(BOSSES.length-1,Math.round(nextIdx/(n-1)*(BOSSES.length-1)))]; $('stageName').textContent=`Bölüm ${passed+1}/${n} · ${nextIdx===n-1?'FINAL BOSS':boss}`; $('stageSub').textContent=`kapı ${nx} kg · ${(lw.kg-nx).toFixed(1)} kg kaldı`; } }
-function renderProfile(){
-  $('hgt').value=st.hgt||''; $('goal').value=st.goal||''; const lw=st.weights[st.weights.length-1], goal=parseFloat(st.goal)||90;
-  $('wNow').textContent=lw?lw.kg.toFixed(1):'—'; $('wDelta').textContent=st.weights.length>1?((lw.kg-st.weights[0].kg)>0?'+':'')+(lw.kg-st.weights[0].kg).toFixed(1)+' kg':'—'; $('wLeft').textContent=lw?Math.max(0,lw.kg-goal).toFixed(1)+' kg':'—';
-  const tl=st.weights.some(w=>w.t>=dayStart()); $('wgt').value=tl?lw.kg:''; $('wsave').textContent=tl?'Güncelle':'Bugünü kaydet';
-  journey();
-  const c=$('wchart'); const ws=st.weights.slice(-40);
-  if(ws.length<2){ c.innerHTML=`<text x="170" y="80" text-anchor="middle" fill="#7A7F87" font-size="12" font-weight="700">iki kayıt sonra grafik çıkar</text>`; }
-  else{ const kgs=ws.map(w=>w.kg); const min=Math.floor(Math.min(...kgs,goal)-1), max=Math.ceil(Math.max(...kgs)+1); const X=i=>28+i/(ws.length-1)*300, Y=v=>18+(1-(v-min)/(max-min))*100;
-    const pts=ws.map((w,i)=>[X(i),Y(w.kg)]); const line=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
-    const area=line+` L ${pts[pts.length-1][0].toFixed(1)} 118 L 28 118 Z`; const gy=Y(goal);
-    const ticks=[min,Math.round((min+max)/2),max].map(v=>`<text x="4" y="${Y(v)+3}" font-size="9" font-weight="700" fill="#7A7F87">${v}</text><line x1="28" x2="328" y1="${Y(v)}" y2="${Y(v)}" stroke="#E6E8E1"/>`).join('');
-    const lab=i=>{ const d=new Date(ws[i].t); return `${d.getDate()}/${d.getMonth()+1}`; }; const xl=[0,Math.floor((ws.length-1)/2),ws.length-1].filter((v,i,a)=>a.indexOf(v)===i).map(i=>`<text x="${X(i)}" y="140" text-anchor="middle" font-size="9" font-weight="700" fill="#7A7F87">${lab(i)}</text>`).join('');
-    c.innerHTML=`<defs><linearGradient id="ag" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#C6F53A" stop-opacity=".7"/><stop offset="1" stop-color="#C6F53A" stop-opacity="0"/></linearGradient></defs>${ticks}
-      <line x1="28" x2="328" y1="${gy}" y2="${gy}" stroke="#15171A" stroke-dasharray="4 4" opacity=".5"/><text x="328" y="${gy-4}" text-anchor="end" font-size="9" font-weight="800">hedef ${goal}</text>
-      <path d="${area}" fill="url(#ag)"/><path d="${line}" fill="none" stroke="#15171A" stroke-width="2.5" stroke-linejoin="round"/>
-      ${pts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="${i===pts.length-1?5:3.5}" fill="${i===pts.length-1?'#15171A':'#C6F53A'}" stroke="#15171A" stroke-width="1.5"/>`).join('')}
-      <text x="${pts[pts.length-1][0]}" y="${pts[pts.length-1][1]-10}" text-anchor="middle" font-size="11" font-weight="800">${kgs[kgs.length-1]}</text>${xl}`; }
-  const wl=$('wlist'); wl.innerHTML=''; [...st.weights].reverse().forEach((w,ri)=>{ const i=st.weights.length-1-ri; const prev=st.weights[i-1]; const dl=prev?w.kg-prev.kg:0; const d=new Date(w.t);
-    const row=document.createElement('div'); row.className='wrow'; row.innerHTML=`<span class="dt">${d.getDate()} ${MON[d.getMonth()]} ${String(d.getFullYear()).slice(2)}</span><span class="kg">${w.kg.toFixed(1)}</span>${prev?`<span class="dl ${dl<=0?'down':'up'}">${dl>0?'+':''}${dl.toFixed(1)}</span>`:'<span class="dl" style="background:var(--line)">başlangıç</span>'}<button class="x" data-i="${i}">✕</button>`; wl.appendChild(row); });
-  wl.querySelectorAll('.x').forEach(b=>b.onclick=()=>{ st.weights.splice(+b.dataset.i,1); save(); renderProfile(); vib(10); });
-  const has=st.photos.some(p=>p.m===monthKey()); $('photoBtn').disabled=has;
-  const nx=new Date(); nx.setMonth(nx.getMonth()+1,1); $('photoNote').textContent=has?`Bu ayın fotosu yüklendi. Sıradaki: 1 ${MON[nx.getMonth()]}.`:'Aynı ışık, aynı poz, aynı ayna. Ayda bir; sonra yan yana bak.';
-  const g=$('gal'); g.innerHTML=''; [...st.photos].reverse().forEach(p=>{ const [y,m]=p.m.split('-'); const f=document.createElement('figure'); f.innerHTML=`<img src="${p.d}" alt=""><figcaption>${MON[+m-1]} ${y}</figcaption>`; g.appendChild(f); });
-}
-$('prof').onclick=()=>{ renderProfile(); $('psheet').classList.add('open'); }; $('pclose').onclick=()=>$('psheet').classList.remove('open');
-$('hgt').onchange=e=>{ st.hgt=e.target.value; save(); renderProfile(); };
-$('goal').onchange=e=>{ st.goal=e.target.value; save(); renderProfile(); };
-$('wsave').onclick=()=>{ const kg=parseFloat($('wgt').value); if(!kg||kg<30||kg>300) return; const g0=gates(); const prevKg=st.weights.length?st.weights[st.weights.length-1].kg:null;
-  const lw=st.weights[st.weights.length-1]; if(lw&&lw.t>=dayStart()) lw.kg=kg; else st.weights.push({t:Date.now(),kg});
-  if(prevKg!==null&&kg<prevKg){ st.fit=clamp(st.fit+Math.round((prevKg-kg)*5),0,100); } save(); renderProfile(); render(); setFit(st.fit); $('wgt').blur();
-  const goal=parseFloat(st.goal)||90; const g1=gates();
-  const r=$('wsave').getBoundingClientRect(); burst(80,['#C6F53A','#15171A','#fff'],r.left+r.width/2,r.top,3,7); sGood(); vib([20,30,60]);
-  if(g1&&prevKg!==null&&kg<prevKg){ const crossed=g1.arr.filter(w=>kg<=w&&prevKg>w).length;
-    if(kg<=goal){ setTimeout(()=>{ word('FINAL BOSS YENİLDİ 👑','huge'); shake(); for(let i=0;i<5;i++) setTimeout(()=>burst(160,['#C6F53A','#15171A','#fff','#FF5FA2'],innerWidth*(.15+.175*i),innerHeight*.4,3.4,11),i*140); sHuge(); vib([80,40,80,40,80,40,300]); },400); }
-    else if(crossed){ setTimeout(()=>{ word(`KAPI GEÇİLDİ · ${g1.arr.filter(w=>kg<=w).length}/${g1.arr.length}`,'huge'); shake(); for(let i=0;i<3;i++) setTimeout(()=>burst(140,['#C6F53A','#15171A','#fff'],innerWidth*(.25+.25*i),innerHeight*.4,3.2,10),i*130); sHuge(); vib([50,30,50,30,220]); },400); }
-    else { setTimeout(()=>word(`−${(prevKg-kg).toFixed(1)} kg · +${Math.round((prevKg-kg)*5)} yakınlık`,'big'),200); } }
-  else if(prevKg!==null&&kg>prevKg) setTimeout(()=>word('dalgalanma, yola devam','cool'),200); };
-$('photoBtn').onclick=()=>$('photoIn').click();
-$('photoIn').onchange=e=>{ const file=e.target.files[0]; if(!file) return; const img=new Image(); const u=URL.createObjectURL(file);
-  img.onload=()=>{ const s=Math.min(1,720/Math.max(img.width,img.height)); const c=document.createElement('canvas'); c.width=img.width*s; c.height=img.height*s; c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-    const d=c.toDataURL('image/jpeg',.72); URL.revokeObjectURL(u); st.photos=st.photos.filter(p=>p.m!==monthKey()); st.photos.push({m:monthKey(),d});
-    if(!save()){ st.photos.pop(); alert('Depolama doldu, foto kaydedilemedi.'); return; } renderProfile(); flash('radial-gradient(circle, rgba(198,245,58,.6), transparent 60%)'); sGood(); word('AYLIK FOTO ✓','big'); e.target.value=''; };
-  img.src=u; };
-
-
-
-// ---------- su: sağ üste çek = doldur (+1 L), sol alta çek = boşalt (−1 L) ----------
-const waterToday=()=>st.water.filter(t=>t>=dayStart()).length;
+// ================= SU =================
 function waterLabel(){ const n=waterToday(); const l=$('wlab'); l.innerHTML=`💧<b>${n}</b>L${n>=3?' ✓':''}`; l.classList.toggle('full',n>=3); }
-(function(){ const g=$('glass'), wrap=$('sceneWrap'), gw=$('gw'), gw2=$('gw2'), ring=$('gring'), zg=$('zoneG'), zr=$('zoneR'); const HOLD=2200, HOLD_R=1300;
+(function(){ const g=$('glass'), wrap=$('sceneWrap'), gw=$('gw'), gw2=$('gw2'), ring=$('gring'), zg=$('zoneG'), zr=$('zoneR'), hb=$('hbar'), hbF=$('hbFill'), hbT=$('hbTxt'); const HOLD=2200, HOLD_R=1300;
   let drag=false, sx=0, sy=0, dx=0, dy=0, level=1, zone=0, t0=0, raf=null, dropT=null;
   const setLevel=v=>{ level=clamp(v,0,1); const y=74-level*60; gw.setAttribute('y',y); gw2.setAttribute('y',y); };
   const place=()=>{ g.style.transform=`translate(${dx}px,${dy}px) rotate(${zone===1?60:(zone===-1?-60:dx/8)}deg)`; };
-  const hb=$('hbar'), hbF=$('hbFill'), hbT=$('hbTxt');
   const stopHold=()=>{ hb.classList.remove('on'); hbF.style.width='0%'; if(raf){ cancelAnimationFrame(raf); raf=null; } if(dropT){ clearInterval(dropT); dropT=null; } ring.style.opacity=0; ring.setAttribute('stroke-dasharray','0 1000'); };
-  const startHold=z=>{ t0=performance.now(); ring.style.opacity=1; hb.classList.add('on'); hb.style.setProperty('--hbc',z===1?'#78DC50':'#FF5050'); ring.setAttribute('stroke',z===1?'#78DC50':'#FF5050'); sTick();
+  const startHold=z=>{ t0=performance.now(); ring.style.opacity=1; ring.setAttribute('stroke',z===1?'#78DC50':'#FF5050'); hb.classList.add('on'); hb.style.setProperty('--hbc',z===1?'#78DC50':'#FF5050'); sTick();
     dropT=setInterval(()=>{ const d=document.createElement('span'); d.className='drop'; d.textContent='💧'; d.style.setProperty('--dx',(Math.random()*30-10)+'px'); $('drops').appendChild(d); setTimeout(()=>d.remove(),750); },z===1?110:70);
     const dur=z===1?HOLD:HOLD_R;
     raf=requestAnimationFrame(function step(now){ const k=Math.min(1,(now-t0)/dur); setLevel(z===1?1-k:k); ring.setAttribute('stroke-dasharray',`${k*214} 1000`); hbF.style.width=(k*100)+'%'; hbT.textContent=(z===1?'💧 +1 L · ':'🗑 −1 L · ')+((dur-(now-t0))/1000).toFixed(1)+' sn'; if(Math.floor(k*10)!==Math.floor((k-.02)*10)) vib(4);
       if(k>=1){ stopHold(); z===1?drinkDone():drainDone(); } else raf=requestAnimationFrame(step); }); };
-  const zoneOf=()=>{ const W=wrap.clientWidth, H=wrap.clientHeight; const nx=dx/W, ny=dy/H; if(nx>.45&&ny<.15) return 1; if(dx<8&&ny>.35) return -1; return 0; };
+  const zoneOf=()=>{ const W=wrap.clientWidth, H=wrap.clientHeight; if(dx/W>.45&&dy/H<.15) return 1; if(dx<8&&dy/H>.35) return -1; return 0; };
   const down=e=>{ drag=true; g.classList.add('drag'); const p=e.touches?e.touches[0]:e; sx=p.clientX-dx; sy=p.clientY-dy; A(); e.preventDefault&&e.preventDefault(); };
   const move=e=>{ if(!drag) return; const p=e.touches?e.touches[0]:e; const W=wrap.clientWidth, H=wrap.clientHeight; dx=clamp(p.clientX-sx,-4,W-52); dy=clamp(p.clientY-sy,-6,H-64);
-    const z=zoneOf(); zg.style.opacity=z===1?1:clamp(dx/W*1.2,0,.5); zr.style.opacity=z===-1?1:clamp(dy/H*1.2,0,.5); $('scene').style.filter=z?`blur(${z===1?6:8}px) saturate(1.3)`:(dx>20||dy>20?'blur(2px)':'');
-    if(z!==zone){ zone=z; stopHold(); if(z===1){ setLevel(1); startHold(1); } else if(z===-1){ if(waterToday()>0){ setLevel(0); startHold(-1); } else { zone=0; word('bugün su yok','cool'); } } else setLevel(1); }
-    place(); };
-  const up=()=>{ if(!drag) return; drag=false; g.classList.remove('drag'); stopHold(); zone=0; dx=0; dy=0; setLevel(1); place(); zg.style.opacity=0; zr.style.opacity=0; $('scene').style.filter=''; };
-  g.addEventListener('touchstart',down,{passive:false}); g.addEventListener('touchmove',move,{passive:true}); g.addEventListener('touchend',up); g.addEventListener('touchcancel',up);
-  g.addEventListener('mousedown',down); addEventListener('mousemove',move); addEventListener('mouseup',up);
-  function drinkDone(){ st.water.push(Date.now()); st.fit=clamp(st.fit+1,0,100); save(); waterLabel(); const n=waterToday();
-    const r=g.getBoundingClientRect(); burst(70,['#78DC50','#5FB9FF','#fff','#15171A'],r.left+r.width/2,r.top+r.height/2,3,7);
-    flash('radial-gradient(circle at 85% 20%, rgba(120,220,80,.8), transparent 60%)'); vib([30,20,80]); sGood(); render();
-    if(n===3){ word('SU HEDEFİ ✓ 3 L','huge'); shake(); for(let i=0;i<3;i++) setTimeout(()=>burst(120,['#5FB9FF','#BFE5FF','#C6F53A','#15171A'],innerWidth*(.25+.25*i),innerHeight*.4,3.2,10),i*130); sHuge(); }
-    else word(`+1 L 💧 · bugün ${n} L`,'big');
-    zone=0; setLevel(1); if(drag){ startHold(1); zone=1; } }
-  function drainDone(){ const i=st.water.map(t=>t>=dayStart()).lastIndexOf(true); if(i>=0) st.water.splice(i,1); st.fit=clamp(st.fit-1,0,100); save(); waterLabel(); render();
-    flash('radial-gradient(circle at 15% 85%, rgba(255,80,80,.7), transparent 60%)'); vib(40); sBad(); word(`−1 L · bugün ${waterToday()} L`,'cool');
-    zone=0; setLevel(1); if(drag&&waterToday()>0){ setLevel(0); startHold(-1); zone=-1; } }
-  setLevel(1); waterLabel();
-})();
-// ---------- gün sonu cezası & haftalık serbest kart ----------
-function processDays(){
-  if(!log.length&&!st.pills.length) return; const first=dayStart(new Date(Math.min(log[0]?log[0].t:Infinity, st.pills[0]||Infinity)));
-  let d=Math.max(st.processed||0, first), lost=0, missedDays=0; const todayS=dayStart();
-  while(d<todayS){ const meals=log.filter(e=>e.t>=d&&e.t<d+864e5).length; const miss=Math.max(0,3-meals); if(miss){ lost+=miss*3; missedDays++; } d+=864e5; }
-  st.processed=todayS;
-  // hafta bitti mi?
-  const ws=weekStart().getTime(); if((st.weekDone||0)<ws){ const prev=inWeek(ws-7*864e5); const g=prev.filter(e=>e.good).length; const started=prev.length>0||(st.weekDone||0)>0;
-    if(started&&g>=18){ st.cheats=(st.cheats||0)+1; setTimeout(()=>{ word(`HAFTA ${g}/21 · SERBEST KART +1`,'huge'); burst(180,['#fff','#C6F53A','#15171A'],innerWidth/2,innerHeight*.45,5,10); sHuge(); vib([60,40,60,40,200]); },1400); }
-    st.weekDone=ws; }
-  if(lost){ st.fit=clamp(st.fit-lost,0,100); setTimeout(()=>{ word(`−${lost} yakınlık · ${missedDays} gün eksik kayıt`,'cool'); sBad(); vib(30); setFit(st.fit); },600); }
-  save();
-}
+    const z=zoneOf(); zg.style.opacity=z===1?1:clamp(dx/W*1.2,0,.5); zr.style.opacity=z===-1?1:clamp(dy/H*1.2,0,.5); $('fire').style.filter=z?`blur(${z===1?6:8}px) saturate(1.3)`:(dx>20||dy>20?'blur(2px)':'');
+    if(z!==zone){ zone=z; stopHold(); if(z===1){ setLevel(1); startHold(1); } else if(z===-1){ if(waterToday()>0){ setLevel(0); startHold(-1); } else { zone=0; word('bugün su yok','cool'); } } else setLevel(1); } place(); };
+  const up=()=>{ if(!drag) return; drag=false; g.classList.remove('drag'); stopHold(); zone=0; dx=0; dy=0; setLevel(1); place(); zg.style.opacity=0; zr.style.opacity=0; $('fire').style.filter=''; };
+  g.addEventListener('touchstart',down,{passive:false}); g.addEventListener('touchmove',move,{passive:true}); g.addEventListener('touchend',up); g.addEventListener('touchcancel',up); g.addEventListener('mousedown',down); addEventListener('mousemove',move); addEventListener('mouseup',up);
+  function drinkDone(){ redo=[]; st.water.push(Date.now()); st.fit=clamp(st.fit+1,0,100); save(); render(); const n=waterToday(); const r=g.getBoundingClientRect(); burst(70,['#78DC50','#5FB9FF','#fff','#15171A'],r.left+r.width/2,r.top+r.height/2,3,7);
+    flash('radial-gradient(circle at 85% 20%, rgba(120,220,80,.8), transparent 60%)'); vib([30,20,80]); sGood(); if(n===3) bigShow('SU HEDEFİ ✓ 3 L','huge',['#5FB9FF','#BFE5FF','#C6F53A','#15171A']); else word(`+1 L 💧 · bugün ${n} L`,'big');
+    zone=0; setLevel(1); if(drag){ startHold(1); zone=1; } setTimeout(()=>setFit(st.fit),300); }
+  function drainDone(){ const i=st.water.map(t=>t>=dayStart()).lastIndexOf(true); if(i>=0) st.water.splice(i,1); st.fit=clamp(st.fit-1,0,100); save(); render(); flash('radial-gradient(circle at 15% 85%, rgba(255,80,80,.7), transparent 60%)'); vib(40); sBad(); word(`−1 L · bugün ${waterToday()} L`,'cool'); zone=0; setLevel(1); if(drag&&waterToday()>0){ setLevel(0); startHold(-1); zone=-1; } }
+  setLevel(1); })();
+</script>
+<script>
+// ================= DİYET =================
+function renderDiet(){
+  const eaten=[...today().filter(e=>e.good),...inDay(st.snacks,dayStart())]; const kcalNow=eaten.reduce((a,e)=>a+(e.kcal||0),0), pNow=eaten.reduce((a,e)=>a+(e.p||0),0);
+  $('planBox').innerHTML=`<b>60 gün planı · kas koruyarak kurut</b><p>99 kg, 198 cm, 24 y, haftada 3 ağırlık. Açık ~600 kcal → haftada ~0.5 kg yağ, kas kaybı yok. Protein 2 g/kg. İlk 60 gün: tuz az (hazır gıda, turşu, salam yok), günde 3 L su, alkol ve şeker sıfır — ödem ve şişlik ilk 2 haftada gider, aynada ilk fark orası.</p>
+    <div class="mac" style="margin-top:10px"><span class="k">${PLAN.kcal} kcal</span><span>P ${PLAN.p} g</span><span>K ${PLAN.c} g</span><span>Y ${PLAN.f} g</span></div>
+    <p style="margin-top:8px">Bugün plandan: <b style="color:#fff">${kcalNow} kcal · ${pNow} g protein</b></p>`;
+  const box=$('dietSlots'); box.innerHTML='';
+  DIET.forEach(sl=>{ const isSnack=sl.id.startsWith('s'); const done=isSnack?inDay(st.snacks,dayStart()).find(x=>x.slot===sl.id):slotEntry(sl.id);
+    const d=document.createElement('div'); d.className='dslot'; d.innerHTML=`<div class="dhead"><b>${sl.n}</b>${done?`<span class="done">✓ ${done.plan||(done.good?'iyi':'kötü')}</span>`:`<span>~${sl.kcal} kcal · 6 seçenek</span>`}</div>`;
+    const rail=document.createElement('div'); rail.className='rail';
+    sl.opts.forEach((o,i)=>{ const c=document.createElement('div'); c.className='opt'+(done&&done.plan===o.t?' eaten':''); c.innerHTML=`<div class="n">SEÇENEK ${i+1}/6</div><div class="t">${o.t}</div><ul>${o.i.map(x=>`<li>${x}</li>`).join('')}</ul><div class="mac"><span class="k">${o.k} kcal</span><span>P ${o.p}</span><span>K ${o.c}</span><span>Y ${o.f}</span></div><button class="pillb">${done&&done.plan===o.t?'Yedin ✓':'Bunu Ye!'}</button>`;
+      c.querySelector('button').onclick=()=>eat(sl,o); rail.appendChild(c); });
+    d.appendChild(rail); const dots=document.createElement('div'); dots.className='dots'; dots.innerHTML=sl.opts.map((_,i)=>`<i class="${i===0?'on':''}"></i>`).join(''); d.appendChild(dots);
+    rail.addEventListener('scroll',()=>{ const i=Math.round(rail.scrollLeft/(rail.firstChild.offsetWidth+10)); [...dots.children].forEach((x,k)=>x.classList.toggle('on',k===i)); },{passive:true});
+    box.appendChild(d); }); }
+function eat(sl,o){ const isSnack=sl.id.startsWith('s');
+  if(isSnack){ const ex=st.snacks.findIndex(x=>x.t>=dayStart()&&x.slot===sl.id); if(ex>=0) st.snacks.splice(ex,1); redo=[]; st.snacks.push({t:Date.now(),slot:sl.id,plan:o.t,kcal:o.k,p:o.p}); save(); render(); sGood(); vib([20,30]); word(`${o.t} · +8 xp`,'big'); }
+  else { const ex=slotEntry(sl.id); if(ex){ ex.plan=o.t; ex.kcal=o.k; ex.p=o.p; if(!ex.good&&!ex.cheat){ ex.good=true; st.fit=clamp(st.fit+11,0,100); } save(); render(); sGood(); word(`${sl.n} güncellendi · ${o.t}`,'big'); }
+    else { commit(true,sl.id,o.t); const e=log[log.length-1]; e.kcal=o.k; e.p=o.p; save(); } }
+  renderDiet(); }
 
-function openCalm(){ $('calm').classList.add('open'); vib(10); }
+// ================= KARDİYO =================
+let tInt=null;
+function renderCardio(){ const m=$('modes'); m.innerHTML=''; $('cardioNote').textContent=`Kalori ${kg()} kg üzerinden MET formülüyle hesaplanır. Süre akıyorsa çalışıyorsun; Bitir'e basınca ana sayfada Yandı 🔥 bölümüne yazılır.`;
+  MODES.forEach(md=>{ const mins=(st.modeMin||{})[md.id]||md.min; const c=document.createElement('div'); c.className='mode'; c.innerHTML=`<div class="e">${md.e}</div><div class="t">${md.n}</div><div class="k">${Math.round(kcalMin(md.met)*mins)} kcal / ${mins} dk</div><div class="mins"><button data-d="-5">−</button><b>${mins} dk</b><button data-d="5">+</button></div><button class="pillb sm" style="align-self:stretch;text-align:center">Başla!</button>`;
+    c.querySelectorAll('.mins button').forEach(b=>b.onclick=()=>{ st.modeMin=st.modeMin||{}; st.modeMin[md.id]=clamp(mins+ +b.dataset.d,5,180); save(); renderCardio(); sTick(); });
+    c.querySelector('.pillb').onclick=()=>startSession(md,mins); m.appendChild(c); });
+  const td=inDay(st.sessions,dayStart()), wk=st.sessions.filter(s=>s.t>=weekStart().getTime());
+  $('ckpi').innerHTML=`<div><b>${Math.round(td.reduce((a,b)=>a+b.kcal,0))}</b>kcal bugün</div><div><b>${Math.round(wk.reduce((a,b)=>a+b.kcal,0))}</b>kcal bu hafta</div><div><b>${liftDays(7)}/3</b>ağırlık günü</div><div><b>${Math.round(wk.reduce((a,b)=>a+b.min,0))}</b>dk bu hafta</div><div><b>${wk.filter(s=>s.type!=='lift').length}</b>kardiyo seansı</div><div><b>${st.sessions.length}</b>toplam seans</div>`;
+  const s=$('sess'); s.innerHTML=''; [...st.sessions].slice(-12).reverse().forEach(x=>{ const md=MODES.find(m=>m.id===x.type)||{e:'🏃',n:x.type}; const d=new Date(x.t); const r=document.createElement('div'); r.className='srow'; r.innerHTML=`<span>${md.e}</span><span>${md.n}</span><span style="color:var(--mute)">${fmtD(d)} · ${Math.round(x.min)} dk</span><span class="kc">${Math.round(x.kcal)} kcal</span><button class="x">✕</button>`; r.querySelector('.x').onclick=()=>{ st.sessions.splice(st.sessions.indexOf(x),1); save(); renderCardio(); render(); vib(10); }; s.appendChild(r); });
+  tickTimer(); }
+function startSession(md,mins){ if(st.active) return; st.active={type:md.id,start:Date.now(),min:mins}; save(); $('timerBox').style.display='flex'; sGood(); vib([20,30,60]); word(`${md.e} ${md.n} · BAŞLA`,'big'); tickTimer(); if(!tInt) tInt=setInterval(tickTimer,1000); $('pg-cardio').scrollTop=0; }
+function tickTimer(){ const a=st.active; const box=$('timerBox'); if(!a){ box.style.display='none'; if(tInt){ clearInterval(tInt); tInt=null; } return; } box.style.display='flex'; if(!tInt) tInt=setInterval(tickTimer,1000);
+  const md=MODES.find(m=>m.id===a.type); const el=(Date.now()-a.start)/1000, mm=Math.floor(el/60), ss=Math.floor(el%60); const kc=kcalMin(md.met)*el/60; const p=clamp(el/(a.min*60),0,1);
+  $('tName').textContent=`${md.e} ${md.n} · hedef ${a.min} dk`; $('tTime').textContent=`${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`; $('tKcal').textContent=`${kc.toFixed(0)} kcal yandı`; $('tRing').style.width=(p*100)+'%';
+  if(p>=1&&!a.hit){ a.hit=1; save(); bigShow('HEDEF SÜRE ✓','huge',['#FFC98A','#C6F53A','#15171A','#fff']); } }
+$('tStop').onclick=()=>{ const a=st.active; if(!a) return; const md=MODES.find(m=>m.id===a.type); const min=(Date.now()-a.start)/60000; if(min<1){ word('1 dk bile olmadı','cool'); st.active=null; save(); tickTimer(); return; }
+  const kc=kcalMin(md.met)*min; redo=[]; st.sessions.push({t:Date.now(),type:a.type,min,kcal:kc}); st.fit=clamp(st.fit+(a.type==='lift'?7:5),0,100); st.active=null; save(); tickTimer(); renderCardio(); render();
+  bigShow(`${Math.round(kc)} KCAL YANDI 🔥`,'huge',['#FF8A1A','#FFC98A','#C6F53A','#15171A']); setTimeout(()=>word(`+${Math.round(kc/10)} xp`,'xp'),400); setTimeout(()=>setFit(st.fit),300); };
+$('tCancel').onclick=()=>{ st.active=null; save(); tickTimer(); word('iptal','cool'); vib(10); };
+
+// ================= #60 =================
+function render60(){ const start=dayStart(new Date(st.c60+'T00:00:00')); const dayN=clamp(Math.floor((dayStart()-start)/864e5)+1,0,60); const end=new Date(start+59*864e5);
+  $('c60day').textContent=dayN; $('c60range').textContent=`${fmtD(new Date(start))} → ${fmtD(end)}`; let perfect=0, tot=0, done=0;
+  const g=$('cgrid'); g.innerHTML=''; for(let i=0;i<60;i++){ const ds=start+i*864e5; const c=document.createElement('div'); c.className='cd'; const isF=ds>dayStart(); if(isF) c.classList.add('future'); else { const s=dayScore(ds); if(s) c.classList.add('s'+s); if(s===5) perfect++; tot+=s; done++; } if(ds===dayStart()) c.classList.add('today'); c.textContent=i+1; g.appendChild(c); }
+  const pct=done?Math.round(tot/(done*5)*100):0; $('c60sub').textContent=`${perfect} mükemmel gün · ort. %${pct}`;
+  const r=$('c60ring'); const k=dayN/60; r.innerHTML=`<circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="10"/><circle cx="50" cy="50" r="42" fill="none" stroke="#C6F53A" stroke-width="10" stroke-linecap="round" stroke-dasharray="${k*264} 1000" transform="rotate(-90 50 50)"/><text x="50" y="47" text-anchor="middle" fill="#fff" font-size="18" font-weight="800">${Math.round(k*100)}%</text><text x="50" y="62" text-anchor="middle" fill="#C9CDD4" font-size="9" font-weight="700">süre</text>`;
+  const meals=log.filter(e=>e.t>=start), good=meals.filter(e=>e.good).length; const w0=st.weights.find(w=>w.t>=start-864e5)||st.weights[0], lw=st.weights[st.weights.length-1];
+  $('c60kpi').innerHTML=`<div><b>${good}/${meals.length}</b>iyi ana öğün</div><div><b>${st.pills.filter(t=>t>=start).length}</b>F+M günü</div><div><b>${st.water.filter(t=>t>=start).length}</b>L su</div><div><b>${st.sessions.filter(s=>s.t>=start&&s.type==='lift').length}</b>ağırlık</div><div><b>${Math.round(st.sessions.filter(s=>s.t>=start).reduce((a,b)=>a+b.kcal,0))}</b>kcal yakıldı</div><div><b>${w0&&lw?((lw.kg-w0.kg)>0?'+':'')+(lw.kg-w0.kg).toFixed(1):'—'}</b>kg değişim</div>`; }
+
+// ================= PROFİL =================
+const GATE=2, BOSSES=['Isınma','Kapı Bekçisi','Gölge','Çelik Kapı','Alev Duvarı','Buz Kalesi','Titan','Karanlık Lord','Ejderha','FINAL BOSS'];
+function gates(){ const st0=st.weights[0]?st.weights[0].kg:null, goal=parseFloat(st.goal)||88; if(st0===null||st0<=goal) return null; const n=Math.max(2,Math.ceil((st0-goal)/GATE)); const arr=[]; for(let i=1;i<=n;i++) arr.push(+(Math.max(goal,st0-i*GATE)).toFixed(1)); arr[arr.length-1]=goal; return {st0,goal,arr}; }
+function journey(){ const g=gates(); const svg=$('journey'); const lw=st.weights[st.weights.length-1];
+  if(!g||!lw){ svg.innerHTML=`<text x="170" y="85" text-anchor="middle" font-size="13" font-weight="700" fill="#7A7F87">İlk kiloyu kaydet, yol açılsın.</text>`; $('stageName').textContent='Yol kapalı'; $('stageSub').textContent=`hedef ${parseFloat(st.goal)||88} kg`; return; }
+  const p=clamp((g.st0-lw.kg)/(g.st0-g.goal),0,1), n=g.arr.length; const path=[]; for(let i=0;i<=40;i++){ path.push([22+i*7.4, 100+Math.sin(i/40*Math.PI*2.2)*30-i*0.5]); }
+  const d=path.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' '); const at=t=>{ const i=t*40, a=path[Math.floor(i)], b=path[Math.min(40,Math.ceil(i))], f=i-Math.floor(i); return [L(a[0],b[0],f),L(a[1],b[1],f)]; };
+  const [rx,ry]=at(p); const passed=g.arr.filter(w=>lw.kg<=w).length, nextIdx=Math.min(passed,n-1);
+  const nodes=g.arr.map((w,i)=>{ const [x,y]=at((i+1)/n); const done=lw.kg<=w, final=i===n-1, next=i===nextIdx&&!done; return `<g>${final?`<text x="${x}" y="${y-22}" text-anchor="middle" font-size="22">${done?'🏆':'👹'}</text>`:''}<circle cx="${x}" cy="${y}" r="${final?11:7}" fill="${done?'#C6F53A':(final?'#15171A':'#fff')}" stroke="#15171A" stroke-width="2.5" class="${next?'pulse':''}"/>${done&&!final?`<text x="${x}" y="${y+3.5}" text-anchor="middle" font-size="9" font-weight="800">✓</text>`:''}<text x="${x}" y="${y+24}" text-anchor="middle" font-size="9" font-weight="800" fill="${done?'#5E8A00':'#15171A'}">${w}</text></g>`; }).join('');
+  svg.innerHTML=`<defs><linearGradient id="jg" x1="0" x2="1"><stop offset="0" stop-color="#C6F53A"/><stop offset="1" stop-color="#A6DB1F"/></linearGradient></defs><path d="${d}" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#D9DCD3" stroke-width="10" stroke-linecap="round"/><path d="${d}" fill="none" stroke="url(#jg)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${p*330} 1000" pathLength="330"/><path d="${d}" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="4 8" opacity=".9"/><text x="20" y="${path[0][1]+26}" font-size="9" font-weight="800" fill="#7A7F87">${g.st0} başla</text>${nodes}<g transform="translate(${rx} ${ry-6})"><circle cx="0" cy="0" r="12" fill="#15171A"/><text x="0" y="5" text-anchor="middle" font-size="14">${p>=1?'👑':'🏃'}</text></g>`;
+  if(p>=1){ $('stageName').textContent='FINAL BOSS YENİLDİ'; $('stageSub').textContent=`${g.goal} kg · efsane`; } else { const nx=g.arr[nextIdx]; const boss=BOSSES[Math.min(BOSSES.length-1,Math.round(nextIdx/(n-1)*(BOSSES.length-1)))]; $('stageName').textContent=`Bölüm ${passed+1}/${n} · ${nextIdx===n-1?'FINAL BOSS':boss}`; $('stageSub').textContent=`kapı ${nx} kg · ${(lw.kg-nx).toFixed(1)} kg kaldı`; } }
+const monthKey=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+function age(){ if(!st.dob) return ''; const b=new Date(st.dob), n=new Date(); let a=n.getFullYear()-b.getFullYear(); if(n<new Date(n.getFullYear(),b.getMonth(),b.getDate())) a--; return a; }
+function renderProfile(){
+  $('fname').value=st.name||''; $('lname').value=st.lname||''; $('dob').value=st.dob||''; $('hgt').value=st.hgt||''; $('goal').value=st.goal||'';
+  $('proName').textContent=(st.name||st.lname)?`${st.name} ${st.lname}`.trim():'Adını yaz'; const lw=st.weights[st.weights.length-1], goal=parseFloat(st.goal)||88;
+  $('proSub').textContent=[age()?age()+' yaş':'',st.hgt?st.hgt+' cm':'',lw?lw.kg.toFixed(1)+' kg':'',(lw&&st.hgt)?'BMI '+(lw.kg/Math.pow(st.hgt/100,2)).toFixed(1):''].filter(Boolean).join(' · ');
+  $('ava').innerHTML=st.avatar?`<img src="${st.avatar}" alt="">`:'🙂';
+  $('wNow').textContent=lw?lw.kg.toFixed(1):'—'; $('wDelta').textContent=st.weights.length>1?((lw.kg-st.weights[0].kg)>0?'+':'')+(lw.kg-st.weights[0].kg).toFixed(1)+' kg':'—'; $('wLeft').textContent=lw?Math.max(0,lw.kg-goal).toFixed(1)+' kg':'—';
+  const tl=st.weights.some(w=>w.t>=dayStart()); $('wgt').value=tl?lw.kg:''; $('wsave').textContent=tl?'Bugünü güncelle':'Bugünü kaydet'; journey();
+  const c=$('wchart'); const ws=st.weights.slice(-40);
+  if(ws.length<2){ c.innerHTML=`<text x="170" y="80" text-anchor="middle" fill="#7A7F87" font-size="12" font-weight="700">iki kayıt sonra grafik çıkar</text>`; }
+  else{ const kgs=ws.map(w=>w.kg); const min=Math.floor(Math.min(...kgs,goal)-1), max=Math.ceil(Math.max(...kgs)+1); const X=i=>28+i/(ws.length-1)*300, Y=v=>18+(1-(v-min)/(max-min))*100; const pts=ws.map((w,i)=>[X(i),Y(w.kg)]); const line=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' '); const area=line+` L ${pts[pts.length-1][0].toFixed(1)} 118 L 28 118 Z`; const gy=Y(goal);
+    const ticks=[min,Math.round((min+max)/2),max].map(v=>`<text x="4" y="${Y(v)+3}" font-size="9" font-weight="700" fill="#7A7F87">${v}</text><line x1="28" x2="328" y1="${Y(v)}" y2="${Y(v)}" stroke="#E6E8E1"/>`).join(''); const lab=i=>{ const d=new Date(ws[i].t); return `${d.getDate()}/${d.getMonth()+1}`; }; const xl=[0,Math.floor((ws.length-1)/2),ws.length-1].filter((v,i,a)=>a.indexOf(v)===i).map(i=>`<text x="${X(i)}" y="140" text-anchor="middle" font-size="9" font-weight="700" fill="#7A7F87">${lab(i)}</text>`).join('');
+    c.innerHTML=`<defs><linearGradient id="ag" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#C6F53A" stop-opacity=".7"/><stop offset="1" stop-color="#C6F53A" stop-opacity="0"/></linearGradient></defs>${ticks}<line x1="28" x2="328" y1="${gy}" y2="${gy}" stroke="#15171A" stroke-dasharray="4 4" opacity=".5"/><text x="328" y="${gy-4}" text-anchor="end" font-size="9" font-weight="800">hedef ${goal}</text><path d="${area}" fill="url(#ag)"/><path d="${line}" fill="none" stroke="#15171A" stroke-width="2.5" stroke-linejoin="round"/>${pts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="${i===pts.length-1?5:3.5}" fill="${i===pts.length-1?'#15171A':'#C6F53A'}" stroke="#15171A" stroke-width="1.5"/>`).join('')}<text x="${pts[pts.length-1][0]}" y="${pts[pts.length-1][1]-10}" text-anchor="middle" font-size="11" font-weight="800">${kgs[kgs.length-1]}</text>${xl}`; }
+  const wl=$('wlist'); wl.innerHTML=''; [...st.weights].reverse().forEach((w,ri)=>{ const i=st.weights.length-1-ri; const prev=st.weights[i-1]; const dl=prev?w.kg-prev.kg:0; const d=new Date(w.t); const row=document.createElement('div'); row.className='wrow'; row.innerHTML=`<span class="dt">${d.getDate()} ${MON[d.getMonth()]} ${String(d.getFullYear()).slice(2)}</span><span class="kg">${w.kg.toFixed(1)}</span>${prev?`<span class="dl ${dl<=0?'down':'up'}">${dl>0?'+':''}${dl.toFixed(1)}</span>`:'<span class="dl" style="background:var(--line)">başlangıç</span>'}<button class="x" data-i="${i}">✕</button>`; wl.appendChild(row); });
+  wl.querySelectorAll('.x').forEach(b=>b.onclick=()=>{ st.weights.splice(+b.dataset.i,1); save(); renderProfile(); vib(10); });
+  // photos: grouped by month, up to 4
+  const mk=monthKey(); const cnt=st.photos.filter(p=>p.m===mk).length; $('photoBtn').disabled=cnt>=4; $('photoNote').textContent=cnt>=4?`Bu ay 4/4 dolu. Sonraki ay yeniden.`:`Bu ay ${cnt}/4. Aynı ışık, aynı poz, aynı ayna — sonra yan yana bak.`;
+  const g=$('gal'); g.innerHTML=''; const months=[...new Set(st.photos.map(p=>p.m))].sort().reverse();
+  months.forEach(m=>{ const [y,mo]=m.split('-'); const h=document.createElement('div'); h.innerHTML=`<h3 style="margin:6px 0 6px">${MON[+mo-1]} ${y}</h3>`; const grid=document.createElement('div'); grid.className='gal';
+    st.photos.filter(p=>p.m===m).forEach(p=>{ const f=document.createElement('figure'); f.innerHTML=`<img src="${p.d}" alt=""><button class="x">✕</button><figcaption>${fmtD(new Date(p.t))}</figcaption>`; f.querySelector('img').onclick=()=>{ $('lbimg').src=p.d; $('lightbox').classList.add('open'); }; f.querySelector('.x').onclick=()=>{ st.photos.splice(st.photos.indexOf(p),1); save(); renderProfile(); vib(10); }; grid.appendChild(f); });
+    h.appendChild(grid); g.appendChild(h); });
+  renderRems(); }
+$('lightbox').onclick=()=>$('lightbox').classList.remove('open');
+['fname','lname','dob','hgt','goal'].forEach(id=>$(id).onchange=e=>{ st[{fname:'name',lname:'lname'}[id]||id]=e.target.value; save(); renderProfile(); render(); });
+$('wsave').onclick=()=>{ const v=parseFloat($('wgt').value); if(!v||v<30||v>300) return; const prevKg=st.weights.length?st.weights[st.weights.length-1].kg:null; const lw=st.weights[st.weights.length-1]; if(lw&&lw.t>=dayStart()) lw.kg=v; else st.weights.push({t:Date.now(),kg:v});
+  if(prevKg!==null&&v<prevKg) st.fit=clamp(st.fit+Math.round((prevKg-v)*5),0,100); save(); renderProfile(); render(); setFit(st.fit); $('wgt').blur(); const goal=parseFloat(st.goal)||88; const g1=gates(); const r=$('wsave').getBoundingClientRect(); burst(80,LIME,r.left+r.width/2,r.top,3,7); sGood(); vib([20,30,60]);
+  if(g1&&prevKg!==null&&v<prevKg){ const crossed=g1.arr.filter(w=>v<=w&&prevKg>w).length; if(v<=goal) setTimeout(()=>bigShow('FINAL BOSS YENİLDİ 👑','huge',['#C6F53A','#15171A','#fff','#FF5FA2']),400); else if(crossed) setTimeout(()=>bigShow(`KAPI GEÇİLDİ · ${g1.arr.filter(w=>v<=w).length}/${g1.arr.length}`),400); else setTimeout(()=>word(`−${(prevKg-v).toFixed(1)} kg · +${Math.round((prevKg-v)*5)} yakınlık`,'big'),200); }
+  else if(prevKg!==null&&v>prevKg) setTimeout(()=>word('dalgalanma, yola devam','cool'),200); };
+function readImg(file,max,cb){ const img=new Image(); const u=URL.createObjectURL(file); img.onload=()=>{ const s=Math.min(1,max/Math.max(img.width,img.height)); const c=document.createElement('canvas'); c.width=img.width*s; c.height=img.height*s; c.getContext('2d').drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(u); cb(c.toDataURL('image/jpeg',.72)); }; img.src=u; }
+$('photoBtn').onclick=()=>$('photoIn').click();
+$('photoIn').onchange=e=>{ const f=e.target.files[0]; if(!f) return; readImg(f,720,d=>{ st.photos.push({m:monthKey(),d,t:Date.now()}); if(!save()){ st.photos.pop(); alert('Depolama doldu.'); return; } renderProfile(); flash('radial-gradient(circle, rgba(198,245,58,.6), transparent 60%)'); sGood(); word('FOTO ✓','big'); e.target.value=''; }); };
+$('ava').onclick=()=>$('avaIn').click(); $('avaIn').onchange=e=>{ const f=e.target.files[0]; if(!f) return; readImg(f,300,d=>{ st.avatar=d; save(); renderProfile(); sGood(); e.target.value=''; }); };
+// reminders → .ics
+const REMS=[{k:'k',n:'🔥 Kahvaltı',b:'Yedin mi? Sağa kaydır.'},{k:'o',n:'🔥 Öğle',b:'Seri bekliyor.'},{k:'a',n:'🔥 Akşam',b:'Günün son yemeği.'},{k:'f',n:'💊 F+M',b:'Basılı tut, +15 saç kökü.'}];
+function renderRems(){ const box=$('rems'); box.innerHTML=''; REMS.forEach(r=>{ const row=document.createElement('div'); row.className='remrow'; row.innerHTML=`<span>${r.n}</span><input type="time" value="${st.rems[r.k]}"><button class="pillb sm">Takvime</button>`; row.querySelector('input').onchange=ev=>{ st.rems[r.k]=ev.target.value; save(); }; row.querySelector('button').onclick=()=>ics(r); box.appendChild(row); }); }
+function ics(r){ const [h,m]=st.rems[r.k].split(':').map(Number); const d=new Date(); d.setHours(h,m,0,0); if(d<new Date()) d.setDate(d.getDate()+1); const f=x=>x.toISOString().replace(/[-:]|\.\d{3}/g,''); const e=new Date(d.getTime()+5*6e4); const url=location.href.split('#')[0];
+  const txt=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//YANSIN//TR','BEGIN:VEVENT',`UID:yansin-${r.k}@yansin`,`DTSTAMP:${f(new Date())}`,`DTSTART:${f(d)}`,`DTEND:${f(e)}`,'RRULE:FREQ=DAILY',`SUMMARY:${r.n} — YANSIN`,`DESCRIPTION:${r.b} ${url}`,`URL:${url}`,'BEGIN:VALARM','TRIGGER:PT0M','ACTION:DISPLAY',`DESCRIPTION:${r.n}`,'END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const blob=new Blob([txt],{type:'text/calendar'}); const file=new File([blob],`yansin-${r.k}.ics`,{type:'text/calendar'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})) navigator.share({files:[file],title:r.n}).catch(()=>{}); else { const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`yansin-${r.k}.ics`; document.body.appendChild(a); a.click(); a.remove(); } }
+
+// ================= ÖZET & PDF =================
+function openSheet(){ const h=$('hist'); h.innerHTML=''; const rows=[]; for(let k=5;k>=0;k--){ const ws=new Date(weekStart()); ws.setDate(ws.getDate()-7*k); rows.push([ws,inWeek(ws.getTime()).filter(e=>e.good).length]); }
+  rows.forEach(([ws,g],idx)=>{ const we=new Date(ws); we.setDate(we.getDate()+6); const wsT=ws.getTime(), weT=wsT+7*864e5; const pl=st.pills.filter(t=>t>=wsT&&t<weT).length, tr=st.sessions.filter(s=>s.t>=wsT&&s.t<weT); const cur=idx===rows.length-1; const d=document.createElement('div'); d.innerHTML=`<i style="height:${Math.max(4,g/21*70)}px;${cur?'':'opacity:.55'}"></i><b>${g}</b><span class="ac">${pl?'💊'+pl:''}${tr.length?' 🏃'+tr.length:''}</span><span>${cur?'bu hafta':ws.getDate()+'–'+we.getDate()+' '+MON[we.getMonth()]}</span>`; h.appendChild(d); });
+  const tg=log.filter(e=>e.good).length; let best=0,cur=0; for(const e of log){ cur=e.good?cur+1:(e.cheat?cur:0); best=Math.max(best,cur); } const lw=st.weights[st.weights.length-1], goal=parseFloat(st.goal)||88; const days=log.length?Math.floor((dayStart()-dayStart(new Date(log[0].t)))/864e5)+1:0;
+  $('kpi').innerHTML=`<div><b>${days}</b>gün yolda</div><div><b>${tg}/${log.length}</b>iyi ana öğün</div><div><b>${best}</b>en uzun seri</div><div><b>${actStreak('pills')}</b>F+M seri · ${st.pills.length}</div><div><b>${st.sessions.length}</b>antrenman</div><div><b>${Math.round(st.sessions.reduce((a,b)=>a+b.kcal,0))}</b>kcal yakıldı</div><div><b>${st.water.length}</b>L su</div><div><b>${lw?lw.kg.toFixed(1):'—'}</b>kg${st.weights.length>1?` · ${((lw.kg-st.weights[0].kg)>0?'+':'')+(lw.kg-st.weights[0].kg).toFixed(1)}`:''}</div><div><b>${xp()}</b>xp · ${st.cheats||0} kart</div>`;
+  $('pdfNote').textContent=''; $('sheet').classList.add('open'); }
+$('stats').onclick=openSheet; $('close').onclick=()=>$('sheet').classList.remove('open');
+$('share').onclick=()=>{ const w=thisWeek(), g=w.filter(e=>e.good).length; const dots=Array.from({length:21},(_,i)=>w[i]?(w[i].good?'🟢':'⚪'):'⚫').join(''); const txt=`YANSIN · bu hafta ${g}/${w.length} iyi öğün · 🔥 ${Math.round(st.sessions.filter(s=>s.t>=weekStart().getTime()).reduce((a,b)=>a+b.kcal,0))} kcal · 💧 ${waterToday()} L · F+M ${actStreak('pills')} gün\n${dots}\nRütbe: ${RANKS[rankOf(xp())][1]}`; if(navigator.share) navigator.share({text:txt}).catch(()=>{}); else { try{ navigator.clipboard.writeText(txt); }catch(e){} } };
+const tr=s=>String(s).replace(/ş/g,'s').replace(/Ş/g,'S').replace(/ğ/g,'g').replace(/Ğ/g,'G').replace(/ı/g,'i').replace(/İ/g,'I').replace(/ç/g,'c').replace(/Ç/g,'C').replace(/ö/g,'o').replace(/Ö/g,'O').replace(/ü/g,'u').replace(/Ü/g,'U').replace(/[^\x00-\x7F]/g,'');
+$('pdf').onclick=async()=>{ $('pdfNote').textContent='PDF hazırlanıyor…'; try{ if(!window.jspdf){ await new Promise((res,rej)=>{ const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+  const { jsPDF }=window.jspdf; const doc=new jsPDF({unit:'mm',format:'a4'}); const W=210; let y=18; const lime=[198,245,58], ink=[21,23,26], mute=[122,127,135];
+  const H=(t,sz=11,c=ink,b=true)=>{ if(y>280){ doc.addPage(); y=18; } doc.setFont('helvetica',b?'bold':'normal'); doc.setFontSize(sz); doc.setTextColor(...c); doc.text(tr(t),14,y); y+=sz*.5+2; };
+  doc.setFillColor(...ink); doc.rect(0,0,W,30,'F'); doc.setFillColor(...lime); doc.roundedRect(14,9,12,12,3,3,'F'); doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(20); doc.text('YANSIN',30,18); doc.setFontSize(9); doc.setTextColor(201,205,212); doc.text(tr(`${st.name||''} ${st.lname||''}`.trim()+'  ·  rapor '+new Date().toLocaleDateString('tr-TR')),30,24); y=40;
+  const lw=st.weights[st.weights.length-1], goal=parseFloat(st.goal)||88, start=dayStart(new Date(st.c60+'T00:00:00')), dayN=clamp(Math.floor((dayStart()-start)/864e5)+1,0,60);
+  H('Ozet',15); const tg=log.filter(e=>e.good).length; 
+  [[`#60Challenge gun ${dayN}/60`,`Rutbe ${RANKS[rankOf(xp())][1]} · ${xp()} xp`],[`Iyi ana ogun ${tg}/${log.length} (%${log.length?Math.round(tg/log.length*100):0})`,`En uzun seri ${(()=>{let b=0,c=0;for(const e of log){c=e.good?c+1:(e.cheat?c:0);b=Math.max(b,c);}return b;})()}`],[`F+M ${st.pills.length} gun · seri ${actStreak('pills')}`,`Su toplam ${st.water.length} L`],[`Antrenman ${st.sessions.length} seans · ${Math.round(st.sessions.reduce((a,b)=>a+b.min,0))} dk`,`Yakilan ${Math.round(st.sessions.reduce((a,b)=>a+b.kcal,0))} kcal`],[`Kilo ${lw?lw.kg.toFixed(1):'-'} kg (baslangic ${st.weights[0]?st.weights[0].kg:'-'})`,`Hedef ${goal} kg · kalan ${lw?Math.max(0,lw.kg-goal).toFixed(1):'-'}`]].forEach(([a,b])=>{ doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(...ink); doc.text(tr(a),14,y); doc.text(tr(b),110,y); y+=6; }); y+=4;
+  // 60 grid
+  H('#60 gun haritasi',13); const cell=5.6, gx=14; for(let i=0;i<60;i++){ const ds=start+i*864e5; const cx=gx+(i%10)*(cell+1.2), cy=y+Math.floor(i/10)*(cell+1.2); const fut=ds>dayStart(); const s=fut?0:dayScore(ds); const cols=[[230,232,225],[228,243,181],[211,238,133],[198,245,58],[166,219,31],[21,23,26]]; doc.setFillColor(...cols[s]); if(fut) doc.setFillColor(240,241,236); doc.roundedRect(cx,cy,cell,cell,1,1,'F'); doc.setFontSize(5); doc.setTextColor(...(s===5?lime:mute)); doc.text(String(i+1),cx+cell/2,cy+cell/2+.8,{align:'center'}); } y+=6*(cell+1.2)+6;
+  // meals per day (last 14 days)
+  H('Son 14 gun',13); doc.setFontSize(8); doc.setTextColor(...mute); doc.setFont('helvetica','bold'); ['Tarih','Ogun','Iyi','Ara','F+M','Su L','Antrenman','kcal'].forEach((t,i)=>doc.text(t,14+i*24,y)); y+=5;
+  for(let k=13;k>=0;k--){ const ds=dayStart()-k*864e5; if(ds<start-30*864e5) continue; const m=inDay(log,ds), sn=inDay(st.snacks,ds), pl=inDay(st.pills,ds).length, w=inDay(st.water,ds).length, tr2=inDay(st.sessions,ds); if(!m.length&&!sn.length&&!pl&&!w&&!tr2.length&&ds!==dayStart()) continue; const d=new Date(ds);
+    doc.setFont('helvetica','normal'); doc.setTextColor(...ink); [`${d.getDate()}.${d.getMonth()+1}`,m.length,m.filter(e=>e.good).length,sn.length,pl?'x':'-',w,tr2.map(s=>(MODES.find(x=>x.id===s.type)||{}).n||s.type).join(', ').slice(0,22),Math.round(tr2.reduce((a,b)=>a+b.kcal,0))].forEach((t,i)=>doc.text(tr(String(t)),14+i*24,y)); y+=5; if(y>280){ doc.addPage(); y=18; } } y+=4;
+  if(st.weights.length){ H('Kilo kayitlari',13); doc.setFontSize(9); st.weights.slice(-20).forEach(w=>{ const d=new Date(w.t); doc.setFont('helvetica','normal'); doc.setTextColor(...ink); doc.text(`${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}   ${w.kg.toFixed(1)} kg`,14,y); y+=5; if(y>280){ doc.addPage(); y=18; } }); y+=4; }
+  if(st.sessions.length){ H('Antrenmanlar',13); doc.setFontSize(9); st.sessions.slice(-25).forEach(s=>{ const d=new Date(s.t); const md=MODES.find(m=>m.id===s.type)||{n:s.type}; doc.setFont('helvetica','normal'); doc.setTextColor(...ink); doc.text(tr(`${d.getDate()}.${d.getMonth()+1}   ${md.n}   ${Math.round(s.min)} dk   ${Math.round(s.kcal)} kcal`),14,y); y+=5; if(y>280){ doc.addPage(); y=18; } }); }
+  doc.setFontSize(7); doc.setTextColor(...mute); doc.text('YANSIN · kisisel takip raporu · tibbi belge degildir',14,292);
+  const blob=doc.output('blob'); const file=new File([blob],`yansin-${new Date().toISOString().slice(0,10)}.pdf`,{type:'application/pdf'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:'YANSIN raporu'}).catch(()=>{}); } else { const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=file.name; a.target='_blank'; document.body.appendChild(a); a.click(); a.remove(); }
+  $('pdfNote').textContent='Hazır. Türkçe karakterler PDF fontu yüzünden sadeleştirildi.'; sGood(); }catch(e){ $('pdfNote').textContent='PDF oluşturulamadı (internet gerekir).'; } };
+
+// ================= SAKİN OL / BOOST =================
 $('calmClose').onclick=()=>{ $('calm').classList.remove('open'); sGood(); word('DEVAM','big'); };
-
-
-// ---------- motivasyon boost (şifreli) ----------
 (function(){ let pin='', slides=null, idx=0; const pins=$('pins'), pad=$('pad');
   '123456789⌫0✓'.split('').forEach(ch=>{ const b=document.createElement('button'); b.textContent=ch; if(ch==='⌫'||ch==='✓') b.className='del'; b.onclick=()=>{ A(); if(ch==='⌫'){ pin=pin.slice(0,-1); } else if(ch==='✓'){ if(pin.length===4) tryOpen(); return; } else if(pin.length<4){ pin+=ch; sTick(); } draw(); if(pin.length===4) tryOpen(); }; pad.appendChild(b); });
-  function draw(){ [...pins.children].forEach((i,k)=>i.classList.toggle('on',k<pin.length)); }
-  const b64=x=>Uint8Array.from(atob(x),c=>c.charCodeAt(0));
-  async function tryOpen(){ try{ const res=await fetch('boost.json',{cache:'force-cache'}); const j=await res.json();
-      const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pin),'PBKDF2',false,['deriveKey']);
-      const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(j.salt),iterations:j.iter,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
-      const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(j.iv)},key,b64(j.ct)); slides=JSON.parse(new TextDecoder().decode(plain));
-      for(const sl of slides){ if(sl.img){ const raw=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(sl.img.iv)},key,b64(sl.img.ct)); sl.url=URL.createObjectURL(new Blob([raw],{type:'image/jpeg'})); } }
-      pin=''; draw(); idx=0; $('bpin').style.display='none'; $('bshow').style.display='flex'; show(); sGood(); vib([20,30,60]);
-    }catch(e){ pin=''; draw(); pins.classList.remove('err'); void pins.offsetWidth; pins.classList.add('err'); sBad(); vib([60,40,60]); } }
-  function show(){ const sl=slides[idx]; $('bprog').innerHTML=slides.map((_,k)=>`<i class="${k<=idx?'on':''}"></i>`).join('');
-    const img=$('bimg'); img.style.display=sl.url?'block':'none'; if(sl.url){ img.src=''; requestAnimationFrame(()=>img.src=sl.url); } $('bimgwrap').style.display=sl.url?'flex':'none';
-    $('bt').textContent=sl.t; $('bp').textContent=sl.p; $('bnext').textContent=idx===slides.length-1?'Kapat. Git yap.':'Sonraki →'; sTick(); }
+  function draw(){ [...pins.children].forEach((i,k)=>i.classList.toggle('on',k<pin.length)); } const b64=x=>Uint8Array.from(atob(x),c=>c.charCodeAt(0));
+  async function tryOpen(){ try{ const j=await (await fetch('boost.json',{cache:'force-cache'})).json(); const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pin),'PBKDF2',false,['deriveKey']); const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(j.salt),iterations:j.iter,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
+      slides=JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(j.iv)},key,b64(j.ct)))); for(const sl of slides){ if(sl.img){ const raw=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(sl.img.iv)},key,b64(sl.img.ct)); sl.url=URL.createObjectURL(new Blob([raw],{type:'image/jpeg'})); } }
+      pin=''; draw(); idx=0; $('bpin').style.display='none'; $('bshow').style.display='flex'; show(); sGood(); vib([20,30,60]); }catch(e){ pin=''; draw(); pins.classList.remove('err'); void pins.offsetWidth; pins.classList.add('err'); sBad(); vib([60,40,60]); } }
+  function show(){ const sl=slides[idx]; $('bprog').innerHTML=slides.map((_,k)=>`<i class="${k<=idx?'on':''}"></i>`).join(''); const img=$('bimg'); $('bimgwrap').style.display=sl.url?'flex':'none'; if(sl.url){ img.src=''; requestAnimationFrame(()=>img.src=sl.url); } $('bt').textContent=sl.t; $('bp').textContent=sl.p; $('bnext').textContent=idx===slides.length-1?'Kapat. Git yap.':'Sonraki →'; sTick(); }
   $('bnext').onclick=()=>{ if(idx<slides.length-1){ idx++; show(); } else close(true); };
-  function close(fin){ $('bsheet').classList.remove('open'); $('bpin').style.display=''; $('bshow').style.display='none'; if(slides) slides.forEach(sl=>sl.url&&URL.revokeObjectURL(sl.url)); slides=null; if(fin){ flash('radial-gradient(circle, rgba(198,245,58,.7), transparent 60%)'); word('GİT YAP','huge'); sHuge(); vib([40,30,40,30,150]); } }
-  $('bclose').onclick=()=>close(false); $('bclose0').onclick=()=>close(false);
-  $('boostBtn').onclick=()=>{ pin=''; draw(); $('bsheet').classList.add('open'); };
-})();
+  function close(fin){ $('bsheet').classList.remove('open'); $('bpin').style.display=''; $('bshow').style.display='none'; if(slides) slides.forEach(sl=>sl.url&&URL.revokeObjectURL(sl.url)); slides=null; if(fin) bigShow('GİT YAP'); }
+  $('bclose').onclick=()=>close(false); $('bclose0').onclick=()=>close(false); $('boostBtn').onclick=()=>{ pin=''; draw(); $('bsheet').classList.add('open'); }; })();
 
-// ---------- boot ----------
-processDays(); render(); setFit(st.fit,false); checkSlots();
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden){ processDays(); checkSlots(); } });
+// ================= GÜN SONU / HAFTA =================
+function processDays(){ const firstT=Math.min(log[0]?log[0].t:Infinity, st.pills[0]||Infinity, st.water[0]||Infinity); if(!isFinite(firstT)) return; const first=dayStart(new Date(firstT));
+  let d=Math.max(st.processed||0, first), lost=0, missedDays=0; const todayS=dayStart();
+  while(d<todayS){ const meals=inDay(log,d).length; const miss=Math.max(0,3-meals); if(miss){ lost+=miss*3; missedDays++; } d+=864e5; } st.processed=todayS;
+  const ws=weekStart().getTime(); if((st.weekDone||0)<ws){ const prev=inWeek(ws-7*864e5); const g=prev.filter(e=>e.good).length; const started=prev.length>0||(st.weekDone||0)>0; if(started&&g>=18){ st.cheats=(st.cheats||0)+1; setTimeout(()=>bigShow(`HAFTA ${g}/21 · SERBEST KART +1`),1400); } st.weekDone=ws; }
+  if(lost){ st.fit=clamp(st.fit-lost,0,100); setTimeout(()=>{ word(`−${lost} · ${missedDays} gün eksik kayıt`,'cool'); sBad(); vib(30); setFit(st.fit); },600); } save(); }
+
+// ================= BOOT =================
+processDays(); render(); setFit(st.fit,false); setInterval(()=>render(),30000); tickTimer();
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden){ processDays(); render(); tickTimer(); } });
 </script>
 </body>
 </html>
