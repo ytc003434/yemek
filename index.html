@@ -494,12 +494,13 @@ function meters(){ // Yüz / Saç / Göğüs / Göbek
   const hair=clamp(Math.round(actStreak('pills')*3.4),0,100);
   const chest=clamp(Math.round(liftDays(14)/6*100),0,100);
   const belly=clamp(Math.round(st.fit),0,100);
-  return [{n:'YÜZ',v:face},{n:'SAÇ',v:hair},{n:'GÖĞÜS',v:chest},{n:'GÖBEK',v:belly}]; }
+  return [{n:'YÜZ',v:face,h:'son 3 gün: 2L+ su günleri + kötü yemek oranı'},{n:'SAÇ',v:hair,h:'F+M kesintisiz gün sayısı (30 gün = %100)'},{n:'GÖĞÜS',v:chest,h:'son 14 günde ağırlık günü (6 gün = %100)'},{n:'GÖBEK',v:belly,h:'genel ilerleme: iyi yemek, su, antrenman, kilo düşüşü'}]; }
 let curFit=st.fit;
 function drawFire(p){ p=clamp(p,0,1); const s=.45+p*.9; ['fla','flb','flc'].forEach(id=>$(id).style.setProperty('--s',s.toFixed(3))); $('fire').style.setProperty('--glow',p); $('lvlPct').textContent=Math.round(p*100); $('lvlTxt').textContent=LVLTXT(p);
   $('embers').style.opacity=clamp(p*1.4,.15,1); }
 function setFit(f,animate=true){ f=clamp(f,0,100); const from=curFit; curFit=f; if(!animate){ drawFire(f/100); return; } const t0=performance.now(); (function step(now){ const k=Math.min(1,(now-t0)/700), e=1-Math.pow(1-k,3); drawFire(L(from,f,e)/100); if(k<1) requestAnimationFrame(step); })(t0); }
-function drawMeters(){ $('meters').innerHTML=meters().map(m=>`<div class="mt"><small>${m.n}</small><b>${m.v}%</b><i style="--p:${m.v}%"></i></div>`).join(''); }
+function drawMeters(){ const ms=meters(); $('meters').innerHTML=ms.map((m,i)=>`<div class="mt" data-i="${i}"><small>${m.n}</small><b>${m.v}%</b><i style="--p:${m.v}%"></i></div>`).join('');
+  [...$('meters').children].forEach(el=>el.onclick=ev=>{ ev.stopPropagation(); const m=ms[+el.dataset.i]; word(`${m.n} %${m.v}`,'big'); setTimeout(()=>{ const w=document.createElement('div'); w.className='word cool'; w.style.cssText='font-size:15px;white-space:normal;max-width:280px;margin-top:80px'; w.textContent=m.h; $('rise').appendChild(w); setTimeout(()=>w.remove(),2300); },150); sTick(); }); }
 
 // ================= HOME RENDER =================
 function slotEntry(id){ const td=today(); const e=td.find(x=>x.slot===id); if(e) return e; const un=td.filter(x=>!x.slot); const idx=MAIN.findIndex(s=>s.id===id); const taken=MAIN.slice(0,idx).filter(s=>!td.some(x=>x.slot===s.id)).length; return un[taken]||null; }
@@ -592,7 +593,7 @@ function takePill(el){ const rBefore=rankOf(xp()); redo=[]; st.pills.push(stamp(
 
 // ================= SU =================
 function waterLabel(){ const n=waterToday(); const l=$('wlab'); l.innerHTML=`💧<b>${n}</b>L${n>=3?' ✓':''}`; l.classList.toggle('full',n>=3); }
-(function(){ const g=$('glass'), wrap=$('sceneWrap'), gw=$('gw'), gw2=$('gw2'), ring=$('gring'), zg=$('zoneG'), zr=$('zoneR'), hb=$('hbar'), hbF=$('hbFill'), hbT=$('hbTxt'); const HOLD=2200, HOLD_R=1300;
+(function(){ const g=$('glass'), wrap=$('sceneWrap'), gw=$('gw'), gw2=$('gw2'), ring=$('gring'), zg=$('zoneG'), zr=$('zoneR'), hb=$('hbar'), hbF=$('hbFill'), hbT=$('hbTxt'); const HOLD=900, HOLD_R=600;
   let drag=false, sx=0, sy=0, dx=0, dy=0, level=1, zone=0, t0=0, raf=null, dropT=null;
   const setLevel=v=>{ level=clamp(v,0,1); const y=74-level*60; gw.setAttribute('y',y); gw2.setAttribute('y',y); };
   const place=()=>{ g.style.transform=`translate(${dx}px,${dy}px) rotate(${zone===1?60:(zone===-1?-60:dx/8)}deg)`; };
@@ -639,14 +640,16 @@ function eat(sl,o){ const isSnack=sl.id.startsWith('s');
 
 // ================= KARDİYO =================
 let tInt=null;
-function renderCardio(){ const m=$('modes'); m.innerHTML=''; $('cardioNote').textContent=`Kalori ${kg()} kg üzerinden MET formülüyle hesaplanır. Süre akıyorsa çalışıyorsun; Bitir'e basınca ana sayfada Yandı 🔥 bölümüne yazılır.`;
+function renderCardio(){ const m=$('modes'); m.innerHTML=''; $('cardioNote').textContent=`Kalori ${kg()} kg üzerinden MET formülüyle hesaplanır. "Başla!" kronometreyi çalıştırır; antrenmanı zaten yaptıysan süreyi seç ve "✓ Yaptım"a bas — ${isToday()?'bugüne':fmtD(new Date(curDay))+' gününe'} yazılır.`;
   MODES.forEach(md=>{ const mins=(st.modeMin||{})[md.id]||md.min; const c=document.createElement('div'); c.className='mode'; c.innerHTML=`<div class="e">${md.e}</div><div class="t">${md.n}</div><div class="k">${Math.round(kcalMin(md.met)*mins)} kcal / ${mins} dk</div><div class="mins"><button data-d="-5">−</button><b>${mins} dk</b><button data-d="5">+</button></div><button class="pillb sm" style="align-self:stretch;text-align:center">Başla!</button>`;
     c.querySelectorAll('.mins button').forEach(b=>b.onclick=()=>{ st.modeMin=st.modeMin||{}; st.modeMin[md.id]=clamp(mins+ +b.dataset.d,5,180); save(); renderCardio(); sTick(); });
-    c.querySelector('.pillb').onclick=()=>startSession(md,mins); m.appendChild(c); });
+    c.querySelector('.pillb').onclick=()=>startSession(md,mins); const dn=document.createElement('button'); dn.className='pillb ghost sm'; dn.style.cssText='align-self:stretch;text-align:center'; dn.textContent='✓ Yaptım'; dn.onclick=()=>logDone(md,mins); c.appendChild(dn); m.appendChild(c); });
   const td=inDay(st.sessions,dayStart()), wk=st.sessions.filter(s=>s.t>=weekStart().getTime());
   $('ckpi').innerHTML=`<div><b>${Math.round(td.reduce((a,b)=>a+b.kcal,0))}</b>kcal bugün</div><div><b>${Math.round(wk.reduce((a,b)=>a+b.kcal,0))}</b>kcal bu hafta</div><div><b>${liftDays(7)}/3</b>ağırlık günü</div><div><b>${Math.round(wk.reduce((a,b)=>a+b.min,0))}</b>dk bu hafta</div><div><b>${wk.filter(s=>s.type!=='lift').length}</b>kardiyo seansı</div><div><b>${st.sessions.length}</b>toplam seans</div>`;
   const s=$('sess'); s.innerHTML=''; [...st.sessions].slice(-12).reverse().forEach(x=>{ const md=MODES.find(m=>m.id===x.type)||{e:'🏃',n:x.type}; const d=new Date(x.t); const r=document.createElement('div'); r.className='srow'; r.innerHTML=`<span>${md.e}</span><span>${md.n}</span><span style="color:var(--mute)">${fmtD(d)} · ${Math.round(x.min)} dk</span><span class="kc">${Math.round(x.kcal)} kcal</span><button class="x">✕</button>`; r.querySelector('.x').onclick=()=>{ st.sessions.splice(st.sessions.indexOf(x),1); save(); renderCardio(); render(); vib(10); }; s.appendChild(r); });
   tickTimer(); }
+function logDone(md,mins){ const kc=kcalMin(md.met)*mins; redo=[]; st.sessions.push({t:stamp(),type:md.id,min:mins,kcal:kc}); sortT(st.sessions); st.fit=clamp(st.fit+(md.id==='lift'?7:5),0,100); save(); renderCardio(); render();
+  bigShow(`${Math.round(kc)} KCAL ✓ ${md.n.toUpperCase()}`,'huge',['#FF8A1A','#FFC98A','#C6F53A','#15171A']); setTimeout(()=>word(`${mins} dk · +${Math.round(kc/10)} xp`,'xp'),400); setTimeout(()=>setFit(st.fit),300); }
 function startSession(md,mins){ if(st.active) return; st.active={type:md.id,start:Date.now(),min:mins}; save(); $('timerBox').style.display='flex'; sGood(); vib([20,30,60]); word(`${md.e} ${md.n} · BAŞLA`,'big'); tickTimer(); if(!tInt) tInt=setInterval(tickTimer,1000); $('pg-cardio').scrollTop=0; }
 function tickTimer(){ const a=st.active; const box=$('timerBox'); if(!a){ box.style.display='none'; if(tInt){ clearInterval(tInt); tInt=null; } return; } box.style.display='flex'; if(!tInt) tInt=setInterval(tickTimer,1000);
   const md=MODES.find(m=>m.id===a.type); const el=(Date.now()-a.start)/1000, mm=Math.floor(el/60), ss=Math.floor(el%60); const kc=kcalMin(md.met)*el/60; const p=clamp(el/(a.min*60),0,1);
