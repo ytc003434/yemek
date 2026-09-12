@@ -84,10 +84,11 @@
   .ember{position:absolute;bottom:38%;width:4px;height:4px;border-radius:50%;background:var(--lime);opacity:0;animation:em 2.4s linear infinite}
   @keyframes em{0%{transform:translate(0,0) scale(1);opacity:0}10%{opacity:.9}100%{transform:translate(var(--ex),-160px) scale(.2);opacity:0}}
   .base{position:absolute;left:0;right:0;bottom:0;height:40%;background:linear-gradient(180deg,rgba(21,23,26,0),rgba(21,23,26,.85) 45%,#15171A)}
-  .meters{position:absolute;left:10px;right:10px;bottom:10px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;z-index:3}
-  .mt{background:rgba(255,255,255,.1);border-radius:12px;padding:7px 8px;color:#fff}
-  .mt small{display:block;font-size:9px;font-weight:800;color:#C9CDD4;letter-spacing:.04em} .mt b{font-size:15px;font-weight:800;letter-spacing:-.03em;display:block;margin:1px 0 4px}
-  .mt i{display:block;height:3px;border-radius:2px;background:rgba(255,255,255,.15);overflow:hidden} .mt i::after{content:'';display:block;height:100%;width:var(--p,0%);background:var(--lime);transition:width .8s}
+  .ticker{position:absolute;left:0;right:0;bottom:0;height:46%;z-index:3;overflow:hidden;pointer-events:none}
+  .tk{position:absolute;left:0;right:0;text-align:center;padding:0 14px;font-size:17px;font-weight:800;letter-spacing:-.02em;line-height:1.2;color:#DFFF7A;opacity:0;
+      text-shadow:0 0 6px rgba(198,245,58,.9),0 0 18px rgba(198,245,58,.55),0 0 40px rgba(198,245,58,.3);will-change:transform,opacity}
+  .tk.run{animation:tkup 3.4s cubic-bezier(.22,.7,.2,1) forwards}
+  @keyframes tkup{0%{transform:translateY(70px) scale(.96);opacity:0;filter:blur(4px)}12%{opacity:1;filter:blur(0)}72%{opacity:1}100%{transform:translateY(-46px) scale(1.02);opacity:0;filter:blur(2px)}}
   .lvl{position:absolute;top:10px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:baseline;color:#fff;z-index:3;text-shadow:0 2px 12px rgba(21,23,26,.9)}
   .lvl b{font-size:26px;font-weight:800;letter-spacing:-.04em} .lvl span{font-size:11px;font-weight:700;color:#C9CDD4;text-align:right}
   .lvl b em{font-style:normal;color:var(--lime)}
@@ -224,7 +225,7 @@
             <div class="lvl"><b><em id="lvlPct">0</em>%</b><span id="lvlTxt"></span></div>
             <div id="flame"><div class="fl a" id="fla"></div><div class="fl b" id="flb"></div><div class="fl c" id="flc"></div></div><div class="base"></div>
             <div id="embers"></div>
-            <div class="meters" id="meters"></div>
+            <div class="ticker" id="ticker"><div class="tk" id="tk1"></div><div class="tk" id="tk2"></div></div>
           </div>
           <div id="glass"><svg viewBox="0 0 60 80"><defs><clipPath id="gc"><path d="M 12 6 L 48 6 L 43 74 L 17 74 Z"/></clipPath></defs>
             <g clip-path="url(#gc)"><rect id="gw" x="0" y="20" width="60" height="60" fill="#5FB9FF"/><rect id="gw2" x="0" y="20" width="60" height="4" fill="#BFE5FF" opacity=".9"/></g>
@@ -476,7 +477,7 @@ function flash(bg){ const f=$('flash'); f.style.background=bg; f.classList.remov
 function shake(){ $('app').classList.remove('shake'); void $('app').offsetWidth; $('app').classList.add('shake'); }
 const LIME=['#C6F53A','#15171A','#A6DB1F','#ffffff'];
 function bigShow(txt,cls='huge',cols=LIME){ word(txt,cls); shake(); for(let i=0;i<3;i++) setTimeout(()=>burst(140,cols,innerWidth*(.25+.25*i),innerHeight*.4,3.2,10),i*130); sHuge(); vib([50,30,50,30,220]); }
-function celebrate(gc,streak,gain){ const cx=innerWidth/2, cy=innerHeight*.5; burst(90,LIME,cx,cy,2.4); setTimeout(()=>burst(50,['#C6F53A','#15171A'],cx,cy,3),120); flash('radial-gradient(circle at 50% 60%, rgba(198,245,58,.85), rgba(198,245,58,.2) 60%, transparent)');
+function celebrate(gc,streak,gain){ setTimeout(tickerStep,500); const cx=innerWidth/2, cy=innerHeight*.5; burst(90,LIME,cx,cy,2.4); setTimeout(()=>burst(50,['#C6F53A','#15171A'],cx,cy,3),120); flash('radial-gradient(circle at 50% 60%, rgba(198,245,58,.85), rgba(198,245,58,.2) 60%, transparent)');
   const m=MILESTONE[gc]||STREAK[streak]; if(m) bigShow(m); else { word(GOOD[Math.floor(Math.random()*GOOD.length)],'big'); vib([30,40,80]); sGood(); } setTimeout(()=>word(`+${gain} xp`,'xp'),200); }
 function soften(){ flash('radial-gradient(circle at 50% 60%, rgba(201,205,212,.7), transparent 65%)'); word(BAD[Math.floor(Math.random()*BAD.length)],'cool'); vib(15); sBad(); }
 function rankUp(name){ setTimeout(()=>bigShow('RÜTBE: '+name.toUpperCase()),900); }
@@ -488,19 +489,16 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{ document.quer
 <script>
 // ================= FIRE SCENE =================
 (function(){ const em=$('embers'); for(let i=0;i<14;i++){ const e=document.createElement('i'); e.className='ember'; e.style.left=(30+Math.random()*40)+'%'; e.style.setProperty('--ex',(Math.random()*80-40)+'px'); e.style.animationDelay=(Math.random()*2.4)+'s'; e.style.animationDuration=(1.8+Math.random()*1.4)+'s'; em.appendChild(e); } })();
-function meters(){ // Yüz / Saç / Göğüs / Göbek
-  const d3=[0,1,2].map(i=>dayStart()-i*864e5); let wDays=0, badN=0, mealsN=0; d3.forEach(ds=>{ if(inDay(st.water,ds).length>=2) wDays++; const m=inDay(log,ds); mealsN+=m.length; badN+=m.filter(e=>!e.good&&!e.cheat).length; });
-  const face=clamp(Math.round(wDays/3*50+(mealsN?(1-badN/mealsN):0.5)*50),0,100);
-  const hair=clamp(Math.round(actStreak('pills')*3.4),0,100);
-  const chest=clamp(Math.round(liftDays(14)/6*100),0,100);
-  const belly=clamp(Math.round(st.fit),0,100);
-  return [{n:'YÜZ',v:face,h:'son 3 gün: 2L+ su günleri + kötü yemek oranı'},{n:'SAÇ',v:hair,h:'F+M kesintisiz gün sayısı (30 gün = %100)'},{n:'GÖĞÜS',v:chest,h:'son 14 günde ağırlık günü (6 gün = %100)'},{n:'GÖBEK',v:belly,h:'genel ilerleme: iyi yemek, su, antrenman, kilo düşüşü'}]; }
+const LINES=["Bugün kimse görmüyor. Altı ay sonra herkes görecek.","Aynadaki adam hâlâ pazarlık yapıyor. Sen pazarlığı bitirdin.","Kolay olsaydı zaten olurdun.","Disiplin, motivasyon bittikten sonra kalan şeydir.","Bir öğün seni şişman yapmaz — bir öğün seni bırakan adam yapar.","Su iç. Yüzün yarın sana teşekkür edecek.","Kimse gelip seni kurtarmayacak. İyi haber: gerek yok.","Acı şimdi, pişmanlık ömür boyu.","Yarın \"dün başlamalıydım\" demek istemiyorsan bugün başla.","Vücudun son 60 günde ne yaptığının fotoğrafı.","Küçük şeyler küçük değil. Hepsi bu.","Sıkıcı olan şey işe yarar. Heyecanlı olan satılık.","Zayıf halin senden razı olurdu. Onu dinlemiyoruz.","Kendine verdiğin sözü tutan adam her şeyi tutar.","Şu an canın istemiyor. Zaten mesele o.","Zirvedeki adam da bugün canı istemeden yaptı.","Tek bir gün her şeyi değiştirmez; her gün değiştirir.","Yağ inatçı değil, sen kararsızdın.","Bahaneler kilo tutuyor.","Aç kalmak değil, net olmak.","Uyku da antrenmandır. Kapat telefonu.","Kas yavaş gelir, ün hemen. Kası seç.","Bugünün 1%'i, altı ayın bambaşka adamı.","Yediğin şeyi sen seçiyorsun; sonucu değil.","Sonuç istiyorsan sonuç getiren şeyi yap. Hepsi bu.","Hiç kimse ortalama olmaya çalışarak ortalama olmadı.","Şu seri var ya — onu kırmak için bir sebep bulma.","Vazgeçmek de bir alışkanlık. Onu da bırak.","İyi görünmek yan etki. Asıl olan kontrol.","Kendine acıma ve ilerleme aynı anda olmuyor.","Bugün 3/3. Basit. Git yap.","Rahatlık, potansiyelin mezarı.","Kararlarının toplamı sensin, niyetlerinin değil.","Aynaya bakma; 60 gün sonra bak.","Herkes aynı 24 saate sahip. Fark burada başlıyor.","Yarın yine aynı bahaneyi mi duyacağım?","Terlemeyen adam değişmiyor.","Zor günde tutunan adam, kolay günde kazanır.","Şimdi kaydır. Düşünme.","Alev sönmüyor — sen besliyorsun."];
+let tkI=Math.floor(Math.random()*LINES.length), tkFlip=false, tkTimer=null;
+function tickerStep(){ const el=$(tkFlip?'tk2':'tk1'); tkFlip=!tkFlip; el.classList.remove('run'); void el.offsetWidth;
+  const p=clamp(st.fit/100,0,1); el.textContent=LINES[tkI%LINES.length]; tkI++;
+  el.style.bottom=(8+Math.random()*14)+'%'; el.style.fontSize=(15+p*5).toFixed(1)+'px'; el.classList.add('run'); }
+function startTicker(){ if(tkTimer) return; tickerStep(); tkTimer=setInterval(tickerStep,2600); }
 let curFit=st.fit;
 function drawFire(p){ p=clamp(p,0,1); const s=.45+p*.9; ['fla','flb','flc'].forEach(id=>$(id).style.setProperty('--s',s.toFixed(3))); $('fire').style.setProperty('--glow',p); $('lvlPct').textContent=Math.round(p*100); $('lvlTxt').textContent=LVLTXT(p);
   $('embers').style.opacity=clamp(p*1.4,.15,1); }
 function setFit(f,animate=true){ f=clamp(f,0,100); const from=curFit; curFit=f; if(!animate){ drawFire(f/100); return; } const t0=performance.now(); (function step(now){ const k=Math.min(1,(now-t0)/700), e=1-Math.pow(1-k,3); drawFire(L(from,f,e)/100); if(k<1) requestAnimationFrame(step); })(t0); }
-function drawMeters(){ const ms=meters(); $('meters').innerHTML=ms.map((m,i)=>`<div class="mt" data-i="${i}"><small>${m.n}</small><b>${m.v}%</b><i style="--p:${m.v}%"></i></div>`).join('');
-  [...$('meters').children].forEach(el=>el.onclick=ev=>{ ev.stopPropagation(); const m=ms[+el.dataset.i]; word(`${m.n} %${m.v}`,'big'); setTimeout(()=>{ const w=document.createElement('div'); w.className='word cool'; w.style.cssText='font-size:15px;white-space:normal;max-width:280px;margin-top:80px'; w.textContent=m.h; $('rise').appendChild(w); setTimeout(()=>w.remove(),2300); },150); sTick(); }); }
 
 // ================= HOME RENDER =================
 function slotEntry(id){ const td=today(); const e=td.find(x=>x.slot===id); if(e) return e; const un=td.filter(x=>!x.slot); const idx=MAIN.findIndex(s=>s.id===id); const taken=MAIN.slice(0,idx).filter(s=>!td.some(x=>x.slot===s.id)).length; return un[taken]||null; }
@@ -532,7 +530,7 @@ function render(){
   const l=document.createElement('div'); l.className='slot lift'+(lf.length?' done':''); l.innerHTML=`<span>🏋️ Ağırlık</span><b>${lf.length?`✓ ${Math.round(lf.reduce((a,b)=>a+b.min,0))} dk`:liftDays(7)+'/3 hafta'}</b>`; l.onclick=()=>go('cardio'); ar.appendChild(l);
   const c=document.createElement('div'); c.className='slot cardio'+(cd.length?' done':''); c.innerHTML=`<span>🏃 Kardiyo</span><b>${cd.length?`✓ ${Math.round(cd.reduce((a,b)=>a+b.kcal,0))} kcal`:'başla →'}</b>`; c.onclick=()=>go('cardio'); ar.appendChild(c);
   $('hintL').textContent=st.cheats>0?`← serbest kart ×${st.cheats}`:'← kötü'; $('snd').classList.toggle('on',st.sound); $('sndT').textContent=st.sound?'ses açık':'ses kapalı';
-  waterLabel(); drawMeters(); }
+  waterLabel(); }
 function go(pg){ document.querySelector(`nav button[data-pg="${pg}"]`).click(); }
 
 // ================= SWIPE =================
@@ -737,7 +735,8 @@ function reportHTML(){ const lw=st.weights[st.weights.length-1], goal=parseFloat
   const wrows=st.weights.slice(-12).map(w=>`<tr><td>${new Date(w.t).toLocaleDateString('tr-TR')}</td><td><b>${w.kg.toFixed(1)} kg</b></td></tr>`).join('');
   const srows=st.sessions.slice(-12).reverse().map(x=>{ const md=MODES.find(m=>m.id===x.type)||{n:x.type,e:''}; return `<tr><td>${fmtD(new Date(x.t))}</td><td>${md.e} ${md.n}</td><td>${Math.round(x.min)} dk</td><td><b>${Math.round(x.kcal)} kcal</b></td></tr>`; }).join('');
   const kpi=(v,l)=>`<div style="background:#fff;border:1px solid #E6E8E1;border-radius:14px;padding:12px 14px"><div style="font-size:24px;font-weight:800;letter-spacing:-.04em">${v}</div><div style="font-size:11px;font-weight:700;color:#7A7F87">${l}</div></div>`;
-  const mtr=meters().map(m=>`<div style="flex:1"><div style="font-size:10px;font-weight:800;color:#7A7F87;letter-spacing:.04em">${m.n}</div><div style="font-size:22px;font-weight:800">${m.v}%</div><div style="height:5px;border-radius:3px;background:#E6E8E1;overflow:hidden"><div style="height:100%;width:${m.v}%;background:#C6F53A"></div></div></div>`).join('');
+  const wDays=[0,1,2].map(i=>dayStart()-i*864e5).filter(ds=>inDay(st.water,ds).length>=2).length;
+  const mtr=[{n:'ALEV',v:Math.round(st.fit)},{n:'F+M SERİ',v:actStreak('pills'),u:' gün'},{n:'AĞIRLIK / 14 GÜN',v:liftDays(14),u:' gün'},{n:'SU 2L+ / 3 GÜN',v:wDays,u:' gün'}].map(m=>`<div style="flex:1"><div style="font-size:10px;font-weight:800;color:#7A7F87;letter-spacing:.04em">${m.n}</div><div style="font-size:22px;font-weight:800">${m.v}${m.u||'%'}</div></div>`).join('');
   return `<div id="rep" style="width:794px;background:#F5F6F1;font-family:Manrope,system-ui,sans-serif;color:#15171A;padding:0 0 30px">
    <div style="background:#15171A;color:#fff;padding:34px 40px;display:flex;align-items:center;gap:16px"><img src="icon-192.png" style="width:52px;height:52px;border-radius:14px"><div><div style="font-size:30px;font-weight:800;letter-spacing:.08em;line-height:1">YANSIN</div><div style="font-size:12px;color:#C9CDD4;font-weight:700;margin-top:6px">${`${st.name||''} ${st.lname||''}`.trim()||'Kişisel rapor'} · ${new Date().toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})}</div></div><div style="margin-left:auto;text-align:right"><div style="font-size:12px;color:#C9CDD4;font-weight:700">#60Challenge</div><div style="font-size:34px;font-weight:800;letter-spacing:-.04em;line-height:1">Gün ${dayN}<span style="color:#C6F53A;font-size:18px">/60</span></div></div></div>
    <div style="padding:26px 40px 0"><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">${kpi(`${tg}/${log.length}`,'iyi ana öğün')}${kpi(best,'en uzun seri')}${kpi(`${actStreak('pills')} gün`,'F+M serisi')}${kpi(`${st.water.length} L`,'toplam su')}${kpi(st.sessions.length,'antrenman')}${kpi(`${Math.round(st.sessions.reduce((a,b)=>a+b.kcal,0))}`,'kcal yakıldı')}${kpi(lw?`${lw.kg.toFixed(1)} kg`:'—',`kilo · hedef ${goal}`)}${kpi(`${RANKS[rankOf(xp())][1]}`,`${xp()} xp`)}</div>
@@ -784,8 +783,8 @@ function processDays(){ const firstT=Math.min(log[0]?log[0].t:Infinity, st.pills
   if(lost){ st.fit=clamp(st.fit-lost,0,100); setTimeout(()=>{ word(`−${lost} · ${missedDays} gün eksik kayıt`,'cool'); sBad(); vib(30); setFit(st.fit); },600); } save(); }
 
 // ================= BOOT =================
-processDays(); render(); setFit(st.fit,false); setInterval(()=>render(),30000); tickTimer();
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden){ processDays(); render(); tickTimer(); } });
+processDays(); render(); setFit(st.fit,false); startTicker(); setInterval(()=>render(),30000); tickTimer();
+document.addEventListener('visibilitychange',()=>{ if(document.hidden){ if(tkTimer){ clearInterval(tkTimer); tkTimer=null; } } else { processDays(); render(); tickTimer(); startTicker(); } });
 </script>
 </body>
 </html>
