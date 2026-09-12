@@ -49,6 +49,7 @@
   .slot b{display:block;font-size:13px;color:var(--ink);margin-top:1px;position:relative;letter-spacing:-.02em}
   .slot.good{background:var(--lime);border-color:var(--lime);color:var(--limedeep)} .slot.bad{background:var(--grey);border-color:var(--grey);color:#5B6068}
   .slot.cheat{background:var(--card);border-color:var(--ink)} .slot.now{border-color:var(--ink)} .slot.miss{opacity:.45}
+  .slot .kc{position:absolute;top:5px;right:7px;font-size:10px;font-weight:800;background:var(--ink);color:var(--lime);border-radius:7px;padding:1px 5px}
   .slot.snack{min-height:40px;padding:6px 9px;cursor:pointer} .slot.snack b{font-size:12px}
   #acts .slot{min-height:46px;padding:7px 10px;cursor:pointer} #acts .slot b{font-size:13px}
   .slot .fill{position:absolute;left:0;right:0;bottom:0;height:0;background:var(--pinkl);transition:height .05s linear}
@@ -207,7 +208,7 @@
   <section class="page on" id="pg-home">
     <header class="stats">
       <div class="stat s"><b id="streak">0</b>seri</div>
-      <div class="stat burn"><b id="burn">0</b>kcal yandı 🔥</div>
+      <div class="stat burn" style="text-align:center"><b id="burn">0</b>🔥 <span id="eaten">0</span> alınan</div>
       <div class="stat r"><b id="rate">—</b>bu hafta</div>
     </header>
     <div class="rank"><div class="name"><span id="rankName" style="color:var(--ink);font-size:14px;margin:0"></span><span id="xpTxt"></span></div><div class="bar"><i id="xpBar"></i></div></div>
@@ -289,6 +290,7 @@
     <div><h3>Tarih / kg</h3><svg id="wchart" viewBox="0 0 340 150" preserveAspectRatio="none"></svg></div>
     <div class="wlist" id="wlist"></div>
     <div class="boost"><div><b>Motivasyon boost</b><span>şifreli · kötü günler için</span></div><button class="pillb dark" id="boostBtn">Aç</button></div>
+    <div class="boost" style="background:#1C1F24"><div><b>🧠 Nocebo</b><span>korku semptom üretir · 8 kart</span></div><button class="pillb" id="nocBtn">Oku</button></div>
     <div><h3>Aylık foto — ayda 4'e kadar</h3><p class="note" id="photoNote"></p><input type="file" id="photoIn" accept="image/*" style="display:none"><button class="pillb ghost sm" id="photoBtn" style="margin-top:8px">+ Foto ekle</button><div class="mon" id="gal" style="margin-top:12px"></div></div>
     <div><h3>Hatırlatıcılar</h3><p class="note">Saati değiştir, "Takvime" bas: iPhone Takvim'e günlük tekrarlayan alarm olarak eklenir. Anımsatıcılar'daki eskileri silmeyi unutma.</p><div id="rems" style="display:flex;flex-direction:column;gap:6px;margin-top:8px"></div></div>
   </section>
@@ -327,6 +329,12 @@
 </div>
 
 <!-- BOOST -->
+<div id="nsheet" class="sheet dark">
+  <div class="bprog" id="nprog"></div>
+  <div class="bimgwrap"><img id="nimg" alt=""></div>
+  <p id="ncap" class="note" style="color:#C9CDD4;font-size:14px"></p>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto"><button class="btn" id="nclose" style="color:#9AA0A8">kapat</button><button class="pillb" id="nnext">Sonraki →</button></div>
+</div>
 <div id="bsheet" class="sheet dark">
   <div id="bpin"><h2>Şifre</h2><p class="note" style="color:#9AA0A8">4 hane. Bu bölüm sadece senin için.</p><div class="pins" id="pins"><i></i><i></i><i></i><i></i></div><div class="pad" id="pad"></div><button class="btn" id="bclose0" style="color:#9AA0A8;align-self:center">vazgeç</button></div>
   <div id="bshow" style="display:none;flex-direction:column;gap:14px;flex:1;min-height:0">
@@ -438,6 +446,7 @@ function streakNow(){ let s=0; for(let i=log.length-1;i>=0;i--){ if(log[i].good)
 const actToday=k=>inDay(st[k],curDay).length>0;
 function actStreak(k){ let s=0, d=dayStart(); if(!actToday(k)) d-=864e5; while(st[k].some(t=>t>=d&&t<d+864e5)){ s++; d-=864e5; } return s; }
 const waterToday=()=>inDay(st.water,curDay).length;
+const eatenToday=()=>[...inDay(log,curDay).filter(e=>e.good||e.cheat),...inDay(st.snacks,curDay)].reduce((a,e)=>a+(e.kcal||0),0);
 const burnToday=()=>Math.round(inDay(st.sessions,dayStart()).reduce((a,b)=>a+b.kcal,0));
 const liftDays=(n)=>{ const from=dayStart()-(n-1)*864e5; return new Set(st.sessions.filter(s=>s.type==='lift'&&s.t>=from).map(s=>dayStart(new Date(s.t)))).size + new Set(st.lift.filter(t=>t>=from).map(t=>dayStart(new Date(t)))).size; };
 function dayScore(ds){ const meals=inDay(log,ds); const good=Math.min(3,meals.filter(e=>e.good).length); const pill=inDay(st.pills,ds).length>0?1:0; const water=inDay(st.water,ds).length>=2?1:0; return good+pill+water; }
@@ -496,7 +505,7 @@ function drawMeters(){ $('meters').innerHTML=meters().map(m=>`<div class="mt"><s
 function slotEntry(id){ const td=today(); const e=td.find(x=>x.slot===id); if(e) return e; const un=td.filter(x=>!x.slot); const idx=MAIN.findIndex(s=>s.id===id); const taken=MAIN.slice(0,idx).filter(s=>!td.some(x=>x.slot===s.id)).length; return un[taken]||null; }
 function render(){
   const w=thisWeek(); const good=w.filter(e=>e.good).length;
-  $('cnt').textContent=`${w.length} / 21`; $('rate').textContent=w.length?Math.round(good/w.length*100)+'%':'—'; $('streak').textContent=streakNow(); $('burn').textContent=burnToday();
+  $('cnt').textContent=`${w.length} / 21`; $('rate').textContent=w.length?Math.round(good/w.length*100)+'%':'—'; $('streak').textContent=streakNow(); $('burn').textContent=burnToday(); $('eaten').textContent=eatenToday()+' kcal';
   const g=$('grid'); g.innerHTML=''; const wsT=weekStart().getTime()+weekOff*7*864e5;
   for(let d=0;d<7;d++){ const ds=wsT+d*864e5; const meals=inDay(log,ds).slice(0,3); const pill=inDay(st.pills,ds).length>0, wl=inDay(st.water,ds).length; const tr=inDay(st.sessions,ds); const lf=tr.some(s=>s.type==='lift')||inDay(st.lift,ds).length>0, cd=tr.some(s=>s.type!=='lift')||inDay(st.cardio,ds).length>0;
     const col=document.createElement('div'); col.className='col'+(dayStart()===ds?' today':'')+(curDay===ds?' sel':'')+(ds>dayStart()?' fut':''); col.innerHTML=`<small>${DAYS[d]}${dayStart()===ds?'·':''}</small>`; if(ds<=dayStart()) col.onclick=()=>{ curDay=ds; render(); sTick(); vib(6); };
@@ -511,10 +520,10 @@ function render(){
   const now=new Date(), sl=$('slots'); sl.innerHTML='';
   MAIN.forEach(s=>{ const el=document.createElement('div'); el.className='slot'; const e=slotEntry(s.id); const due=new Date(); due.setHours(s.h,s.m,0,0);
     if(e) el.classList.add(e.good?'good':(e.cheat?'cheat':'bad')); else if(!isToday()) el.classList.add('miss'); else if(now>due&&now-due>3*36e5) el.classList.add('miss'); else if(Math.abs(now-due)<9e5) el.classList.add('now');
-    el.innerHTML=`${s.n}<b>${e?(e.plan?e.plan:(e.good?'iyi':(e.cheat?'serbest':'kötü'))):hhmm(s.h,s.m)}</b>`; sl.appendChild(el); });
+    el.innerHTML=`${s.n}<b>${e?(e.plan?e.plan:(e.good?'iyi':(e.cheat?'serbest':'kötü'))):hhmm(s.h,s.m)}</b>${e&&e.kcal?`<span class="kc">${e.kcal}</span>`:''}`; if(e) el.onclick=()=>askKcal(e,s.n); sl.appendChild(el); });
   // snacks
   const sn=$('snacks'); sn.innerHTML='';
-  SNK.forEach(s=>{ const el=document.createElement('div'); el.className='slot snack'; const e=inDay(st.snacks,curDay).find(x=>x.slot===s.id); if(e) el.classList.add('good'); el.innerHTML=`${s.n}<b>${e?(e.plan||'✓ +8 xp'):hhmm(s.h,s.m)}</b>`; el.onclick=()=>toggleSnack(s.id); sn.appendChild(el); });
+  SNK.forEach(s=>{ const el=document.createElement('div'); el.className='slot snack'; const e=inDay(st.snacks,curDay).find(x=>x.slot===s.id); if(e) el.classList.add('good'); el.innerHTML=`${s.n}<b>${e?(e.plan||'✓'):hhmm(s.h,s.m)}</b>${e&&e.kcal?`<span class="kc">${e.kcal}</span>`:''}`; el.onclick=()=>{ if(e) askKcal(e,s.n); else toggleSnack(s.id); }; sn.appendChild(el); });
   // acts
   const ar=$('acts'); ar.innerHTML='';
   const pl=document.createElement('div'); pl.className='slot'; pl.id='pill'; const pd=actToday('pills'); if(pd) pl.classList.add('done'); pl.innerHTML=`<div class="fill"></div><span>💊 F+M</span><b>${pd?`✓ ${actStreak('pills')} gün`:'basılı tut'}</b><span class="q" id="fmq">?</span>`; ar.appendChild(pl); bindPill(pl); pl.querySelector('#fmq').addEventListener('click',ev=>{ ev.stopPropagation(); $('calm').classList.add('open'); vib(10); });
@@ -566,6 +575,7 @@ $('redo').onclick=()=>{ const r=redo.pop(); if(!r) return; if(r.k==='meal'){ log
 $('snd').onclick=()=>{ st.sound=!st.sound; save(); render(); if(st.sound){ unlock(); sTick(); } };
 
 // ================= ARA ÖĞÜN =================
+function askKcal(e,label){ const v=prompt(`${label} — kaç kcal?`+(e.plan?` (${e.plan})`:''), e.kcal||''); if(v===null) return; const n=parseInt(v,10); if(isNaN(n)||n<0){ delete e.kcal; } else e.kcal=n; save(); render(); if(!isNaN(n)&&n>0){ sTick(); vib(8); } }
 function toggleSnack(slot,plan=null){ const i=st.snacks.findIndex(x=>x.t>=curDay&&x.t<curDay+864e5&&x.slot===slot); if(i>=0){ st.snacks.splice(i,1); save(); render(); word('ara öğün kaldırıldı','cool'); vib(10); return; }
   redo=[]; st.snacks.push({t:stamp(),slot,plan}); sortT(st.snacks); save(); render(); const el=[...$('snacks').children][SNK.findIndex(s=>s.id===slot)]; const r=el.getBoundingClientRect(); burst(50,LIME,r.left+r.width/2,r.top,3,6); sGood(); vib([20,30]); word('ARA ÖĞÜN · metabolizma açık · +8 xp','big'); }
 
@@ -754,6 +764,14 @@ $('calmClose').onclick=()=>{ $('calm').classList.remove('open'); sGood(); word('
   $('bnext').onclick=()=>{ if(idx<slides.length-1){ idx++; show(); } else close(true); };
   function close(fin){ $('bsheet').classList.remove('open'); $('bpin').style.display=''; $('bshow').style.display='none'; if(slides) slides.forEach(sl=>sl.url&&URL.revokeObjectURL(sl.url)); slides=null; if(fin) bigShow('GİT YAP'); }
   $('bclose').onclick=()=>close(false); $('bclose0').onclick=()=>close(false); $('boostBtn').onclick=()=>{ pin=''; draw(); $('bsheet').classList.add('open'); }; })();
+
+
+// ================= NOCEBO =================
+(function(){ const CAP=['Nazar gerçek mi, şehir efsanesi mi?','Torino Üniversitesi nörobilimcisi Fabrizio Benedetti yıllarını nocebo etkisine adadı.','Nocebo, plasebonun tersi: zarar vereceğine inandığın şey bedeni gerçekten hastalandırıyor.','Zararsız bir madde "ağrı yapacak" denilince, beyinde gerçek ağrı sinyalleri ölçüldü.','"Nazar değdi" diyen biri bu mekanizmayı tetikliyor: kötü niyete inanmak stres hormonunu yükseltiyor.','Yükselen kortizol bağışıklığı zayıflatıyor; baş ağrısı, halsizlik, gerçek fiziksel belirtiler çıkabiliyor.','Nazar boncuğu takan biri iyi hissediyorsa tesadüf değil — beklenti beyni ve bedeni değiştiriyor.','Belki de en güçlü ilaç zihnimizdir. Neye inandığın, ne olacağını belirliyor.'];
+  let i=0; const show=()=>{ $('nprog').innerHTML=CAP.map((_,k)=>`<i class="${k<=i?'on':''}"></i>`).join(''); const im=$('nimg'); im.src=''; requestAnimationFrame(()=>im.src=`nocebo/${i+1}.jpg`); $('ncap').textContent=CAP[i]; $('nnext').textContent=i===CAP.length-1?'Anladım, kapat':'Sonraki →'; sTick(); };
+  $('nocBtn').onclick=()=>{ i=0; show(); $('nsheet').classList.add('open'); vib(8); };
+  $('nnext').onclick=()=>{ if(i<CAP.length-1){ i++; show(); } else { $('nsheet').classList.remove('open'); bigShow('KORKU DEĞİL, TEKRAR'); } };
+  $('nclose').onclick=()=>$('nsheet').classList.remove('open'); })();
 
 // ================= GÜN SONU / HAFTA =================
 function processDays(){ const firstT=Math.min(log[0]?log[0].t:Infinity, st.pills[0]||Infinity, st.water[0]||Infinity); if(!isFinite(firstT)) return; const first=dayStart(new Date(firstT));
